@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="lr-cover" x1="10" y1="8" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="lr-page" x1="20" y1="14" x2="44" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="#0f1b33"/>
+  <path d="M13 14.5c6.3-2.5 12.2-1.8 19 2.2v33c-6.8-4-12.7-4.7-19-2.2z" fill="url(#lr-cover)"/>
+  <path d="M51 14.5c-6.3-2.5-12.2-1.8-19 2.2v33c6.8-4 12.7-4.7 19-2.2z" fill="url(#lr-page)"/>
+  <path d="M20 23.5h8M20 29h8M36 23.5h8M36 29h8M20 35h8M36 35h5" stroke="#1e3a8a" stroke-opacity=".48" stroke-width="2" stroke-linecap="round"/>
+  <path d="M14 50.5c6.4-3.1 12.3-3.2 18-.8 5.7-2.4 11.6-2.3 18 .8" fill="none" stroke="#93c5fd" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M42.5 41.5l7 7" stroke="#fbbf24" stroke-width="4.2" stroke-linecap="round"/>
+  <circle cx="39.2" cy="38.2" r="7.2" fill="none" stroke="#fbbf24" stroke-width="4.2"/>
+</svg>

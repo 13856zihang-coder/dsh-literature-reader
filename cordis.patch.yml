@@ -1,0 +1,11 @@
+- insert:
+    - id: literature-reader
+      name: '@local/literature-reader'
+      config:
+        dataDir: 'D:/DSH-Literature'
+        obsidianVault: 'D:/note'
+        notesFolder: '文献阅读'
+        wordNote: '英文单词'
+        autoOpenObsidian: true
+        # 留空表示跟随所选模型的默认档位；面板里的选择优先于这一项。
+        reasoningEffort: ''
