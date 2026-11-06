@@ -151,16 +151,24 @@ window.__ModuleLoader__.load({
       analysisOpen: '查看',
       analysisMissing: '还没有生成阅读备忘',
       readingDigest: '阅读摘要',
-      summaryReady: '学习总结已就绪',
+      summaryReady: '总结已就绪',
       readingHint: 'AI 正在阅读全文，完成后即可提问、翻译或生成总结。',
       starter1: '用三句话概括这篇文献',
       starter2: '解释 Figure 1 的物理含义',
       starter3: '这篇工作最重要的局限是什么？',
       vaultKicker: 'OBSIDIAN VAULT',
-      summaryRunning: '正在生成学习总结…',
-      summaryDone: '学习总结已生成',
+      summaryRunning: '正在生成总结…',
+      summaryPreparing: '正在检查需要解释的术语…',
+      glossaryTitle: '这些词要收进「名词解释」吗？',
+      glossaryIntro: 'AI 判断不了它们是不是这篇文献的专业术语，请你确认。',
+      glossarySelectAll: '全选',
+      glossarySelectNone: '全不选',
+      glossaryStart: '开始生成',
+      glossaryCancel: '取消',
+      glossaryIncluded: '另有 {count} 条已确定收录',
+      summaryDone: '总结已生成',
       summaryFailed: '总结生成失败',
-      summaryPreview: '学习总结',
+      summaryPreview: '总结',
       openObsidian: '在 Obsidian 中打开',
       writingObsidian: '正在写入 Obsidian…',
       imported: '已导入，正在后台解析',
@@ -174,7 +182,7 @@ window.__ModuleLoader__.load({
       analysisWarning: 'AI 通读未完成',
       retryRead: '重新通读',
       pageOf: '页',
-      summaryExists: '这篇文献已经有总结，重新生成会覆盖同一个笔记文件。继续吗？',
+      summaryExists: '这篇文献已经有总结，重新生成会覆盖同一个文件。继续吗？',
       annotateSaved: '批注已保存',
       summaryWritten: '已写入 Obsidian',
       wordSaved: '已记录到「{note}」第 {number} 条',
@@ -184,7 +192,7 @@ window.__ModuleLoader__.load({
       wordDuplicateSection: '收录在「{section}」这一节。',
       wordDuplicateHint: '如果这是另一个语境下的用法，可以先在 Obsidian 中确认，再手动补充。',
       wordRecordError: '记录到 Obsidian 失败：{message}',
-      notePath: '笔记',
+      notePath: '总结文件',
       copied: '已复制',
       readAnalysis: '阅读备忘',
       emptyChat: '读到哪里，问到哪里。',
@@ -239,6 +247,150 @@ window.__ModuleLoader__.load({
       fontSizeLarge: '大',
       fontSizeHuge: '特大',
       modelNeedsRestart: '模型选择需要重启 DSH 宿主后才会生效。已刷新页面但宿主仍在运行旧版本。',
+      noteLoading: '正在加载总结…',
+      noteLoadFailed: '总结加载失败',
+      noteBack: '返回阅读',
+      noteOpen: '速览总结',
+      import: '导入 PDF',
+      chevronLeft: '上一页',
+      chevronRight: '下一页',
+      noteMore: '更多',
+      noteKind: '速览总结 · 快速回顾',
+      noteWordCount: '{count} 字',
+      notePreviewTab: '预览',
+      noteEditorTab: '编辑',
+      noteSaving: '保存中…',
+      noteSaved: '已保存',
+      noteUnsaved: '未保存',
+      noteSaveFailedShort: '保存失败',
+      noteSaveFailed: '保存失败，请稍后重试',
+      noteReloaded: '已重新载入最新正文',
+      noteLeaveBody: '还有未保存的修改，确定离开总结吗？',
+      noteLeaveEditBody: '还有未保存的修改，确定退出编辑吗？',
+      noteConflictBody: '正文已被修改（可能是 Obsidian 里保存过）。选择覆盖保存，或重新载入最新内容。',
+      noteConflictOverwrite: '覆盖保存',
+      noteConflictReload: '重新载入',
+      noteGenerate: '生成速览总结',
+      noteEmptyBody: '这篇文献还没有总结',
+      noteEmptyHint: '总结用于快速回顾，生成后可以选中任意一段写下标注，再让 AI 按标注修订。',
+      noteVaultBanner: '这个笔记在 Obsidian 里被修改过（{time}），当前显示的是插件里的版本。继续保存会覆盖 Obsidian 的修改。',
+      noteVaultView: '查看 Obsidian 版本',
+      noteVaultTitle: 'Obsidian 里的版本',
+      noteVaultReadOnly: '只读预览。本插件的历史版本只包含本地正文，不含 Obsidian 侧的手写内容——如需保留请先复制。',
+      noteVaultCopy: '复制全文',
+      noteVaultCopied: '已复制到剪贴板',
+      noteVaultCopyFailed: '复制失败，请手动选择文本',
+      noteVaultLoadFailed: '读取 Obsidian 版本失败',
+      noteVaultMissing: 'Obsidian 里找不到这份笔记，可能已在外部删除',
+      noteVaultOverwritten: '已保存。你之前在 Obsidian 的修改已被覆盖——本插件的历史版本只包含本地内容，不包含 Obsidian 侧的手写部分。',
+      noteEditorHint: 'Ctrl/Cmd + S 保存',
+      noteEditorWords: '{count} 字',
+      noteEditorCancel: '退出编辑',
+      noteEditorDraft: '检测到未提交的草稿',
+      noteEditorDraftRestore: '恢复草稿',
+      noteEditorDraftDiscard: '丢弃',
+      noteAnnotate: '标注',
+      noteAnnColor: '颜色',
+      noteAnnPlaceholder: '写下你的意见：哪里不清楚、哪里要补充、哪里要改…',
+      noteAnnNeedNote: '请先写一句意见，再保存标注',
+      noteAnnSave: '保存标注',
+      noteAnnSaved: '标注已保存',
+      noteAnnEdit: '编辑标注',
+      noteAnnDelete: '删除',
+      noteAnnDeleted: '标注已删除',
+      noteAnnDeleteConfirm: '确定删除这条标注吗？',
+      noteAnnSaveFailed: '标注保存失败',
+      noteAnnFailedLocate: '这段文字已无法定位，请重新选择',
+      noteAnnSelectFirst: '请先在正文中选择一段文字',
+      noteAnnShortcut: 'Ctrl/Cmd + Enter 保存，Esc 取消',
+      noteAnnCount: '标注',
+      noteAnnOpen: '待应用',
+      noteAnnResolved: '已应用',
+      noteAnnOrphan: '已失效',
+      noteAnnEmpty: '还没有标注',
+      noteAnnEmptyHint: '选中一句话，写下你的标注。',
+      noteAnnLocate: '定位',
+      noteAnnReply: 'AI 说明',
+      noteAnnPanelToggle: '标注栏',
+      noteAnnExpandAll: '展开全部',
+      noteAnnCollapseAll: '收起全部',
+      noteAnnLost: '有 {count} 条标注因正文变化而失效',
+      noteColorAmber: '琥珀',
+      noteColorRose: '玫红',
+      noteColorSky: '天蓝',
+      noteColorMint: '薄荷',
+      noteStatusOpen: '待应用',
+      noteStatusResolved: '已应用',
+      noteStatusOrphan: '已失效',
+      noteCalloutAbstract: '摘要',
+      noteCalloutFigure: '图',
+      noteCalloutWarning: '注意',
+      noteCalloutQuestion: '问题',
+      noteCalloutTip: '提示',
+      noteCalloutInfo: '说明',
+      noteApply: '应用修改',
+      noteApplyPending: '{count} 条标注待应用',
+      noteApplyHint: '不会自动修改，确认后再点应用',
+      noteApplyInstruction: '补充要求（可选），例如：第 5 节讲得更细一点',
+      noteApplying: '正在按你的标注修改…',
+      noteApplyingFigure: '正在补图 {index}/{total}…',
+      noteApplyDone: '已应用 {count} 条标注',
+      noteApplyUnresolved: '已应用 {applied} 条，{unresolved} 条 AI 未能应用',
+      noteApplyFailed: '修订失败，请稍后重试',
+      noteInsertImage: '插图',
+      noteInsertTitle: '插入图片',
+      noteInsertUpload: '上传图片',
+      noteInsertCrop: '从 PDF 截取',
+      noteInsertPickFile: '选择图片（PNG / JPEG）',
+      noteInsertPreview: '预览',
+      noteInsertPage: '第 {page} / {total} 页',
+      noteInsertPrevPage: '上一页',
+      noteInsertNextPage: '下一页',
+      noteInsertDragHint: '在页面上拖动框选要插入的区域',
+      noteInsertLoadingPage: '正在加载页面…',
+      noteInsertNoRegion: '请先在页面上框选区域',
+      noteInsertPosition: '插入位置',
+      noteInsertPosAuto: '让 AI 判断',
+      noteInsertPosSection: '指定章节',
+      noteInsertPosCursor: '当前光标处',
+      noteInsertCursorHint: '插入到编辑区光标处；没定位到光标时放在正文末尾。',
+      noteInsertInstruction: '告诉我放哪里；不确定的话我会问你',
+      noteInsertSubmit: '插入',
+      noteInserting: '插入中…',
+      noteInsertFailed: '插图失败，请稍后重试',
+      noteInsertTypeBad: '只支持 PNG 或 JPEG 图片',
+      noteInsertTooLarge: '图片不能超过 8 MB',
+      noteInserted: '图片已插入正文',
+      noteQuestionTitle: '这张图放在哪里更合适？',
+      noteQuestionRound: '第 {round} 轮',
+      noteQuestionAnswerPlaceholder: '回答上面的问题，AI 会据此决定插入位置…',
+      noteQuestionSubmit: '回答并插入',
+      noteQuestionForce: '让 AI 直接决定',
+      noteQuestionFailed: '处理回答失败，请稍后重试',
+      noteFixFigures: '补全插图',
+      noteFiguresRunning: '正在按占位符补图…',
+      noteFiguresProgress: '补图中 {index}/{total}',
+      noteFiguresDone: '已插入 {created} 张图片，{failed} 张失败',
+      noteFiguresFailed: '补图失败，请稍后重试',
+      noteNoPlaceholders: '当前总结没有待插入的图片',
+      noteHistory: '历史',
+      noteHistoryTitle: '历史版本',
+      noteHistoryLoading: '正在加载历史…',
+      noteHistoryEmpty: '还没有历史版本',
+      noteHistoryFailed: '历史版本加载失败',
+      noteHistoryChars: '{count} 字',
+      noteHistoryPreview: '预览',
+      noteHistoryPreviewTitle: '历史版本预览',
+      noteHistoryPreviewReadOnly: '只读预览，恢复后才会替换正文',
+      noteHistoryRestore: '恢复',
+      noteHistoryRestoreConfirm: '恢复这个版本会覆盖当前正文（当前正文会先存为历史），确定吗？',
+      noteHistorySourceAuto: '自动生成',
+      noteHistorySourceManual: '手动保存',
+      noteHistorySourceRevision: '按标注修订',
+      noteHistorySourceRestore: '恢复',
+      noteHistorySourceUnknown: '其他',
+      noteRestoreDone: '已恢复历史版本',
+      noteRestoreFailed: '恢复失败，请稍后重试',
     }
     const en = {
       panel: 'Literature Reader',
@@ -328,7 +480,7 @@ window.__ModuleLoader__.load({
       busyMoveBlocked: 'A paper is being processed; try moving it afterwards',
       deletedOk: 'Deleted',
       emptyTitle: 'Turn papers into your own knowledge',
-      emptyDesc: 'Import a PDF and the AI reads it first. Select any passage to ask, draw on the page, then generate a tagged Obsidian study note.',
+      emptyDesc: 'Import a PDF and the AI reads it first. Select any passage to ask, draw on the page, then generate a tagged Obsidian summary.',
       emptyImport: 'Import your first paper',
       featureRead: 'Read first',
       featureReadDesc: 'The AI studies the full text, formulas and findings in the background.',
@@ -383,10 +535,18 @@ window.__ModuleLoader__.load({
       starter2: 'Explain the meaning of Figure 1',
       starter3: 'What is the biggest limitation of this work?',
       vaultKicker: 'OBSIDIAN VAULT',
-      summaryRunning: 'Writing study summary…',
-      summaryDone: 'Study summary ready',
+      summaryRunning: 'Writing summary…',
+      summaryPreparing: 'Checking which terms need explaining…',
+      glossaryTitle: 'Include these terms in the glossary?',
+      glossaryIntro: "The AI couldn't tell whether these are technical terms from this paper — please confirm.",
+      glossarySelectAll: 'Select all',
+      glossarySelectNone: 'Select none',
+      glossaryStart: 'Start generating',
+      glossaryCancel: 'Cancel',
+      glossaryIncluded: '{count} more are already confirmed',
+      summaryDone: 'Summary ready',
       summaryFailed: 'Could not generate summary',
-      summaryPreview: 'Study summary',
+      summaryPreview: 'Summary',
       openObsidian: 'Open in Obsidian',
       writingObsidian: 'Writing to Obsidian…',
       imported: 'Imported, parsing in the background',
@@ -400,7 +560,7 @@ window.__ModuleLoader__.load({
       analysisWarning: 'AI reading is incomplete',
       retryRead: 'Read again',
       pageOf: 'of',
-      summaryExists: 'This paper already has a summary. Regenerating will overwrite the same note. Continue?',
+      summaryExists: 'This paper already has a summary. Regenerating will overwrite the same file. Continue?',
       annotateSaved: 'Annotation saved',
       summaryWritten: 'Written to Obsidian',
       wordSaved: 'Added to “{note}” as entry {number}',
@@ -410,7 +570,7 @@ window.__ModuleLoader__.load({
       wordDuplicateSection: 'Filed under “{section}”.',
       wordDuplicateHint: 'If it is used differently here, confirm in Obsidian and add a note there.',
       wordRecordError: 'Could not write to Obsidian: {message}',
-      notePath: 'Note',
+      notePath: 'Summary file',
       copied: 'Copied',
       readAnalysis: 'Reading notes',
       emptyChat: 'Ask from wherever you are reading.',
@@ -465,8 +625,919 @@ window.__ModuleLoader__.load({
       fontSizeLarge: 'Large',
       fontSizeHuge: 'Huge',
       modelNeedsRestart: 'The model picker needs a DSH host restart. The page reloaded but the host is still running the old version.',
+      noteLoading: 'Loading summary…',
+      noteLoadFailed: 'Could not load the summary',
+      noteBack: 'Back to reading',
+      noteOpen: 'Summary',
+      import: 'Import PDF',
+      chevronLeft: 'Previous page',
+      chevronRight: 'Next page',
+      noteMore: 'More',
+      noteKind: 'Quick-recall summary',
+      noteWordCount: '{count} chars',
+      notePreviewTab: 'Preview',
+      noteEditorTab: 'Edit',
+      noteSaving: 'Saving…',
+      noteSaved: 'Saved',
+      noteUnsaved: 'Unsaved',
+      noteSaveFailedShort: 'Save failed',
+      noteSaveFailed: 'Could not save, please try again',
+      noteReloaded: 'Reloaded the latest note',
+      noteLeaveBody: 'You have unsaved changes. Leave the summary anyway?',
+      noteLeaveEditBody: 'You have unsaved changes. Leave the editor anyway?',
+      noteConflictBody: 'The note changed elsewhere (maybe saved from Obsidian). Overwrite it, or reload the latest version.',
+      noteConflictOverwrite: 'Overwrite',
+      noteConflictReload: 'Reload',
+      noteGenerate: 'Generate summary',
+      noteEmptyBody: 'This paper has no summary yet',
+      noteEmptyHint: 'A summary is for quick recall. Once generated, select any passage to annotate it and let the AI revise from your notes.',
+      noteVaultBanner: 'This note was edited in Obsidian ({time}). Saving here will overwrite those edits.',
+      noteVaultView: 'View Obsidian version',
+      noteVaultTitle: 'Version in Obsidian',
+      noteVaultReadOnly: 'Read-only preview. Version history only covers the local copy, not text written directly in Obsidian — copy anything you want to keep.',
+      noteVaultCopy: 'Copy all',
+      noteVaultCopied: 'Copied to clipboard',
+      noteVaultCopyFailed: 'Could not copy, please select the text manually',
+      noteVaultLoadFailed: 'Could not read the Obsidian version',
+      noteVaultMissing: 'The note is missing from Obsidian; it may have been deleted there',
+      noteVaultOverwritten: 'Saved. Your earlier Obsidian edits were overwritten — version history only covers the local copy, not text written directly in Obsidian.',
+      noteEditorHint: 'Ctrl/Cmd + S to save',
+      noteEditorWords: '{count} chars',
+      noteEditorCancel: 'Exit editor',
+      noteEditorDraft: 'Unsubmitted draft found',
+      noteEditorDraftRestore: 'Restore draft',
+      noteEditorDraftDiscard: 'Discard',
+      noteAnnotate: 'Annotate',
+      noteAnnColor: 'Colour',
+      noteAnnPlaceholder: 'What is unclear, missing, or wrong here?',
+      noteAnnNeedNote: 'Write a short comment before saving',
+      noteAnnSave: 'Save annotation',
+      noteAnnSaved: 'Annotation saved',
+      noteAnnEdit: 'Edit annotation',
+      noteAnnDelete: 'Delete',
+      noteAnnDeleted: 'Annotation deleted',
+      noteAnnDeleteConfirm: 'Delete this annotation?',
+      noteAnnSaveFailed: 'Could not save the annotation',
+      noteAnnFailedLocate: 'That text can no longer be located, please select it again',
+      noteAnnSelectFirst: 'Select some text in the note first',
+      noteAnnShortcut: 'Ctrl/Cmd + Enter to save, Esc to cancel',
+      noteAnnCount: 'Annotations',
+      noteAnnOpen: 'To apply',
+      noteAnnResolved: 'Applied',
+      noteAnnOrphan: 'Lost',
+      noteAnnEmpty: 'No annotations yet',
+      noteAnnEmptyHint: 'Select a sentence and leave your annotation.',
+      noteAnnLocate: 'Locate',
+      noteAnnReply: 'AI note',
+      noteAnnPanelToggle: 'Annotations',
+      noteAnnExpandAll: 'Expand all',
+      noteAnnCollapseAll: 'Collapse all',
+      noteAnnLost: '{count} annotations were lost because the note changed',
+      noteColorAmber: 'Amber',
+      noteColorRose: 'Rose',
+      noteColorSky: 'Sky',
+      noteColorMint: 'Mint',
+      noteStatusOpen: 'To apply',
+      noteStatusResolved: 'Applied',
+      noteStatusOrphan: 'Lost',
+      noteCalloutAbstract: 'Abstract',
+      noteCalloutFigure: 'Figure',
+      noteCalloutWarning: 'Warning',
+      noteCalloutQuestion: 'Question',
+      noteCalloutTip: 'Tip',
+      noteCalloutInfo: 'Note',
+      noteApply: 'Apply changes',
+      noteApplyPending: '{count} annotations to apply',
+      noteApplyHint: 'Nothing changes until you apply.',
+      noteApplyInstruction: 'Extra request (optional), e.g. explain section 5 in more detail',
+      noteApplying: 'Applying your annotations…',
+      noteApplyingFigure: 'Adding figures {index}/{total}…',
+      noteApplyDone: 'Applied {count} annotations',
+      noteApplyUnresolved: 'Applied {applied}, {unresolved} could not be applied',
+      noteApplyFailed: 'Revision failed, please try again',
+      noteInsertImage: 'Insert image',
+      noteInsertTitle: 'Insert an image',
+      noteInsertUpload: 'Upload image',
+      noteInsertCrop: 'Crop from PDF',
+      noteInsertPickFile: 'Choose an image (PNG / JPEG)',
+      noteInsertPreview: 'Preview',
+      noteInsertPage: 'Page {page} / {total}',
+      noteInsertPrevPage: 'Previous page',
+      noteInsertNextPage: 'Next page',
+      noteInsertDragHint: 'Drag on the page to select the region',
+      noteInsertLoadingPage: 'Loading page…',
+      noteInsertNoRegion: 'Select a region on the page first',
+      noteInsertPosition: 'Placement',
+      noteInsertPosAuto: 'Let the AI decide',
+      noteInsertPosSection: 'After a section',
+      noteInsertPosCursor: 'At the cursor',
+      noteInsertCursorHint: 'Inserted at the editor cursor; falls back to the end of the note.',
+      noteInsertInstruction: 'Tell me where it goes; if unsure, I will ask you',
+      noteInsertSubmit: 'Insert',
+      noteInserting: 'Inserting…',
+      noteInsertFailed: 'Could not insert the image, please try again',
+      noteInsertTypeBad: 'Only PNG or JPEG images are supported',
+      noteInsertTooLarge: 'The image must be under 8 MB',
+      noteInserted: 'Image inserted into the note',
+      noteQuestionTitle: 'Where should this figure go?',
+      noteQuestionRound: 'Round {round}',
+      noteQuestionAnswerPlaceholder: 'Answer the question above and the AI will place the figure…',
+      noteQuestionSubmit: 'Answer and insert',
+      noteQuestionForce: 'Let the AI decide',
+      noteQuestionFailed: 'Could not use that answer, please try again',
+      noteFixFigures: 'Fill in figures',
+      noteFiguresRunning: 'Creating figures for placeholders…',
+      noteFiguresProgress: 'Figures {index}/{total}',
+      noteFiguresDone: 'Inserted {created} figures, {failed} failed',
+      noteFiguresFailed: 'Could not create the figures, please try again',
+      noteNoPlaceholders: 'This note has no figure placeholders',
+      noteHistory: 'History',
+      noteHistoryTitle: 'Version history',
+      noteHistoryLoading: 'Loading history…',
+      noteHistoryEmpty: 'No earlier versions yet',
+      noteHistoryFailed: 'Could not load the history',
+      noteHistoryChars: '{count} chars',
+      noteHistoryPreview: 'Preview',
+      noteHistoryPreviewTitle: 'Version preview',
+      noteHistoryPreviewReadOnly: 'Read-only preview; the note changes only after you restore',
+      noteHistoryRestore: 'Restore',
+      noteHistoryRestoreConfirm: 'Restoring this version replaces the current note (which is saved to history first). Continue?',
+      noteHistorySourceAuto: 'Generated',
+      noteHistorySourceManual: 'Manual save',
+      noteHistorySourceRevision: 'Revised from annotations',
+      noteHistorySourceRestore: 'Restored',
+      noteHistorySourceUnknown: 'Other',
+      noteRestoreDone: 'Version restored',
+      noteRestoreFailed: 'Could not restore that version, please try again',
     }
     let t = (key) => zh[key] || key
+
+// #region markdown-core
+const MD_FENCE_RE = /^ {0,3}(`{3,}|~{3,})[ \t]*([^`]*)$/
+const MD_CLOSING_FENCE_RE = /^ {0,3}(`{3,}|~{3,})[ \t]*$/
+const MD_HEADING_RE = /^ {0,3}(#{1,6})(?:[ \t]+(.*))?$/
+const MD_HR_RE = /^ {0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})$/
+const MD_QUOTE_LINE_RE = /^ {0,3}>[ ]?(.*)$/
+const MD_LIST_RE = /^( {0,3})([-*+]|\d{1,9}[.)])([ \t]+)(.*)$/
+const MD_IMAGE_RE = /^ {0,3}!\[([^\]]*)\]\(\s*([^)\s]+)(?:\s+["'][^"']*["'])?\s*\)\s*$/
+const MD_TABLE_DELIM_RE = /^ {0,3}\|?[ \t]*:?-+:?[ \t]*(?:\|[ \t]*:?-+:?[ \t]*)*\|?[ \t]*$/
+const MD_CALLOUT_RE = /^\[!([A-Za-z0-9_-]+)\]([+-])?[ \t]*(.*)$/
+const MD_CITE_RE = /^\[p\.\s*\d+(?:\s*[-–]\s*\d+)?\]/i
+const MD_FIGURE_LINE_RE = /^[ \t]*\[\[FIGURE:([\s\S]*?)\]\][ \t]*$/
+const MD_FIGURE_PAGE_RE = /^(?:p\.?\s*)?(\d+)$/i
+const MD_WS_RE = /[ \t\n\r\f\v]/
+
+function mdIsBlank(value) {
+  return /^[ \t]*$/.test(value)
+}
+
+function mdClip(value, limit) {
+  const text = typeof value === 'string' ? value : String(value === undefined || value === null ? '' : value)
+  return text.length > limit ? text.slice(0, limit) : text
+}
+
+// Split the normalised source into lines carrying absolute source offsets.
+function mdSplitLines(source) {
+  const lines = []
+  let index = 0
+  for (;;) {
+    const newline = source.indexOf('\n', index)
+    if (newline === -1) {
+      lines.push({ text: source.slice(index), start: index, end: source.length })
+      break
+    }
+    lines.push({ text: source.slice(index, newline), start: index, end: newline })
+    index = newline + 1
+  }
+  return lines
+}
+
+// Inline parser. `text` is a contiguous slice of the source that starts at
+// `base`, so every element keeps exact source offsets even after the markers
+// are stripped from the rendered text.
+function mdParseInline(value, base) {
+  const text = typeof value === 'string' ? value : ''
+  const offset = Number.isFinite(base) ? base : 0
+  const inline = []
+  let bufferStart = 0
+  let index = 0
+  const flush = (end) => {
+    if (end > bufferStart) {
+      inline.push({
+        type: 'text',
+        text: text.slice(bufferStart, end),
+        srcStart: offset + bufferStart,
+        srcEnd: offset + end,
+      })
+    }
+  }
+  while (index < text.length) {
+    const char = text[index]
+    if (char === '\\' && index + 1 < text.length) {
+      index += 2
+      continue
+    }
+    if (char === '`') {
+      const close = text.indexOf('`', index + 1)
+      if (close > index + 1) {
+        flush(index)
+        inline.push({
+          type: 'code',
+          text: text.slice(index + 1, close),
+          srcStart: offset + index + 1,
+          srcEnd: offset + close,
+        })
+        index = close + 1
+        bufferStart = index
+        continue
+      }
+    }
+    if (char === '*' || char === '_') {
+      const doubled = text[index + 1] === char
+      if (doubled) {
+        const close = text.indexOf(char + char, index + 2)
+        if (close > index + 1) {
+          flush(index)
+          inline.push({
+            type: 'strong',
+            text: text.slice(index + 2, close),
+            srcStart: offset + index + 2,
+            srcEnd: offset + close,
+          })
+          index = close + 2
+          bufferStart = index
+          continue
+        }
+      } else if (!(char === '_' && /[A-Za-z0-9]/.test(text[index + 1] || ''))) {
+        const close = text.indexOf(char, index + 1)
+        if (close > index + 1) {
+          flush(index)
+          inline.push({
+            type: 'em',
+            text: text.slice(index + 1, close),
+            srcStart: offset + index + 1,
+            srcEnd: offset + close,
+          })
+          index = close + 1
+          bufferStart = index
+          continue
+        }
+      }
+    }
+    if (char === '[') {
+      const cite = MD_CITE_RE.exec(text.slice(index))
+      if (cite) {
+        flush(index)
+        inline.push({
+          type: 'cite',
+          text: cite[0],
+          srcStart: offset + index,
+          srcEnd: offset + index + cite[0].length,
+        })
+        index += cite[0].length
+        bufferStart = index
+        continue
+      }
+      const close = text.indexOf(']', index + 1)
+      if (close > index && text[close + 1] === '(') {
+        const end = text.indexOf(')', close + 2)
+        if (end > close + 1) {
+          flush(index)
+          inline.push({
+            type: 'link',
+            text: text.slice(index + 1, close),
+            srcStart: offset + index + 1,
+            srcEnd: offset + close,
+            href: text.slice(close + 2, end),
+          })
+          index = end + 1
+          bufferStart = index
+          continue
+        }
+      }
+    }
+    index += 1
+  }
+  flush(text.length)
+  return inline
+}
+
+function mdLooksLikeTable(lines, at) {
+  if (at + 1 >= lines.length) return false
+  const header = lines[at].text
+  const delimiter = lines[at + 1].text
+  if (header.indexOf('|') === -1 || delimiter.indexOf('|') === -1) return false
+  return MD_TABLE_DELIM_RE.test(delimiter)
+}
+
+// Build the inline runs of a multi-line paragraph one line at a time. Parsing
+// the joined text in one slice would be cheaper, but quoted blocks are
+// reconstructed without their `> ` markers, so neighbouring lines are not
+// contiguous in the source. A synthetic newline element keeps the mapping
+// monotonic in both cases.
+function mdJoinLineInline(lines, from, to) {
+  const inline = []
+  for (let index = from; index < to; index += 1) {
+    if (index > from) {
+      const offset = lines[index - 1].end
+      inline.push({ type: 'text', text: '\n', srcStart: offset, srcEnd: offset + 1 })
+    }
+    for (const item of mdParseInline(lines[index].text, lines[index].start)) inline.push(item)
+  }
+  return inline
+}
+
+function mdStartsBlock(lines, at) {
+  const value = lines[at].text
+  if (mdIsBlank(value)) return true
+  if (MD_FENCE_RE.test(value)) return true
+  if (MD_HEADING_RE.test(value)) return true
+  if (MD_HR_RE.test(value)) return true
+  if (MD_QUOTE_LINE_RE.test(value)) return true
+  if (MD_IMAGE_RE.test(value)) return true
+  if (MD_LIST_RE.test(value)) return true
+  return mdLooksLikeTable(lines, at)
+}
+
+// Split one table row into trimmed cells that keep their source offsets.
+function mdSplitTableRow(line) {
+  const raw = line.text
+  const cells = []
+  let segmentStart = 0
+  let index = 0
+  const push = (from, to) => {
+    let left = from
+    let right = to
+    while (left < right && /[ \t]/.test(raw[left])) left += 1
+    while (right > left && /[ \t]/.test(raw[right - 1])) right -= 1
+    cells.push({ text: raw.slice(left, right), start: line.start + left })
+  }
+  while (index <= raw.length) {
+    if (index === raw.length || (raw[index] === '|' && raw[index - 1] !== '\\')) {
+      push(segmentStart, index)
+      segmentStart = index + 1
+    }
+    index += 1
+  }
+  if (cells.length > 0 && cells[0].text === '' && /^[ \t]*\|/.test(raw)) cells.shift()
+  if (cells.length > 0 && cells[cells.length - 1].text === '' && /\|[ \t]*$/.test(raw)) cells.pop()
+  return cells
+}
+
+// Translate every offset stored on a block (and its inline runs) through `map`.
+function mdShiftBlocks(blocks, map) {
+  const last = map.length - 1
+  const at = (position) => {
+    if (!Number.isFinite(position)) return map[0] || 0
+    const clamped = Math.max(0, Math.min(last, Math.trunc(position)))
+    return map[clamped]
+  }
+  const shiftInline = (inline) => {
+    if (!Array.isArray(inline)) return
+    for (const item of inline) {
+      if (!item) continue
+      item.srcStart = at(item.srcStart)
+      item.srcEnd = at(item.srcEnd)
+    }
+  }
+  for (const block of blocks) {
+    if (!block) continue
+    block.start = at(block.start)
+    block.end = at(block.end)
+    if (Number.isFinite(block.textStart)) block.textStart = at(block.textStart)
+    shiftInline(block.inline)
+    if (Array.isArray(block.items)) {
+      for (const item of block.items) {
+        if (!item) continue
+        item.start = at(item.start)
+        item.end = at(item.end)
+        shiftInline(item.inline)
+      }
+    }
+    if (Array.isArray(block.header)) {
+      for (const cell of block.header) shiftInline(cell)
+    }
+    if (Array.isArray(block.rows)) {
+      for (const row of block.rows) {
+        if (!Array.isArray(row)) continue
+        for (const cell of row) shiftInline(cell)
+      }
+    }
+    if (Array.isArray(block.blocks)) mdShiftBlocks(block.blocks, map)
+  }
+  return blocks
+}
+
+function mdParseBlocks(source) {
+  const lines = mdSplitLines(source)
+  const blocks = []
+  let index = 0
+  while (index < lines.length) {
+    const line = lines[index]
+    const text = line.text
+    if (mdIsBlank(text)) {
+      index += 1
+      continue
+    }
+
+    // Fenced code block.
+    const fence = MD_FENCE_RE.exec(text)
+    if (fence) {
+      const marker = fence[1]
+      const lang = (fence[2] || '').trim().split(/[ \t]+/)[0] || ''
+      let close = index + 1
+      while (close < lines.length) {
+        const closing = MD_CLOSING_FENCE_RE.exec(lines[close].text)
+        if (closing && closing[1][0] === marker[0] && closing[1].length >= marker.length) break
+        close += 1
+      }
+      const closed = close < lines.length
+      const bodyLines = lines.slice(index + 1, close)
+      // An unclosed fence runs to EOF; the trailing newline produces one empty
+      // sentinel line that is not part of the code.
+      if (!closed && bodyLines.length > 0 && bodyLines[bodyLines.length - 1].text === '') bodyLines.pop()
+      const inner = bodyLines.map((item) => item.text).join('\n')
+      const textStart = bodyLines.length > 0
+        ? bodyLines[0].start
+        : index + 1 < lines.length ? lines[index + 1].start : line.end
+      blocks.push({
+        type: 'code',
+        lang,
+        text: inner,
+        textStart,
+        start: line.start,
+        end: closed ? lines[close].end : lines[lines.length - 1].end,
+      })
+      index = closed ? close + 1 : lines.length
+      continue
+    }
+
+    // Heading.
+    const heading = MD_HEADING_RE.exec(text)
+    if (heading) {
+      const level = Math.min(heading[1].length, 4)
+      const raw = heading[2] === undefined ? '' : heading[2]
+      const contentOffset = text.length - raw.length
+      const content = raw.replace(/[ \t]+#+[ \t]*$/, '').replace(/[ \t]+$/, '')
+      blocks.push({
+        type: 'heading',
+        level,
+        inline: mdParseInline(content, line.start + contentOffset),
+        start: line.start,
+        end: line.end,
+      })
+      index += 1
+      continue
+    }
+
+    // Horizontal rule.
+    if (MD_HR_RE.test(text)) {
+      blocks.push({ type: 'hr', start: line.start, end: line.end })
+      index += 1
+      continue
+    }
+
+    // Table.
+    if (mdLooksLikeTable(lines, index)) {
+      const header = mdSplitTableRow(lines[index]).map((cell) => mdParseInline(cell.text, cell.start))
+      let cursor = index + 2
+      const rows = []
+      while (cursor < lines.length && !mdIsBlank(lines[cursor].text) && lines[cursor].text.indexOf('|') !== -1) {
+        rows.push(mdSplitTableRow(lines[cursor]).map((cell) => mdParseInline(cell.text, cell.start)))
+        cursor += 1
+      }
+      blocks.push({ type: 'table', header, rows, start: line.start, end: lines[cursor - 1].end })
+      index = cursor
+      continue
+    }
+
+    // Block quote, with optional Obsidian callout marker on the first line.
+    if (MD_QUOTE_LINE_RE.test(text)) {
+      const collected = []
+      let cursor = index
+      while (cursor < lines.length) {
+        const match = MD_QUOTE_LINE_RE.exec(lines[cursor].text)
+        if (!match) break
+        const value = match[1]
+        collected.push({ text: value, start: lines[cursor].start + (lines[cursor].text.length - value.length) })
+        cursor += 1
+      }
+      let callout = null
+      const marker = MD_CALLOUT_RE.exec(collected[0].text)
+      if (marker) {
+        callout = { title: (marker[3] || '').trim(), kind: marker[1].toLowerCase() }
+        // The callout title is metadata for the renderer, not body text.
+        collected.shift()
+      }
+      const content = collected.map((item) => item.text).join('\n')
+      const map = []
+      collected.forEach((item, position) => {
+        if (position > 0) map.push(item.start)
+        for (let offset = 0; offset < item.text.length; offset += 1) map.push(item.start + offset)
+      })
+      const tail = cursor < lines.length ? lines[cursor].start : lines[lines.length - 1].end
+      map.push(Math.max(tail, map.length > 0 ? map[map.length - 1] : tail))
+      blocks.push({
+        type: 'quote',
+        blocks: mdShiftBlocks(mdParseBlocks(content), map),
+        callout,
+        start: line.start,
+        end: lines[cursor - 1].end,
+      })
+      index = cursor
+      continue
+    }
+
+    // Block image (own line).
+    const image = MD_IMAGE_RE.exec(text)
+    if (image) {
+      blocks.push({ type: 'image', src: image[2], alt: image[1], start: line.start, end: line.end })
+      index += 1
+      continue
+    }
+
+    // Flat list; continuation lines are folded into the item and nested
+    // markers stay plain text on purpose.
+    const listItem = MD_LIST_RE.exec(text)
+    if (listItem) {
+      const ordered = /\d/.test(listItem[2])
+      const items = []
+      let cursor = index
+      while (cursor < lines.length) {
+        const item = MD_LIST_RE.exec(lines[cursor].text)
+        if (!item) break
+        if (/\d/.test(item[2]) !== ordered) break
+        const contentStart = lines[cursor].start + item[1].length + item[2].length + item[3].length
+        let inline = mdParseInline(item[4], contentStart)
+        let itemEnd = lines[cursor].end
+        let next = cursor + 1
+        while (next < lines.length) {
+          const continuation = lines[next].text
+          if (mdIsBlank(continuation)) break
+          if (MD_LIST_RE.test(continuation)) break
+          if (mdStartsBlock(lines, next)) break
+          if (!/^[ \t]/.test(continuation)) break
+          const stripped = continuation.replace(/^[ \t]+/, '')
+          const offset = lines[next].start + (continuation.length - stripped.length)
+          inline = inline.concat(
+            [{ type: 'text', text: '\n', srcStart: lines[next].start, srcEnd: lines[next].start + 1 }],
+            mdParseInline(stripped, offset),
+          )
+          itemEnd = lines[next].end
+          next += 1
+        }
+        items.push({ inline, start: lines[cursor].start, end: itemEnd })
+        cursor = next
+      }
+      blocks.push({ type: 'list', ordered, items, start: line.start, end: items[items.length - 1].end })
+      index = cursor
+      continue
+    }
+
+    // Paragraph: consume lines until a blank line or the start of another block.
+    let cursor = index + 1
+    while (cursor < lines.length && !mdIsBlank(lines[cursor].text) && !mdStartsBlock(lines, cursor)) cursor += 1
+    blocks.push({
+      type: 'paragraph',
+      inline: mdJoinLineInline(lines, index, cursor),
+      start: line.start,
+      end: lines[cursor - 1].end,
+    })
+    index = cursor
+  }
+  return blocks
+}
+
+/**
+ * Parse Markdown into a block tree. Tolerant by design: unclosed markers,
+ * unbalanced tables and odd indentation never throw.
+ * @param {string} source
+ * @returns {{ blocks: object[] }}
+ */
+function parseMarkdown(source) {
+  try {
+    const text = typeof source === 'string' ? source : ''
+    return { blocks: mdParseBlocks(text.replace(/\r\n?/g, '\n')) }
+  } catch {
+    return { blocks: [] }
+  }
+}
+
+function mdPushRun(state, value, offsetAt) {
+  if (typeof value !== 'string' || value.length === 0) return
+  for (let index = 0; index < value.length; index += 1) state.map.push(offsetAt(index))
+  state.text += value
+}
+
+function mdPushInline(state, inline) {
+  if (!Array.isArray(inline)) return
+  for (const item of inline) {
+    if (!item || typeof item.text !== 'string' || item.text.length === 0) continue
+    const base = Number.isFinite(item.srcStart) ? item.srcStart : 0
+    mdPushRun(state, item.text, (index) => base + index)
+  }
+}
+
+function mdInlineStart(inline, fallback) {
+  if (Array.isArray(inline)) {
+    for (const item of inline) {
+      if (item && Number.isFinite(item.srcStart)) return item.srcStart
+    }
+  }
+  return Number.isFinite(fallback) ? fallback : 0
+}
+
+function mdProjectBlock(block, state) {
+  if (block.type === 'heading' || block.type === 'paragraph') {
+    mdPushInline(state, block.inline)
+    return
+  }
+  if (block.type === 'list') {
+    const items = Array.isArray(block.items) ? block.items : []
+    items.forEach((item, position) => {
+      if (!item) return
+      if (position > 0) mdPushRun(state, '\n', () => (Number.isFinite(item.start) ? item.start : 0))
+      mdPushInline(state, item.inline)
+    })
+    return
+  }
+  if (block.type === 'code') {
+    if (typeof block.text === 'string' && block.text.length > 0) {
+      const base = Number.isFinite(block.textStart)
+        ? block.textStart
+        : Number.isFinite(block.start) ? block.start : 0
+      mdPushRun(state, block.text, (index) => base + index)
+    }
+    return
+  }
+  if (block.type === 'table') {
+    const rows = []
+    if (Array.isArray(block.header)) rows.push(block.header)
+    if (Array.isArray(block.rows)) {
+      for (const row of block.rows) rows.push(row)
+    }
+    rows.forEach((row, rowIndex) => {
+      if (!Array.isArray(row)) return
+      if (rowIndex > 0) {
+        const offset = mdInlineStart(row[0], block.start)
+        mdPushRun(state, '\n', () => offset)
+      }
+      row.forEach((cell, cellIndex) => {
+        if (cellIndex > 0) {
+          const offset = mdInlineStart(cell, block.start)
+          mdPushRun(state, '\t', () => offset)
+        }
+        mdPushInline(state, cell)
+      })
+    })
+    return
+  }
+  if (block.type === 'quote') {
+    const children = Array.isArray(block.blocks) ? block.blocks : []
+    let first = true
+    for (const child of children) {
+      if (!child || typeof child !== 'object') continue
+      if (!first) mdPushRun(state, '\n', () => (Number.isFinite(child.start) ? child.start : 0))
+      first = false
+      child.plainStart = state.text.length
+      mdProjectBlock(child, state)
+      child.plainEnd = state.text.length
+    }
+  }
+}
+
+/**
+ * Flatten parsed blocks into the plain text a reader selects from.
+ * `map[i]` is the source offset of `text[i]` and is non-decreasing.
+ * Block objects get `plainStart`/`plainEnd` written back in place.
+ * @param {object[]} blocks
+ * @returns {{ text: string, map: number[] }}
+ */
+function plainProjection(blocks) {
+  const state = { text: '', map: [] }
+  const list = Array.isArray(blocks) ? blocks : []
+  for (const block of list) {
+    if (!block || typeof block !== 'object') continue
+    const start = Number.isFinite(block.start) ? block.start : 0
+    if (state.text.length > 0) mdPushRun(state, '\n', () => start)
+    block.plainStart = state.text.length
+    mdProjectBlock(block, state)
+    block.plainEnd = state.text.length
+  }
+  return { text: state.text, map: state.map }
+}
+
+// Collapse whitespace runs into one space and remember where every remaining
+// character came from, so quote matching survives re-wrapped text.
+function mdNormalizeWhitespace(value) {
+  const text = typeof value === 'string' ? value : ''
+  const chars = []
+  const index = []
+  let previousSpace = false
+  for (let position = 0; position < text.length; position += 1) {
+    const char = text[position]
+    if (MD_WS_RE.test(char)) {
+      if (!previousSpace) {
+        chars.push(' ')
+        index.push(position)
+        previousSpace = true
+      }
+    } else {
+      chars.push(char)
+      index.push(position)
+      previousSpace = false
+    }
+  }
+  let from = 0
+  let to = chars.length
+  while (from < to && chars[from] === ' ') from += 1
+  while (to > from && chars[to - 1] === ' ') to -= 1
+  return { text: chars.slice(from, to).join(''), index: index.slice(from, to) }
+}
+
+function mdPlainPositionForSource(projection, sourceOffset) {
+  if (!Number.isFinite(sourceOffset)) return -1
+  const map = projection.map
+  let low = 0
+  let high = map.length - 1
+  let found = -1
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2)
+    if (map[middle] >= sourceOffset) {
+      found = middle
+      high = middle - 1
+    } else {
+      low = middle + 1
+    }
+  }
+  return found
+}
+
+/**
+ * Find `quote` inside the projection, preferring prefix/suffix context and then
+ * the candidate closest to the stored source offset.
+ * @returns {{plainStart:number, plainEnd:number, start:number, end:number, exact:boolean}|null}
+ */
+function locateQuote(projection, selection) {
+  if (!projection || typeof projection.text !== 'string' || !Array.isArray(projection.map)) return null
+  const request = selection && typeof selection === 'object' ? selection : {}
+  const needle = mdNormalizeWhitespace(request.quote)
+  if (!needle.text) return null
+  const haystack = mdNormalizeWhitespace(projection.text)
+  const matches = []
+  let from = 0
+  while (from <= haystack.text.length) {
+    const at = haystack.text.indexOf(needle.text, from)
+    if (at === -1) break
+    matches.push(at)
+    from = at + 1
+  }
+  if (matches.length === 0) return null
+  const prefix = mdNormalizeWhitespace(request.prefix)
+  const suffix = mdNormalizeWhitespace(request.suffix)
+  const target = mdPlainPositionForSource(projection, request.start)
+  let best = null
+  for (const at of matches) {
+    // Slice one extra character on each side: whitespace runs in the haystack
+    // are single spaces, while the stored context may end with a space that
+    // normalisation trimmed away.
+    const before = haystack.text.slice(Math.max(0, at - prefix.text.length - 1), at).replace(/ $/, '')
+    const after = haystack.text.slice(at + needle.text.length, at + needle.text.length + suffix.text.length + 1).replace(/^ /, '')
+    const prefixOk = prefix.text.length > 0 && before.endsWith(prefix.text)
+    const suffixOk = suffix.text.length > 0 && after.startsWith(suffix.text)
+    const candidate = {
+      plainStart: haystack.index[at],
+      plainEnd: haystack.index[at + needle.text.length - 1] + 1,
+      score: (prefixOk ? 2 : 0) + (suffixOk ? 1 : 0),
+      distance: target >= 0 ? Math.abs(haystack.index[at] - target) : 0,
+    }
+    if (!best || candidate.score > best.score
+      || (candidate.score === best.score && candidate.distance < best.distance)) {
+      best = candidate
+    }
+  }
+  const mapped = mapPlainToSource(projection, best.plainStart, best.plainEnd)
+  if (!mapped) return null
+  return {
+    plainStart: best.plainStart,
+    plainEnd: best.plainEnd,
+    start: mapped.start,
+    end: mapped.end,
+    exact: matches.length === 1,
+  }
+}
+
+/**
+ * Translate a plain-text range into source offsets. Leading/trailing
+ * whitespace of the range is dropped; illegal ranges return null.
+ * @returns {{start:number, end:number}|null}
+ */
+function mapPlainToSource(projection, plainStart, plainEnd) {
+  if (!projection || typeof projection.text !== 'string' || !Array.isArray(projection.map)) return null
+  const length = projection.text.length
+  if (!Number.isFinite(plainStart) || !Number.isFinite(plainEnd)) return null
+  let from = Math.trunc(plainStart)
+  let to = Math.trunc(plainEnd)
+  if (from < 0 || to > length || from >= to) return null
+  while (from < to && MD_WS_RE.test(projection.text[from])) from += 1
+  while (to > from && MD_WS_RE.test(projection.text[to - 1])) to -= 1
+  if (from >= to) return null
+  const start = projection.map[from]
+  const end = projection.map[to - 1] + 1
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return null
+  return { start, end }
+}
+
+/**
+ * Apply non-overlapping replacements. Replacements are spliced from the end of
+ * the text backwards; the ones that overlap an already applied range are
+ * reported as skipped (invalid entries are skipped as well).
+ * @returns {{text:string, applied:object[], skipped:object[]}}
+ */
+function applyReplacements(source, replacements) {
+  const text = typeof source === 'string' ? source : ''
+  const list = Array.isArray(replacements) ? replacements : []
+  const candidates = []
+  const skipped = []
+  for (const item of list) {
+    if (!item || typeof item !== 'object') {
+      if (item && typeof item === 'object') skipped.push(item)
+      continue
+    }
+    const start = Number(item.start)
+    const end = Number(item.end)
+    if (!Number.isFinite(start) || !Number.isFinite(end)) {
+      skipped.push(item)
+      continue
+    }
+    const from = Math.trunc(start)
+    const to = Math.trunc(end)
+    if (from < 0 || to < from || to > text.length) {
+      skipped.push(item)
+      continue
+    }
+    candidates.push({
+      item,
+      start: from,
+      end: to,
+      replacement: typeof item.replacement === 'string' ? item.replacement : '',
+    })
+  }
+  candidates.sort((left, right) => (right.start - left.start) || (right.end - left.end))
+  const applied = []
+  let output = text
+  let boundary = Number.POSITIVE_INFINITY
+  for (const candidate of candidates) {
+    if (candidate.end > boundary) {
+      skipped.push(candidate.item)
+      continue
+    }
+    output = output.slice(0, candidate.start) + candidate.replacement + output.slice(candidate.end)
+    applied.push(candidate.item)
+    boundary = candidate.start
+  }
+  return { text: output, applied, skipped }
+}
+
+/**
+ * Find `[[FIGURE: p.7 | caption | hint]]` placeholders. `start`/`end` cover the
+ * whole line including its trailing newline; `line` is the 1-based line number.
+ * @returns {{index:number,start:number,end:number,line:number,page:number,caption:string,hint:string}[]}
+ */
+function findFigurePlaceholders(source) {
+  const text = typeof source === 'string' ? source : ''
+  const found = []
+  let position = 0
+  let lineNumber = 0
+  while (position <= text.length) {
+    const newline = text.indexOf('\n', position)
+    const lineEnd = newline === -1 ? text.length : newline
+    let lineText = text.slice(position, lineEnd)
+    if (lineText.endsWith('\r')) lineText = lineText.slice(0, -1)
+    lineNumber += 1
+    const match = MD_FIGURE_LINE_RE.exec(lineText)
+    if (match) {
+      const fields = match[1].split('|')
+      const pageMatch = MD_FIGURE_PAGE_RE.exec((fields[0] || '').trim())
+      const page = pageMatch ? Number.parseInt(pageMatch[1], 10) : 0
+      if (Number.isFinite(page) && page > 0) {
+        found.push({
+          index: found.length,
+          start: position,
+          end: newline === -1 ? lineEnd : newline + 1,
+          line: lineNumber,
+          page,
+          caption: mdClip((fields[1] || '').trim(), 200),
+          hint: mdClip(fields.slice(2).join('|').trim(), 400),
+        })
+      }
+    }
+    if (newline === -1) break
+    position = newline + 1
+  }
+  return found
+}
+// #endregion markdown-core
 
     const ICON = {
       book: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20 M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z',
@@ -1492,6 +2563,7 @@ window.__ModuleLoader__.load({
       summaryRunning,
       onOpenNote,
       onPreview,
+      onStudyNote,
     }) {
       const [expanded, setExpanded] = useState(false)
       if (!paper) return null
@@ -1560,11 +2632,11 @@ window.__ModuleLoader__.load({
                     {
                       type: 'button',
                       className: 'lr-btn small primary',
-                      onClick: onOpenNote,
+                      onClick: onStudyNote,
                       key: 'open-note',
                     },
-                    h(Icon, { name: 'note', size: 13 }),
-                    t('openNote'),
+                    h(Icon, { name: 'book', size: 13 }),
+                    t('noteOpen'),
                   ),
                   h(
                     'button',
@@ -1574,7 +2646,7 @@ window.__ModuleLoader__.load({
                       onClick: onPreview,
                       key: 'preview',
                     },
-                    h(Icon, { name: 'book', size: 13 }),
+                    h(Icon, { name: 'note', size: 13 }),
                     t('preview'),
                   ),
                 ]
@@ -2838,6 +3910,3056 @@ window.__ModuleLoader__.load({
       )
     }
 
+    // ── Summary view: renderer with annotation highlights ────────────────────
+    // The Markdown subset from docs/summary-editor-spec.md §3.3 is rendered by
+    // `MarkdownDoc`. Every text run becomes a span carrying `data-p` (the plain
+    // projection offset) so a DOM selection can be translated back into source
+    // offsets without guessing.
+    const NOTE_COLORS = ['amber', 'rose', 'sky', 'mint']
+    const NOTE_MEDIA_RE = /\.(png|jpe?g|webp|gif|svg|avif)$/i
+    const NOTE_CITE_RE = /^\[p{1,2}\.\s*(\d+)/i
+    const NOTE_FIGURE_LINE_RE = /^\s*\[\[FIGURE:/
+
+    function noteColorLabel(color) {
+      if (color === 'rose') return t('noteColorRose')
+      if (color === 'sky') return t('noteColorSky')
+      if (color === 'mint') return t('noteColorMint')
+      return t('noteColorAmber')
+    }
+
+    function noteStatusLabel(status) {
+      if (status === 'resolved') return t('noteStatusResolved')
+      if (status === 'orphan') return t('noteStatusOrphan')
+      return t('noteStatusOpen')
+    }
+
+    function noteCalloutIcon(kind) {
+      switch (String(kind || '').toLowerCase()) {
+        case 'figure':
+          return 'expand'
+        case 'warning':
+        case 'danger':
+        case 'caution':
+        case 'bug':
+          return 'close'
+        case 'question':
+        case 'faq':
+        case 'help':
+          return 'quote'
+        case 'tip':
+        case 'success':
+        case 'check':
+        case 'done':
+          return 'check'
+        case 'info':
+        case 'note':
+        case 'todo':
+          return 'note'
+        default:
+          return 'sparkle'
+      }
+    }
+
+    function noteCalloutLabel(kind) {
+      switch (String(kind || '').toLowerCase()) {
+        case 'abstract':
+        case 'summary':
+        case 'tldr':
+          return t('noteCalloutAbstract')
+        case 'figure':
+          return t('noteCalloutFigure')
+        case 'warning':
+        case 'danger':
+        case 'caution':
+        case 'bug':
+          return t('noteCalloutWarning')
+        case 'question':
+        case 'faq':
+        case 'help':
+          return t('noteCalloutQuestion')
+        case 'tip':
+        case 'success':
+        case 'check':
+        case 'done':
+          return t('noteCalloutTip')
+        default:
+          return t('noteCalloutInfo')
+      }
+    }
+
+    // Local preview cannot load `_附件/<paperId>/<name>.png`; the host serves the
+    // same file from /papers/:id/figure/:name.
+    function resolveNoteFigureSrc(src, paperId) {
+      const value = String(src || '').trim()
+      if (!value) return ''
+      if (/^(https?:|data:|blob:)/i.test(value)) return value
+      if (value.indexOf(`${API}/`) === 0) return value
+      const clean = value.split('#')[0].split('?')[0]
+      const name = clean.slice(clean.lastIndexOf('/') + 1)
+      let decoded = name
+      try {
+        decoded = decodeURIComponent(name)
+      } catch {
+        decoded = name
+      }
+      if (!paperId || !NOTE_MEDIA_RE.test(decoded)) return value
+      return `${API}/papers/${encodeURIComponent(paperId)}/figure/${encodeURIComponent(decoded)}`
+    }
+
+    // Plain projection index of the first character at or after `sourceOffset`.
+    function notePlainIndex(projection, sourceOffset) {
+      const map = projection && Array.isArray(projection.map) ? projection.map : null
+      if (!map || map.length === 0) return 0
+      const target = Number.isFinite(sourceOffset) ? sourceOffset : 0
+      let low = 0
+      let high = map.length - 1
+      let found = -1
+      while (low <= high) {
+        const middle = (low + high) >> 1
+        if (map[middle] >= target) {
+          found = middle
+          high = middle - 1
+        } else {
+          low = middle + 1
+        }
+      }
+      return found === -1 ? map.length : found
+    }
+
+    // Source range -> plain range. Returns null when the range is empty.
+    function noteSourceToPlain(projection, start, end) {
+      const map = projection && Array.isArray(projection.map) ? projection.map : null
+      if (!map || map.length === 0) return null
+      if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return null
+      const from = notePlainIndex(projection, start)
+      let low = 0
+      let high = map.length - 1
+      let last = -1
+      while (low <= high) {
+        const middle = (low + high) >> 1
+        if (map[middle] <= end - 1) {
+          last = middle
+          low = middle + 1
+        } else {
+          high = middle - 1
+        }
+      }
+      if (last < 0) return null
+      const to = last + 1
+      if (to <= from) return null
+      return { start: from, end: to }
+    }
+
+    // Split annotated ranges into non-overlapping segments; later annotations
+    // win when they overlap (spec §9.2).
+    function buildNoteSegments(entries) {
+      if (!entries || entries.length === 0) return []
+      const bounds = []
+      for (const entry of entries) {
+        bounds.push(entry.plainStart)
+        bounds.push(entry.plainEnd)
+      }
+      bounds.sort((left, right) => left - right)
+      const segments = []
+      for (let index = 0; index < bounds.length - 1; index += 1) {
+        const from = bounds[index]
+        const to = bounds[index + 1]
+        if (to <= from) continue
+        let winner = null
+        for (const entry of entries) {
+          if (entry.plainStart <= from && entry.plainEnd >= to) winner = entry
+        }
+        if (!winner) continue
+        const last = segments[segments.length - 1]
+        if (last && last.entry === winner && last.end === from) last.end = to
+        else segments.push({ entry: winner, start: from, end: to })
+      }
+      return segments
+    }
+
+    function noteSegmentStartIndex(segments, from) {
+      let low = 0
+      let high = segments.length - 1
+      let found = segments.length
+      while (low <= high) {
+        const middle = (low + high) >> 1
+        if (segments[middle].end > from) {
+          found = middle
+          high = middle - 1
+        } else {
+          low = middle + 1
+        }
+      }
+      return found
+    }
+
+    function noteChunksForRange(segments, from, to) {
+      const chunks = []
+      if (to <= from) return chunks
+      let cursor = from
+      for (let index = noteSegmentStartIndex(segments, from); index < segments.length; index += 1) {
+        const segment = segments[index]
+        if (segment.start >= to) break
+        const start = Math.max(segment.start, from)
+        const end = Math.min(segment.end, to)
+        if (end <= start) continue
+        if (start > cursor) chunks.push({ start: cursor, end: start, entry: null })
+        chunks.push({ start, end, entry: segment.entry })
+        cursor = end
+      }
+      if (cursor < to) chunks.push({ start: cursor, end: to, entry: null })
+      return chunks
+    }
+
+    // Plain offset of a DOM selection endpoint, or null when the node has no
+    // mapped text (captions, badges, toolbar).
+    function notePlainOffsetAt(node, offset) {
+      if (!node) return null
+      if (node.nodeType === 3) {
+        const parent = node.parentElement
+        const base = parent ? parent.getAttribute('data-p') : null
+        if (base == null) return null
+        const length = String(node.nodeValue || '').length
+        return Number(base) + Math.max(0, Math.min(length, offset))
+      }
+      if (node.nodeType !== 1) return null
+      const own = node.getAttribute('data-p')
+      if (own != null) return Number(own)
+      const kids = node.childNodes
+      if (offset >= 0 && offset < kids.length) {
+        const next = kids[offset]
+        if (next.nodeType === 1) {
+          const value = noteFirstPlain(next)
+          if (value != null) return value
+        }
+      }
+      if (offset > 0) {
+        const previous = kids[offset - 1]
+        if (previous.nodeType === 1) {
+          const value = noteLastPlain(previous)
+          if (value != null) return value
+        }
+      }
+      return null
+    }
+
+    function noteFirstPlain(node) {
+      if (!node || node.nodeType !== 1) return null
+      const own = node.getAttribute('data-p')
+      if (own != null) return Number(own)
+      const found = node.querySelector ? node.querySelector('[data-p]') : null
+      return found ? Number(found.getAttribute('data-p')) : null
+    }
+
+    function noteLastPlain(node) {
+      if (!node || node.nodeType !== 1) return null
+      const own = node.getAttribute('data-p')
+      if (own != null) return Number(own) + String(node.textContent || '').length
+      const all = node.querySelectorAll ? node.querySelectorAll('[data-p]') : null
+      if (!all || all.length === 0) return null
+      const last = all[all.length - 1]
+      return Number(last.getAttribute('data-p')) + String(last.textContent || '').length
+    }
+
+    function renderNoteRunsAt(text, base, ctx, keyPrefix) {
+      const value = typeof text === 'string' ? text : ''
+      if (!value) return []
+      const segments = ctx.segments || []
+      const from = base
+      const to = base + value.length
+      const chunks = segments.length > 0
+        ? noteChunksForRange(segments, from, to)
+        : [{ start: from, end: to, entry: null }]
+      const out = []
+      chunks.forEach((chunk, index) => {
+        const slice = value.slice(chunk.start - from, chunk.end - from)
+        if (!slice) return
+        const key = `${keyPrefix}-c${index}`
+        const entry = chunk.entry
+        if (!entry) {
+          out.push(h('span', { key, className: 'lr-note-t', 'data-p': chunk.start }, slice))
+          return
+        }
+        const ann = entry.ann
+        out.push(
+          h(
+            'mark',
+            {
+              key,
+              className: `lr-ann-mark lr-ann-${ann.color || 'amber'}${ann.status === 'resolved' ? ' is-resolved' : ''}${ann.status === 'orphan' ? ' is-orphan' : ''}`,
+              'data-p': chunk.start,
+              'data-ann': ann.id,
+              title: ann.note || ann.quote || '',
+              onClick: (event) => {
+                event.stopPropagation()
+                ctx.onAnnPick?.(ann.id)
+              },
+            },
+            slice,
+          ),
+        )
+        if (chunk.start === entry.plainStart) {
+          out.push(
+            h(
+              'sup',
+              {
+                key: `${key}-seq`,
+                className: `lr-ann-seq lr-ann-seq-${ann.color || 'amber'}`,
+                'data-ann': ann.id,
+                title: ann.note || ann.quote || '',
+                onClick: (event) => {
+                  event.stopPropagation()
+                  ctx.onAnnPick?.(ann.id)
+                },
+              },
+              String(entry.number),
+            ),
+          )
+        }
+      })
+      return out
+    }
+
+    function renderNoteInline(inline, ctx, keyPrefix) {
+      const out = []
+      if (!Array.isArray(inline)) return out
+      inline.forEach((item, index) => {
+        if (!item || typeof item.text !== 'string') return
+        const key = `${keyPrefix}-i${index}`
+        if (item.type === 'cite') {
+          const match = NOTE_CITE_RE.exec(item.text)
+          const page = match ? Number(match[1]) : 0
+          out.push(
+            h(
+              'button',
+              {
+                key,
+                type: 'button',
+                className: 'lr-note-cite',
+                title: t('citationJump').split('{page}').join(String(page)),
+                onClick: (event) => {
+                  event.stopPropagation()
+                  ctx.onCite?.(page)
+                },
+              },
+              ...renderNoteRunsAt(item.text, notePlainIndex(ctx.projection, item.srcStart), ctx, key),
+            ),
+          )
+          return
+        }
+        if (item.type === 'link') {
+          out.push(
+            h(
+              'a',
+              { key, className: 'lr-note-doc-link', href: item.href, target: '_blank', rel: 'noreferrer noopener' },
+              ...renderNoteRunsAt(item.text, notePlainIndex(ctx.projection, item.srcStart), ctx, key),
+            ),
+          )
+          return
+        }
+        const runs = renderNoteRunsAt(item.text, notePlainIndex(ctx.projection, item.srcStart), ctx, key)
+        if (runs.length === 0) return
+        if (item.type === 'strong') out.push(h('strong', { key }, ...runs))
+        else if (item.type === 'em') out.push(h('em', { key }, ...runs))
+        else if (item.type === 'code') out.push(h('code', { key, className: 'lr-note-inline-code' }, ...runs))
+        else for (const node of runs) out.push(node)
+      })
+      return out
+    }
+
+    function renderNoteCalloutHead(callout) {
+      const title = callout && callout.title ? callout.title : ''
+      const kind = callout ? callout.kind : ''
+      return h(
+        'div',
+        { className: 'lr-note-callout-head' },
+        h(Icon, { name: noteCalloutIcon(kind), size: 13 }),
+        h('span', { className: 'lr-note-callout-title' }, title || noteCalloutLabel(kind)),
+      )
+    }
+
+    function renderNoteBlocks(blocks, ctx, prefix = 'b') {
+      const out = []
+      if (!Array.isArray(blocks)) return out
+      blocks.forEach((block, index) => {
+        if (!block) return
+        const key = `${prefix}-${index}`
+        if (block.type === 'heading') {
+          const level = Math.max(1, Math.min(4, Number(block.level) || 1))
+          out.push(
+            h(
+              `h${level}`,
+              { key, className: `lr-note-h lr-note-h${level}`, 'data-block': block.start },
+              ...renderNoteInline(block.inline, ctx, key),
+            ),
+          )
+          return
+        }
+        if (block.type === 'paragraph') {
+          const raw = (block.inline || []).map((item) => (item && item.text) || '').join('')
+          const pending = NOTE_FIGURE_LINE_RE.test(raw)
+          out.push(
+            h(
+              'p',
+              { key, className: `lr-note-p${pending ? ' lr-note-p-pending' : ''}`, 'data-block': block.start },
+              pending
+                ? h('span', { className: 'lr-note-figure-flag', 'aria-hidden': true }, h(Icon, { name: 'expand', size: 12 }))
+                : null,
+              ...renderNoteInline(block.inline, ctx, key),
+            ),
+          )
+          return
+        }
+        if (block.type === 'list') {
+          const items = Array.isArray(block.items) ? block.items : []
+          out.push(
+            h(
+              block.ordered ? 'ol' : 'ul',
+              { key, className: 'lr-note-doc-list', 'data-block': block.start },
+              items.map((item, itemIndex) =>
+                h(
+                  'li',
+                  { key: `${key}-${itemIndex}` },
+                  ...renderNoteInline(item.inline, ctx, `${key}-${itemIndex}`),
+                ),
+              ),
+            ),
+          )
+          return
+        }
+        if (block.type === 'code') {
+          const base = notePlainIndex(ctx.projection, Number.isFinite(block.textStart) ? block.textStart : block.start)
+          out.push(
+            h(
+              'pre',
+              { key, className: 'lr-note-pre', 'data-block': block.start },
+              h(
+                'code',
+                null,
+                ...renderNoteRunsAt(block.text || '', base, ctx, `${key}-code`),
+              ),
+            ),
+          )
+          return
+        }
+        if (block.type === 'table') {
+          const header = Array.isArray(block.header) ? block.header : []
+          const rows = Array.isArray(block.rows) ? block.rows : []
+          out.push(
+            h(
+              'div',
+              { key, className: 'lr-note-table-wrap' },
+              h(
+                'table',
+                { className: 'lr-note-table' },
+                h(
+                  'thead',
+                  null,
+                  h(
+                    'tr',
+                    null,
+                    header.map((cell, cellIndex) =>
+                      h('th', { key: `${key}-h${cellIndex}` }, ...renderNoteInline(cell, ctx, `${key}-h${cellIndex}`)),
+                    ),
+                  ),
+                ),
+                h(
+                  'tbody',
+                  null,
+                  rows.map((row, rowIndex) =>
+                    h(
+                      'tr',
+                      { key: `${key}-r${rowIndex}` },
+                      (row || []).map((cell, cellIndex) =>
+                        h(
+                          'td',
+                          { key: `${key}-r${rowIndex}c${cellIndex}` },
+                          ...renderNoteInline(cell, ctx, `${key}-r${rowIndex}c${cellIndex}`),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          )
+          return
+        }
+        if (block.type === 'quote') {
+          const callout = block.callout
+          out.push(
+            h(
+              callout ? 'div' : 'blockquote',
+              {
+                key,
+                className: callout
+                  ? `lr-note-callout lr-note-callout-${String(callout.kind || 'note').replace(/[^a-z0-9_-]/gi, '')}`
+                  : 'lr-note-quote',
+                'data-block': block.start,
+              },
+              callout ? renderNoteCalloutHead(callout) : null,
+              h(
+                'div',
+                { className: callout ? 'lr-note-callout-body' : 'lr-note-quote-body' },
+                ...renderNoteBlocks(block.blocks, ctx, `${key}-q`),
+              ),
+            ),
+          )
+          return
+        }
+        if (block.type === 'hr') {
+          out.push(h('hr', { key, className: 'lr-note-hr' }))
+          return
+        }
+        if (block.type === 'image') {
+          const next = blocks[index + 1]
+          const nextInline = next && next.type === 'paragraph' && Array.isArray(next.inline) ? next.inline : []
+          const captionIsNext = nextInline.length === 1 && nextInline[0] && nextInline[0].type === 'em'
+          const src = resolveNoteFigureSrc(block.src, ctx.paperId)
+          out.push(
+            h(
+              'figure',
+              { key, className: 'lr-note-figure', 'data-block': block.start },
+              h('img', {
+                src,
+                alt: block.alt || '',
+                loading: 'lazy',
+                onClick: (event) => {
+                  event.stopPropagation()
+                  ctx.onImage?.(src, block.alt || '')
+                },
+              }),
+              block.alt && !captionIsNext ? h('figcaption', null, block.alt) : null,
+            ),
+          )
+        }
+      })
+      return out
+    }
+
+    // Read-only document used by both the note view and the read-only previews.
+    function MarkdownDoc({
+      text,
+      parsed: provided,
+      paperId,
+      annotations,
+      onCite,
+      onAnnPick,
+      onImage,
+      className = '',
+    }) {
+      // Callers that already parsed the text (the note view needs the
+      // projection for selection mapping) pass it in; everyone else parses here.
+      const own = useMemo(() => {
+        if (provided) return null
+        const result = parseMarkdown(text || '')
+        const projection = plainProjection(result.blocks)
+        return { blocks: result.blocks, projection }
+      }, [provided, text])
+      const parsed = provided || own
+      const entries = useMemo(() => {
+        const list = []
+        const source = Array.isArray(annotations) ? annotations : []
+        source.forEach((ann, index) => {
+          if (!ann || ann.status === 'orphan') return
+          const span = noteSourceToPlain(parsed.projection, Number(ann.start), Number(ann.end))
+          if (!span) return
+          list.push({ ann, number: index + 1, plainStart: span.start, plainEnd: span.end })
+        })
+        return list
+      }, [annotations, parsed])
+      const segments = useMemo(() => buildNoteSegments(entries), [entries])
+      const ctx = {
+        projection: parsed.projection,
+        segments,
+        paperId,
+        onCite,
+        onAnnPick,
+        onImage,
+      }
+      return h('div', { className: `lr-note-doc ${className}`.trim() }, ...renderNoteBlocks(parsed.blocks, ctx))
+    }
+
+    function noteHeadings(blocks) {
+      const out = []
+      if (!Array.isArray(blocks)) return out
+      for (const block of blocks) {
+        if (!block) continue
+        if (block.type === 'heading') {
+          const text = (block.inline || []).map((item) => (item && item.text) || '').join('').trim()
+          out.push({ level: block.level, text, start: block.start })
+        }
+      }
+      return out
+    }
+
+    function noteWordCount(value) {
+      return String(value || '').replace(/\s+/g, '').length
+    }
+
+    function noteFormatTime(iso) {
+      if (!iso) return ''
+      const date = new Date(iso)
+      if (Number.isNaN(date.getTime())) return String(iso)
+      const pad = (value) => String(value).padStart(2, '0')
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
+    }
+
+    function noteExcerpt(value, limit) {
+      const text = String(value || '').replace(/\s+/g, ' ').trim()
+      if (text.length <= limit) return text
+      return `${text.slice(0, limit)}…`
+    }
+
+    function noteMakeId() {
+      try {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID()
+      } catch {
+        // fall through to the timestamp id
+      }
+      return `ann-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
+    }
+
+    function noteDraftKey(paperId) {
+      return `dsh.literature.noteDraft.${paperId}`
+    }
+
+    function readNoteDraft(paperId) {
+      try {
+        const raw = localStorage.getItem(noteDraftKey(paperId))
+        if (!raw) return null
+        const parsed = JSON.parse(raw)
+        if (!parsed || typeof parsed.markdown !== 'string') return null
+        return parsed
+      } catch {
+        return null
+      }
+    }
+
+    function writeNoteDraft(paperId, draft) {
+      try {
+        localStorage.setItem(noteDraftKey(paperId), JSON.stringify(draft))
+      } catch {
+        // quota failures are harmless: the in-memory edit still works
+      }
+    }
+
+    function clearNoteDraft(paperId) {
+      try {
+        localStorage.removeItem(noteDraftKey(paperId))
+      } catch {
+        // ignore storage failures
+      }
+    }
+
+    // Plain range covered by a DOM selection inside the note document. The two
+    // endpoints normally resolve through data-p; a selection that ends on a
+    // wrapper element (e.g. after dragging over a whole list) falls back to the
+    // intersected mapped spans.
+    function noteSelectionSpan(container, range) {
+      if (!container || !range) return null
+      let from = notePlainOffsetAt(range.startContainer, range.startOffset)
+      let to = notePlainOffsetAt(range.endContainer, range.endOffset)
+      if (from == null || to == null || to <= from) {
+        const spans = container.querySelectorAll('[data-p]')
+        let low = Infinity
+        let high = -Infinity
+        for (const span of spans) {
+          if (!range.intersectsNode || range.intersectsNode(span)) {
+            const base = Number(span.getAttribute('data-p'))
+            if (!Number.isFinite(base)) continue
+            low = Math.min(low, base)
+            high = Math.max(high, base + String(span.textContent || '').length)
+          }
+        }
+        if (!Number.isFinite(low) || !Number.isFinite(high) || high <= low) return null
+        from = low
+        to = high
+      }
+      return { from, to }
+    }
+
+    function NoteLightbox({ image, onClose }) {
+      useEffect(() => {
+        const onKey = (event) => {
+          if (event.key === 'Escape') onClose?.()
+        }
+        window.addEventListener('keydown', onKey)
+        return () => window.removeEventListener('keydown', onKey)
+      }, [onClose])
+      if (!image) return null
+      return h(
+        'div',
+        {
+          className: 'lr-note-lightbox',
+          role: 'dialog',
+          'aria-modal': 'true',
+          onMouseDown: (event) => {
+            if (event.target === event.currentTarget) onClose?.()
+          },
+        },
+        h('img', { src: image.src, alt: image.alt || '' }),
+        h(
+          'button',
+          { type: 'button', className: 'lr-note-lightbox-close', onClick: onClose, 'aria-label': t('close') },
+          h(Icon, { name: 'close', size: 16 }),
+        ),
+      )
+    }
+
+    function NoteColorPicker({ value, onChange, compact = false }) {
+      return h(
+        'div',
+        { className: `lr-ann-colors${compact ? ' compact' : ''}`, role: 'radiogroup', 'aria-label': t('noteAnnColor') },
+        NOTE_COLORS.map((color) =>
+          h(
+            'button',
+            {
+              key: color,
+              type: 'button',
+              className: `lr-ann-color lr-ann-color-${color}${value === color ? ' active' : ''}`,
+              role: 'radio',
+              'aria-checked': value === color,
+              title: noteColorLabel(color),
+              onClick: () => onChange?.(color),
+            },
+          ),
+        ),
+      )
+    }
+
+    // Confirm which uncertain vocabulary terms belong in the glossary. The
+    // selection is local state; the parent owns the generate decision, so
+    // closing/cancelling here simply never calls the SSE endpoint.
+    function GlossaryConfirmDialog({ questions, includeCount, onConfirm, onClose }) {
+      const [checked, setChecked] = useState(() =>
+        (questions || []).map((item) => item.guess !== false),
+      )
+      if (!questions || questions.length === 0) return null
+      const allOn = checked.every(Boolean)
+      const toggle = (index) => {
+        setChecked((current) => current.map((value, i) => (i === index ? !value : value)))
+      }
+      const confirm = () => {
+        const picked = questions.filter((item, index) => checked[index])
+        onConfirm?.(picked)
+      }
+      return h(
+        Modal,
+        {
+          title: t('glossaryTitle'),
+          subtitle: t('glossaryIntro'),
+          onClose,
+        },
+        h(
+          'div',
+          { className: 'lr-glossary' },
+          h(
+            'div',
+            { className: 'lr-glossary-tools' },
+            h(
+              'button',
+              {
+                type: 'button',
+                className: 'lr-btn small',
+                onClick: () => setChecked((current) => current.map(() => true)),
+                disabled: allOn,
+              },
+              t('glossarySelectAll'),
+            ),
+            h(
+              'button',
+              {
+                type: 'button',
+                className: 'lr-btn small',
+                onClick: () => setChecked((current) => current.map(() => false)),
+                disabled: checked.every((value) => !value),
+              },
+              t('glossarySelectNone'),
+            ),
+            includeCount > 0
+              ? h(
+                  'span',
+                  { className: 'lr-glossary-count' },
+                  t('glossaryIncluded').split('{count}').join(String(includeCount)),
+                )
+              : null,
+          ),
+          h(
+            'div',
+            { className: 'lr-glossary-list' },
+            questions.map((item, index) =>
+              h(
+                'label',
+                { key: `${item.term}-${index}`, className: `lr-glossary-row${checked[index] ? ' checked' : ''}` },
+                h('input', {
+                  type: 'checkbox',
+                  checked: Boolean(checked[index]),
+                  onChange: () => toggle(index),
+                }),
+                h('span', { className: 'lr-glossary-term' }, item.term || ''),
+                item.translation
+                  ? h('span', { className: 'lr-glossary-trans' }, `— ${item.translation}`)
+                  : null,
+              ),
+            ),
+          ),
+          h(
+            'div',
+            { className: 'lr-glossary-actions' },
+            h(
+              'button',
+              { type: 'button', className: 'lr-btn', onClick: onClose },
+              t('glossaryCancel'),
+            ),
+            h(
+              'button',
+              { type: 'button', className: 'lr-btn primary', onClick: confirm },
+              h(Icon, { name: 'sparkle', size: 13 }),
+              t('glossaryStart'),
+            ),
+          ),
+        ),
+      )
+    }
+
+    // Floating "标注" button shown after a text selection.
+    function NoteSelectionToolbar({ toolbar, onAnnotate, onDismiss }) {
+      if (!toolbar) return null
+      return h(
+        'div',
+        {
+          className: 'lr-ann-toolbar',
+          style: { left: `${toolbar.left}px`, top: `${toolbar.top}px` },
+          onMouseDown: (event) => event.preventDefault(),
+        },
+        h(
+          'button',
+          { type: 'button', className: 'lr-ann-toolbar-btn primary', onClick: onAnnotate },
+          h(Icon, { name: 'quote', size: 12 }),
+          t('noteAnnotate'),
+        ),
+        h(
+          'button',
+          {
+            type: 'button',
+            className: 'lr-ann-toolbar-close',
+            onClick: onDismiss,
+            'aria-label': t('close'),
+          },
+          h(Icon, { name: 'close', size: 11 }),
+        ),
+      )
+    }
+
+    // Create/edit one annotation. Saving never touches the document body.
+    function NoteAnnotationDialog({ draft, onSave, onDelete, onClose, onLocate }) {
+      const [note, setNote] = useState(draft?.note || '')
+      const [color, setColor] = useState(draft?.color || 'amber')
+      const [busy, setBusy] = useState(false)
+      const [error, setError] = useState('')
+      const areaRef = useRef(null)
+      useEffect(() => {
+        const timer = setTimeout(() => areaRef.current?.focus(), 40)
+        return () => clearTimeout(timer)
+      }, [])
+      const submit = async () => {
+        if (busy) return
+        if (!note.trim() && !draft?.id) {
+          setError(t('noteAnnNeedNote'))
+          return
+        }
+        setBusy(true)
+        setError('')
+        try {
+          await onSave({ ...draft, note: note.trim(), color })
+          setBusy(false)
+        } catch (saveError) {
+          setError(safeError(saveError) || t('noteAnnSaveFailed'))
+          setBusy(false)
+        }
+      }
+      const remove = async () => {
+        if (busy || !draft?.id) return
+        setBusy(true)
+        try {
+          await onDelete(draft.id)
+        } catch (deleteError) {
+          setError(safeError(deleteError) || t('noteAnnSaveFailed'))
+          setBusy(false)
+        }
+      }
+      return h(
+        Modal,
+        { title: draft?.id ? t('noteAnnEdit') : t('noteAnnotate'), onClose: busy ? () => {} : onClose },
+        h(
+          'div',
+          { className: 'lr-ann-dialog' },
+          h('div', { className: 'lr-ann-quote-box' }, noteExcerpt(draft?.quote || '', 220) || t('noteAnnSelectFirst')),
+          h(
+            'textarea',
+            {
+              ref: areaRef,
+              className: 'lr-ann-input',
+              value: note,
+              rows: 4,
+              placeholder: t('noteAnnPlaceholder'),
+              onChange: (event) => setNote(event.target.value),
+              onKeyDown: (event) => {
+                if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                  event.preventDefault()
+                  submit()
+                }
+              },
+            },
+          ),
+          h(
+            'div',
+            { className: 'lr-ann-dialog-row' },
+            h('span', { className: 'lr-ann-label' }, t('noteAnnColor')),
+            h(NoteColorPicker, { value: color, onChange: setColor }),
+          ),
+          draft?.reply
+            ? h('div', { className: 'lr-ann-reply' }, `${t('noteAnnReply')}：${draft.reply}`)
+            : null,
+          error ? h('div', { className: 'lr-ann-error' }, error) : null,
+          h(
+            'div',
+            { className: 'lr-ann-dialog-actions' },
+            draft?.id && onLocate
+              ? h(
+                  'button',
+                  {
+                    type: 'button',
+                    className: 'lr-btn small',
+                    onClick: () => {
+                      onLocate?.(draft.id)
+                    },
+                  },
+                  h(Icon, { name: 'target', size: 12 }),
+                  t('noteAnnLocate'),
+                )
+              : null,
+            draft?.id
+              ? h(
+                  'button',
+                  { type: 'button', className: 'lr-btn small danger', onClick: remove, disabled: busy },
+                  h(Icon, { name: 'trash', size: 12 }),
+                  t('noteAnnDelete'),
+                )
+              : null,
+            h('span', { className: 'lr-ann-spacer' }),
+            h('button', { type: 'button', className: 'lr-btn', onClick: onClose, disabled: busy }, t('cancel')),
+            h(
+              'button',
+              { type: 'button', className: 'lr-btn primary', onClick: submit, disabled: busy },
+              busy ? h(Spinner, { size: 12 }) : h(Icon, { name: 'check', size: 13 }),
+              t('noteAnnSave'),
+            ),
+          ),
+          h('div', { className: 'lr-ann-hint' }, t('noteAnnShortcut')),
+        ),
+      )
+    }
+
+    function NoteAnnotationGroup({ title, items, collapsed, onToggle, onLocate, onEdit, onDelete }) {
+      if (items.length === 0) return null
+      return h(
+        'div',
+        { className: `lr-ann-group${collapsed ? ' collapsed' : ''}` },
+        h(
+          'button',
+          { type: 'button', className: 'lr-ann-group-head', onClick: onToggle },
+          h(Icon, { name: 'chevronRight', size: 11 }),
+          h('span', null, title),
+          h('span', { className: 'lr-ann-group-count' }, String(items.length)),
+        ),
+        collapsed
+          ? null
+          : h(
+              'div',
+              { className: 'lr-ann-group-body' },
+              items.map(({ ann, number }) =>
+                h(
+                  'div',
+                  { key: ann.id, className: `lr-ann-item lr-ann-item-${ann.status || 'open'}` },
+                  h('span', { className: `lr-ann-badge lr-ann-seq-${ann.color || 'amber'}` }, String(number)),
+                  h(
+                    'div',
+                    { className: 'lr-ann-item-main' },
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        className: 'lr-ann-item-quote',
+                        onClick: () => onLocate?.(ann.id),
+                        title: ann.quote,
+                      },
+                      noteExcerpt(ann.quote, 80),
+                    ),
+                    ann.note ? h('div', { className: 'lr-ann-item-note' }, ann.note) : null,
+                    ann.reply
+                      ? h('div', { className: 'lr-ann-item-reply' }, `${t('noteAnnReply')}：${ann.reply}`)
+                      : null,
+                  ),
+                  h(
+                    'div',
+                    { className: 'lr-ann-item-actions' },
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        className: 'lr-btn icon small',
+                        title: t('noteAnnLocate'),
+                        onClick: () => onLocate?.(ann.id),
+                      },
+                      h(Icon, { name: 'target', size: 12 }),
+                    ),
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        className: 'lr-btn icon small',
+                        title: t('noteAnnEdit'),
+                        onClick: () => onEdit?.(ann.id),
+                      },
+                      h(Icon, { name: 'pen', size: 12 }),
+                    ),
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        className: 'lr-btn icon small danger',
+                        title: t('noteAnnDelete'),
+                        onClick: () => onDelete?.(ann.id),
+                      },
+                      h(Icon, { name: 'trash', size: 12 }),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+      )
+    }
+
+    function NoteAnnotationPanel({
+      annotations,
+      open,
+      collapsed,
+      onToggle,
+      onClose,
+      onLocate,
+      onEdit,
+      onDelete,
+    }) {
+      const groups = { open: [], resolved: [], orphan: [] }
+      annotations.forEach((ann, index) => {
+        const key = ann.status === 'resolved' ? 'resolved' : ann.status === 'orphan' ? 'orphan' : 'open'
+        groups[key].push({ ann, number: index + 1 })
+      })
+      const [folded, setFolded] = useState({ resolved: true, orphan: false })
+      const total = annotations.length
+      const allFolded = Boolean(folded.open && folded.resolved && folded.orphan)
+      return h(
+        'aside',
+        {
+          className: `lr-ann-panel${open ? ' open' : ''}${collapsed ? ' collapsed' : ''}`,
+          'aria-label': t('noteAnnCount'),
+        },
+        h(
+          'div',
+          { className: 'lr-ann-panel-head' },
+          h(Icon, { name: 'quote', size: 14 }),
+          h('span', { className: 'lr-ann-panel-title' }, `${t('noteAnnCount')} · ${total}`),
+          h(
+            'button',
+            {
+              type: 'button',
+              className: 'lr-btn icon small',
+              title: allFolded ? t('noteAnnExpandAll') : t('noteAnnCollapseAll'),
+              onClick: () =>
+                setFolded(
+                  allFolded ? { open: false, resolved: false, orphan: false } : { open: true, resolved: true, orphan: true },
+                ),
+            },
+            h(Icon, { name: allFolded ? 'list' : 'minus', size: 12 }),
+          ),
+          h(
+            'button',
+            {
+              type: 'button',
+              className: 'lr-btn icon small lr-ann-panel-close',
+              title: t('close'),
+              onClick: onClose,
+            },
+            h(Icon, { name: 'close', size: 12 }),
+          ),
+        ),
+        total === 0
+          ? h(
+              'div',
+              { className: 'lr-ann-empty' },
+              h(Icon, { name: 'quote', size: 18 }),
+              h('div', null, t('noteAnnEmpty')),
+              h('div', { className: 'lr-ann-empty-hint' }, t('noteAnnEmptyHint')),
+            )
+          : h(
+              'div',
+              { className: 'lr-ann-panel-body' },
+              h(NoteAnnotationGroup, {
+                title: t('noteAnnOpen'),
+                items: groups.open,
+                collapsed: Boolean(folded.open),
+                onToggle: () => setFolded((value) => ({ ...value, open: !value.open })),
+                onLocate,
+                onEdit,
+                onDelete,
+              }),
+              h(NoteAnnotationGroup, {
+                title: t('noteAnnResolved'),
+                items: groups.resolved,
+                collapsed: Boolean(folded.resolved),
+                onToggle: () => setFolded((value) => ({ ...value, resolved: !value.resolved })),
+                onLocate,
+                onEdit,
+                onDelete,
+              }),
+              h(NoteAnnotationGroup, {
+                title: t('noteAnnOrphan'),
+                items: groups.orphan,
+                collapsed: Boolean(folded.orphan),
+                onToggle: () => setFolded((value) => ({ ...value, orphan: !value.orphan })),
+                onLocate,
+                onEdit,
+                onDelete,
+              }),
+            ),
+      )
+    }
+
+    function NoteApplyBar({
+      pendingCount,
+      running,
+      label,
+      instruction,
+      onInstruction,
+      onApply,
+      onOpenPanel,
+      orphanCount,
+      disabled,
+    }) {
+      return h(
+        'div',
+        { className: `lr-note-applybar${running ? ' running' : ''}` },
+        h(
+          'div',
+          { className: 'lr-note-applybar-info' },
+          h(
+            'button',
+            {
+              type: 'button',
+              className: 'lr-note-applybar-count',
+              onClick: onOpenPanel,
+              title: t('noteAnnCount'),
+            },
+            h(Icon, { name: 'quote', size: 13 }),
+            t('noteApplyPending').split('{count}').join(String(pendingCount)),
+          ),
+          h('span', { className: 'lr-note-applybar-hint' }, running ? label || t('noteApplying') : t('noteApplyHint')),
+          orphanCount > 0 ? h('span', { className: 'lr-note-applybar-warn' }, `${t('noteAnnOrphan')} ${orphanCount}`) : null,
+        ),
+        h('input', {
+          className: 'lr-note-applybar-input',
+          value: instruction,
+          placeholder: t('noteApplyInstruction'),
+          disabled: running || disabled,
+          onChange: (event) => onInstruction(event.target.value),
+          onKeyDown: (event) => {
+            if (event.key === 'Enter' && !running) {
+              event.preventDefault()
+              onApply?.()
+            }
+          },
+          'aria-label': t('noteApplyInstruction'),
+        }),
+        h(
+          'button',
+          {
+            type: 'button',
+            className: 'lr-btn primary lr-note-apply-btn',
+            onClick: onApply,
+            disabled: running || disabled || (pendingCount === 0 && !String(instruction || '').trim()),
+            title: t('noteApply'),
+          },
+          running ? h(Spinner, { size: 13 }) : h(Icon, { name: 'sparkle', size: 14 }),
+          running ? label || t('noteApplying') : t('noteApply'),
+        ),
+      )
+    }
+
+    function NoteEditor({ value, onChange, onSave, onCancel, dirty, saving, error, draftOffer, onRestoreDraft, onDiscardDraft, onInsertImage, onCursor }) {
+      const areaRef = useRef(null)
+      const reportCursor = (area) => {
+        if (area && typeof onCursor === 'function') onCursor(area.selectionStart)
+      }
+      useEffect(() => {
+        const area = areaRef.current
+        if (!area) return
+        area.focus()
+        const end = area.value.length
+        try {
+          area.setSelectionRange(end, end)
+        } catch {
+          // ignore selection failures on readonly nodes
+        }
+      }, [])
+      return h(
+        'div',
+        { className: 'lr-note-editor' },
+        h(
+          'div',
+          { className: 'lr-note-editor-bar' },
+          h(
+            'button',
+            { type: 'button', className: 'lr-btn small primary', onClick: onSave, disabled: saving || !dirty },
+            saving ? h(Spinner, { size: 12 }) : h(Icon, { name: 'check', size: 13 }),
+            dirty ? t('save') : t('noteSaved'),
+          ),
+          h(
+            'button',
+            { type: 'button', className: 'lr-btn small', onClick: onCancel, disabled: saving },
+            t('noteEditorCancel'),
+          ),
+          h('span', { className: 'lr-note-editor-words' }, t('noteEditorWords').split('{count}').join(String(noteWordCount(value)))),
+          h('span', { className: 'lr-ann-spacer' }),
+          h(
+            'button',
+            { type: 'button', className: 'lr-btn small', onClick: onInsertImage, disabled: saving },
+            h(Icon, { name: 'expand', size: 12 }),
+            t('noteInsertImage'),
+          ),
+          h('span', { className: 'lr-note-editor-hint' }, t('noteEditorHint')),
+        ),
+        draftOffer
+          ? h(
+              'div',
+              { className: 'lr-note-draft-banner' },
+              h(Icon, { name: 'note', size: 13 }),
+              h('span', null, `${t('noteEditorDraft')} · ${noteFormatTime(draftOffer.savedAt)}`),
+              h(
+                'button',
+                { type: 'button', className: 'lr-btn small', onClick: onRestoreDraft },
+                t('noteEditorDraftRestore'),
+              ),
+              h(
+                'button',
+                { type: 'button', className: 'lr-btn small', onClick: onDiscardDraft },
+                t('noteEditorDraftDiscard'),
+              ),
+            )
+          : null,
+        error ? h('div', { className: 'lr-note-editor-error' }, error) : null,
+        h(
+          'div',
+          { className: 'lr-note-editor-body' },
+          h('textarea', {
+            ref: areaRef,
+            className: 'lr-note-source',
+            value,
+            spellCheck: false,
+            onChange: (event) => onChange(event.target.value),
+            onSelect: (event) => reportCursor(event.currentTarget),
+            onClick: (event) => reportCursor(event.currentTarget),
+            onKeyUp: (event) => reportCursor(event.currentTarget),
+            onKeyDown: (event) => {
+              if ((event.ctrlKey || event.metaKey) && (event.key === 's' || event.key === 'S')) {
+                event.preventDefault()
+                onSave?.()
+                return
+              }
+              if (event.key === 'Tab') {
+                event.preventDefault()
+                const area = event.currentTarget
+                const start = area.selectionStart
+                const end = area.selectionEnd
+                const next = `${value.slice(0, start)}  ${value.slice(end)}`
+                onChange(next)
+                requestAnimationFrame(() => {
+                  area.selectionStart = start + 2
+                  area.selectionEnd = start + 2
+                  reportCursor(area)
+                })
+              }
+            },
+          }),
+        ),
+      )
+    }
+
+    // Axis-aligned crop rectangle in normalised 0-1000 page coordinates.
+    function noteNormRect(a, b) {
+      const x0 = Math.round(Math.min(a.x, b.x) * 1000)
+      const y0 = Math.round(Math.min(a.y, b.y) * 1000)
+      const x1 = Math.round(Math.max(a.x, b.x) * 1000)
+      const y1 = Math.round(Math.max(a.y, b.y) * 1000)
+      return [
+        Math.max(0, Math.min(1000, x0)),
+        Math.max(0, Math.min(1000, y0)),
+        Math.max(0, Math.min(1000, x1)),
+        Math.max(0, Math.min(1000, y1)),
+      ]
+    }
+
+    function NoteInsertDialog({ paper, markdown, anchorOffset, onClose, onInserted, showToast }) {
+      const [tab, setTab] = useState('upload')
+      const [upload, setUpload] = useState(null)
+      const [uploadError, setUploadError] = useState('')
+      const [instruction, setInstruction] = useState('')
+      const [position, setPosition] = useState('auto')
+      const [heading, setHeading] = useState('')
+      const [page, setPage] = useState(1)
+      const [pageLoading, setPageLoading] = useState(true)
+      const [drag, setDrag] = useState(null)
+      const [region, setRegion] = useState(null)
+      const [crop, setCrop] = useState(null)
+      const [busy, setBusy] = useState(false)
+      const [error, setError] = useState('')
+      const [question, setQuestion] = useState(null)
+      const [answer, setAnswer] = useState('')
+      const imgRef = useRef(null)
+      const pageCount = Math.max(1, Number(paper?.pageCount) || 1)
+
+      const headings = useMemo(() => {
+        const blocks = parseMarkdown(markdown || '').blocks
+        const out = []
+        for (const block of blocks) {
+          if (!block || block.type !== 'heading') continue
+          if (Number(block.level) < 2) continue
+          const text = (block.inline || []).map((item) => (item && item.text) || '').join('').trim()
+          if (text) out.push({ text })
+        }
+        return out
+      }, [markdown])
+
+      useEffect(() => {
+        setPageLoading(true)
+      }, [page])
+
+      const pickFile = async (file) => {
+        if (!file) return
+        if (!/^image\/(png|jpeg)$/i.test(file.type)) {
+          setUploadError(t('noteInsertTypeBad'))
+          return
+        }
+        if (file.size > 8 * 1024 * 1024) {
+          setUploadError(t('noteInsertTooLarge'))
+          return
+        }
+        setUploadError('')
+        try {
+          const dataUrl = await new Promise((resolve, reject) => {
+            const reader = new FileReader()
+            reader.onload = () => resolve(String(reader.result || ''))
+            reader.onerror = () => reject(new Error(t('noteInsertFailed')))
+            reader.readAsDataURL(file)
+          })
+          setUpload({ dataUrl, name: file.name || '', mediaType: file.type })
+        } catch (readError) {
+          setUploadError(safeError(readError) || t('noteInsertFailed'))
+        }
+      }
+
+      const pointFromEvent = (event) => {
+        const node = imgRef.current
+        if (!node) return null
+        const rect = node.getBoundingClientRect()
+        if (!rect.width || !rect.height) return null
+        const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width))
+        const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height))
+        return { x, y }
+      }
+
+      const finishCrop = async (normalized) => {
+        const node = imgRef.current
+        if (!node || !normalized) return
+        const [x0, y0, x1, y1] = normalized
+        if (x1 - x0 < 8 || y1 - y0 < 8) {
+          setCrop(null)
+          return
+        }
+        const naturalWidth = node.naturalWidth || 1
+        const naturalHeight = node.naturalHeight || 1
+        const sx = Math.round((x0 / 1000) * naturalWidth)
+        const sy = Math.round((y0 / 1000) * naturalHeight)
+        const sw = Math.max(1, Math.round(((x1 - x0) / 1000) * naturalWidth))
+        const sh = Math.max(1, Math.round(((y1 - y0) / 1000) * naturalHeight))
+        try {
+          const canvas = document.createElement('canvas')
+          canvas.width = sw
+          canvas.height = sh
+          const context = canvas.getContext('2d')
+          context.drawImage(node, sx, sy, sw, sh, 0, 0, sw, sh)
+          const dataUrl = canvas.toDataURL('image/png')
+          const base64 = dataUrl.slice(dataUrl.indexOf(',') + 1)
+          const bytes = Math.floor((base64.length * 3) / 4)
+          if (bytes > 8 * 1024 * 1024) {
+            setError(t('noteInsertTooLarge'))
+            setCrop(null)
+            return
+          }
+          setError('')
+          setCrop({ dataUrl, mediaType: 'image/png' })
+        } catch (cropError) {
+          setError(safeError(cropError) || t('noteInsertFailed'))
+        }
+      }
+
+      const buildAnchor = () => {
+        if (position === 'section' && heading) return { heading }
+        if (position === 'cursor') {
+          const offset = Number(anchorOffset)
+          return { afterOffset: Number.isFinite(offset) && offset >= 0 ? offset : 0 }
+        }
+        return undefined
+      }
+
+      const submit = async () => {
+        if (busy) return
+        const payload = tab === 'upload' ? upload : crop
+        if (!payload?.dataUrl) {
+          setError(tab === 'upload' ? t('noteInsertPickFile') : t('noteInsertNoRegion'))
+          return
+        }
+        if (position === 'section' && !heading) {
+          setError(t('noteInsertPosSection'))
+          return
+        }
+        setBusy(true)
+        setError('')
+        try {
+          const result = await request(`/papers/${paper.id}/summary/images`, {
+            method: 'POST',
+            body: {
+              dataUrl: payload.dataUrl,
+              mediaType: payload.mediaType || 'image/png',
+              name: tab === 'upload' ? payload.name || '' : '',
+              instruction: instruction.trim(),
+              anchor: buildAnchor(),
+            },
+          })
+          if (result.status === 'needs_question') {
+            setQuestion({ question: result.question || '', suggestion: result.suggestion || '', imageId: result.imageId, round: 1 })
+            setAnswer('')
+            return
+          }
+          if (result.markdown !== undefined) {
+            onInserted?.(result)
+            showToast(t('noteInserted'), 'ok')
+            onClose?.()
+            return
+          }
+          setError(t('noteInsertFailed'))
+        } catch (submitError) {
+          setError(safeError(submitError) || t('noteInsertFailed'))
+        } finally {
+          setBusy(false)
+        }
+      }
+
+      const answerQuestion = async (force) => {
+        if (busy || !question?.imageId) return
+        setBusy(true)
+        setError('')
+        try {
+          const result = await request(`/papers/${paper.id}/summary/images/${encodeURIComponent(question.imageId)}/place`, {
+            method: 'POST',
+            body: force
+              ? { force: true, heading: position === 'section' ? heading : undefined }
+              : { answer: answer.trim(), heading: position === 'section' ? heading : undefined },
+          })
+          if (result.status === 'needs_question' && !force && question.round < 2) {
+            setQuestion({
+              question: result.question || '',
+              suggestion: result.suggestion || '',
+              imageId: result.imageId || question.imageId,
+              round: question.round + 1,
+            })
+            setAnswer('')
+            return
+          }
+          if (result.markdown !== undefined) {
+            onInserted?.(result)
+            showToast(t('noteInserted'), 'ok')
+            onClose?.()
+            return
+          }
+          setError(t('noteInsertFailed'))
+        } catch (answerError) {
+          setError(safeError(answerError) || t('noteQuestionFailed'))
+        } finally {
+          setBusy(false)
+        }
+      }
+
+      if (question) {
+        return h(
+          Modal,
+          { title: t('noteQuestionTitle'), subtitle: paper?.title, onClose: busy ? () => {} : onClose },
+          h(
+            'div',
+            { className: 'lr-note-question' },
+            h('div', { className: 'lr-note-question-badge' }, t('noteQuestionRound').split('{round}').join(String(question.round))),
+            h('div', { className: 'lr-note-question-text' }, question.question),
+            question.suggestion ? h('div', { className: 'lr-note-question-suggest' }, question.suggestion) : null,
+            h('textarea', {
+              className: 'lr-ann-input',
+              rows: 3,
+              value: answer,
+              placeholder: t('noteQuestionAnswerPlaceholder'),
+              onChange: (event) => setAnswer(event.target.value),
+              onKeyDown: (event) => {
+                if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                  event.preventDefault()
+                  answerQuestion(false)
+                }
+              },
+            }),
+            error ? h('div', { className: 'lr-ann-error' }, error) : null,
+            h(
+              'div',
+              { className: 'lr-ann-dialog-actions' },
+              h('span', { className: 'lr-ann-spacer' }),
+              h('button', { type: 'button', className: 'lr-btn', onClick: onClose, disabled: busy }, t('cancel')),
+              h(
+                'button',
+                { type: 'button', className: 'lr-btn', onClick: () => answerQuestion(true), disabled: busy },
+                t('noteQuestionForce'),
+              ),
+              h(
+                'button',
+                { type: 'button', className: 'lr-btn primary', onClick: () => answerQuestion(false), disabled: busy },
+                busy ? h(Spinner, { size: 12 }) : h(Icon, { name: 'arrowUp', size: 13 }),
+                t('noteQuestionSubmit'),
+              ),
+            ),
+          ),
+        )
+      }
+
+      return h(
+        Modal,
+        { title: t('noteInsertTitle'), subtitle: paper?.title, onClose: busy ? () => {} : onClose, wide: true },
+        h(
+          'div',
+          { className: 'lr-note-insert' },
+          h(
+            'div',
+            { className: 'lr-note-tabs' },
+            h(
+              'button',
+              {
+                type: 'button',
+                className: `lr-note-tab${tab === 'upload' ? ' active' : ''}`,
+                onClick: () => setTab('upload'),
+              },
+              h(Icon, { name: 'upload', size: 13 }),
+              t('noteInsertUpload'),
+            ),
+            h(
+              'button',
+              {
+                type: 'button',
+                className: `lr-note-tab${tab === 'crop' ? ' active' : ''}`,
+                onClick: () => setTab('crop'),
+              },
+              h(Icon, { name: 'select', size: 13 }),
+              t('noteInsertCrop'),
+            ),
+          ),
+          tab === 'upload'
+            ? h(
+                'div',
+                { className: 'lr-note-upload' },
+                h(
+                  'label',
+                  { className: 'lr-note-upload-pick' },
+                  h(Icon, { name: 'upload', size: 15 }),
+                  t('noteInsertPickFile'),
+                  h('input', {
+                    type: 'file',
+                    accept: 'image/png,image/jpeg',
+                    className: 'lr-file-input',
+                    onChange: (event) => pickFile(event.target.files && event.target.files[0]),
+                  }),
+                ),
+                upload
+                  ? h('img', { className: 'lr-note-upload-preview', src: upload.dataUrl, alt: t('noteInsertPreview') })
+                  : null,
+                uploadError ? h('div', { className: 'lr-ann-error' }, uploadError) : null,
+              )
+            : h(
+                'div',
+                { className: 'lr-note-crop' },
+                h(
+                  'div',
+                  { className: 'lr-note-crop-bar' },
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      className: 'lr-btn icon small',
+                      onClick: () => setPage((value) => Math.max(1, value - 1)),
+                      disabled: page <= 1,
+                      title: t('noteInsertPrevPage'),
+                    },
+                    h(Icon, { name: 'chevronLeft', size: 12 }),
+                  ),
+                  h('span', { className: 'lr-note-crop-page' }, t('noteInsertPage').split('{page}').join(String(page)).split('{total}').join(String(pageCount))),
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      className: 'lr-btn icon small',
+                      onClick: () => setPage((value) => Math.min(pageCount, value + 1)),
+                      disabled: page >= pageCount,
+                      title: t('noteInsertNextPage'),
+                    },
+                    h(Icon, { name: 'chevronRight', size: 12 }),
+                  ),
+                  h('span', { className: 'lr-note-crop-hint' }, t('noteInsertDragHint')),
+                ),
+                h(
+                  'div',
+                  { className: 'lr-note-crop-stage' },
+                  h('img', {
+                    ref: imgRef,
+                    src: `${API}/papers/${paper.id}/page/${page}`,
+                    alt: t('noteInsertPage').split('{page}').join(String(page)).split('{total}').join(String(pageCount)),
+                    draggable: false,
+                    onLoad: () => setPageLoading(false),
+                    onError: () => setPageLoading(false),
+                    onPointerDown: (event) => {
+                      const point = pointFromEvent(event)
+                      if (!point) return
+                      event.currentTarget.setPointerCapture?.(event.pointerId)
+                      setDrag({ start: point, current: point })
+                    },
+                    onPointerMove: (event) => {
+                      if (!drag) return
+                      const point = pointFromEvent(event)
+                      if (point) setDrag({ start: drag.start, current: point })
+                    },
+                    onPointerUp: () => {
+                      if (!drag) return
+                      const normalized = noteNormRect(drag.start, drag.current)
+                      setDrag(null)
+                      setRegion(normalized)
+                      finishCrop(normalized)
+                    },
+                    onPointerCancel: () => setDrag(null),
+                  }),
+                  drag
+                    ? h('div', {
+                        className: 'lr-note-crop-box',
+                        style: {
+                          left: `${Math.min(drag.start.x, drag.current.x) * 100}%`,
+                          top: `${Math.min(drag.start.y, drag.current.y) * 100}%`,
+                          width: `${Math.abs(drag.current.x - drag.start.x) * 100}%`,
+                          height: `${Math.abs(drag.current.y - drag.start.y) * 100}%`,
+                        },
+                      })
+                    : region
+                      ? h('div', {
+                          className: 'lr-note-crop-box locked',
+                          style: {
+                            left: `${(region[0] / 1000) * 100}%`,
+                            top: `${(region[1] / 1000) * 100}%`,
+                            width: `${((region[2] - region[0]) / 1000) * 100}%`,
+                            height: `${((region[3] - region[1]) / 1000) * 100}%`,
+                          },
+                        })
+                      : null,
+                  pageLoading ? h('div', { className: 'lr-note-crop-loading' }, h(Spinner, { size: 16 }), t('noteInsertLoadingPage')) : null,
+                ),
+                crop
+                  ? h(
+                      'div',
+                      { className: 'lr-note-crop-result' },
+                      h('img', { src: crop.dataUrl, alt: t('noteInsertPreview') }),
+                      h('span', null, t('noteInsertPreview')),
+                    )
+                  : null,
+              ),
+          h('input', {
+            className: 'lr-note-insert-input',
+            value: instruction,
+            placeholder: t('noteInsertInstruction'),
+            onChange: (event) => setInstruction(event.target.value),
+          }),
+          h(
+            'div',
+            { className: 'lr-ann-dialog-row' },
+            h('span', { className: 'lr-ann-label' }, t('noteInsertPosition')),
+            h(
+              'div',
+              { className: 'lr-note-pos' },
+              [
+                ['auto', t('noteInsertPosAuto')],
+                ['section', t('noteInsertPosSection')],
+                ['cursor', t('noteInsertPosCursor')],
+              ].map(([value, label]) =>
+                h(
+                  'button',
+                  {
+                    key: value,
+                    type: 'button',
+                    className: `lr-note-pos-btn${position === value ? ' active' : ''}`,
+                    onClick: () => setPosition(value),
+                  },
+                  label,
+                ),
+              ),
+            ),
+          ),
+          position === 'section'
+            ? h(
+                'select',
+                {
+                  className: 'lr-select lr-note-section-select',
+                  value: heading,
+                  onChange: (event) => setHeading(event.target.value),
+                },
+                h('option', { value: '' }, t('noteInsertPosSection')),
+                headings.map((item) =>
+                  h('option', { key: item.text, value: item.text }, item.text),
+                ),
+              )
+            : null,
+          position === 'cursor'
+            ? h('div', { className: 'lr-note-cursor-hint' }, t('noteInsertCursorHint'))
+            : null,
+          error ? h('div', { className: 'lr-ann-error' }, error) : null,
+          h(
+            'div',
+            { className: 'lr-ann-dialog-actions' },
+            h('span', { className: 'lr-ann-spacer' }),
+            h('button', { type: 'button', className: 'lr-btn', onClick: onClose, disabled: busy }, t('cancel')),
+            h(
+              'button',
+              { type: 'button', className: 'lr-btn primary', onClick: submit, disabled: busy },
+              busy ? h(Spinner, { size: 12 }) : h(Icon, { name: 'check', size: 13 }),
+              busy ? t('noteInserting') : t('noteInsertSubmit'),
+            ),
+          ),
+        ),
+      )
+    }
+
+    function NoteHistoryDrawer({ open, loading, versions, error, onClose, onPreview, onRestore, busy }) {
+      if (!open) return null
+      return h(
+        'div',
+        { className: 'lr-note-history-mask', onMouseDown: (event) => { if (event.target === event.currentTarget) onClose?.() } },
+        h(
+          'aside',
+          { className: 'lr-note-history', role: 'dialog', 'aria-modal': 'true', 'aria-label': t('noteHistoryTitle') },
+          h(
+            'div',
+            { className: 'lr-note-history-head' },
+            h(Icon, { name: 'refresh', size: 14 }),
+            h('span', { className: 'lr-note-history-title' }, t('noteHistoryTitle')),
+            h(
+              'button',
+              { type: 'button', className: 'lr-btn icon small', onClick: onClose, 'aria-label': t('close') },
+              h(Icon, { name: 'close', size: 12 }),
+            ),
+          ),
+          h(
+            'div',
+            { className: 'lr-note-history-body' },
+            loading
+              ? h('div', { className: 'lr-note-history-empty' }, h(Spinner, { size: 14 }), t('noteHistoryLoading'))
+              : error
+                ? h('div', { className: 'lr-note-history-empty' }, error)
+                : versions.length === 0
+                  ? h('div', { className: 'lr-note-history-empty' }, t('noteHistoryEmpty'))
+                  : versions.map((item) => {
+                      const stamp = item.stamp || item.id || ''
+                      const label =
+                        item.source === 'manual'
+                          ? t('noteHistorySourceManual')
+                          : item.source === 'revision'
+                            ? t('noteHistorySourceRevision')
+                            : item.source === 'restore'
+                              ? t('noteHistorySourceRestore')
+                              : item.source === 'summary' || item.source === 'auto'
+                                ? t('noteHistorySourceAuto')
+                                : t('noteHistorySourceUnknown')
+                      return h(
+                        'div',
+                        { key: stamp, className: 'lr-note-history-row' },
+                        h(
+                          'div',
+                          { className: 'lr-note-history-main' },
+                          h('div', { className: 'lr-note-history-time' }, noteFormatTime(item.updatedAt || item.createdAt || '')),
+                          h(
+                            'div',
+                            { className: 'lr-note-history-meta' },
+                            h('span', { className: 'lr-note-history-tag' }, label),
+                            h(
+                              'span',
+                              null,
+                              t('noteHistoryChars').split('{count}').join(String(item.chars || 0)),
+                            ),
+                          ),
+                        ),
+                        h(
+                          'div',
+                          { className: 'lr-note-history-actions' },
+                          h(
+                            'button',
+                            { type: 'button', className: 'lr-btn small', onClick: () => onPreview?.(item), disabled: busy },
+                            t('noteHistoryPreview'),
+                          ),
+                          h(
+                            'button',
+                            { type: 'button', className: 'lr-btn small', onClick: () => onRestore?.(item), disabled: busy },
+                            t('noteHistoryRestore'),
+                          ),
+                        ),
+                      )
+                    }),
+          ),
+        ),
+      )
+    }
+
+    // Full-screen summary. It owns the summary text, its annotations, the
+    // Markdown editor, image insertion, figure completion and history.
+    function NoteView({ paper, onBack, onCitePage, onOpenObsidian, onRegenerate, showToast, onPaperChanged }) {
+      const paperId = paper?.id || ''
+      const [mode, setMode] = useState('preview')
+      const [loading, setLoading] = useState(true)
+      const [loadError, setLoadError] = useState('')
+      const [markdown, setMarkdown] = useState('')
+      const [version, setVersion] = useState('')
+      const [updatedAt, setUpdatedAt] = useState('')
+      const [annotations, setAnnotations] = useState(EMPTY)
+      const [annError, setAnnError] = useState('')
+      const [panelOpen, setPanelOpen] = useState(() => {
+        try {
+          return window.innerWidth > 1100
+        } catch {
+          return true
+        }
+      })
+      const [dialog, setDialog] = useState(null)
+      const [toolbar, setToolbar] = useState(null)
+      const [instruction, setInstruction] = useState('')
+      const [applying, setApplying] = useState(null)
+      const [draft, setDraft] = useState('')
+      const [dirty, setDirty] = useState(false)
+      const [saveState, setSaveState] = useState('saved')
+      const [saveError, setSaveError] = useState('')
+      const [conflict, setConflict] = useState(false)
+      const [draftOffer, setDraftOffer] = useState(null)
+      const [insertOpen, setInsertOpen] = useState(false)
+      const [anchorOffset, setAnchorOffset] = useState(null)
+      const [historyOpen, setHistoryOpen] = useState(false)
+      const [historyLoading, setHistoryLoading] = useState(false)
+      const [historyVersions, setHistoryVersions] = useState(EMPTY)
+      const [historyError, setHistoryError] = useState('')
+      const [historyPreview, setHistoryPreview] = useState(null)
+      const [lightbox, setLightbox] = useState(null)
+      const [figures, setFigures] = useState(null)
+      const [moreOpen, setMoreOpen] = useState(false)
+      // Obsidian is read-only for us, so a vault note newer than the local body
+      // means someone hand-edited it there. We warn, but never block saving.
+      const [vaultState, setVaultState] = useState(null)
+      const [vaultPreview, setVaultPreview] = useState(null)
+
+      const paperWrapRef = useRef(null)
+      const scrollRef = useRef(null)
+      const pendingRef = useRef(null)
+      const applyAbort = useRef(null)
+      const figuresAbort = useRef(null)
+      const modeRef = useRef('preview')
+      const moreRef = useRef(null)
+
+      useEffect(() => {
+        modeRef.current = mode
+      }, [mode])
+
+      const parsed = useMemo(() => {
+        const result = parseMarkdown(markdown)
+        const projection = plainProjection(result.blocks)
+        return { blocks: result.blocks, projection }
+      }, [markdown])
+
+      // Fetch the Obsidian body once, ahead of the click. If the user only ever
+      // gets a passive link they tend to save first and only then read the
+      // warning — by then the hand edit is gone, so pull it while it still exists.
+      const prefetchVaultBody = useCallback(async () => {
+        if (!paperId) return null
+        try {
+          const result = await request(`/papers/${paperId}/summary/vault-body`)
+          const body = {
+            markdown: result.markdown || '',
+            updatedAt: result.updatedAt || '',
+            missing: false,
+            error: '',
+          }
+          setVaultPreview(body)
+          return body
+        } catch (error) {
+          const missing = Boolean(error && error.status === 404)
+          const body = {
+            markdown: '',
+            updatedAt: '',
+            missing,
+            error: missing ? t('noteVaultMissing') : safeError(error) || t('noteVaultLoadFailed'),
+          }
+          setVaultPreview(body)
+          return body
+        }
+      }, [paperId])
+
+      // Open the read-only dialog instantly when the body is already cached.
+      function openVaultPreview() {
+        if (vaultPreview && vaultPreview.markdown) {
+          setVaultPreview({ ...vaultPreview, open: true })
+          return
+        }
+        setVaultPreview({ markdown: '', updatedAt: '', missing: false, error: '', loading: true, open: true })
+        prefetchVaultBody().then((body) => {
+          if (body) setVaultPreview({ ...body, open: true })
+        })
+      }
+
+      const load = useCallback(
+        async (silent) => {
+          if (!paperId) return null
+          if (!silent) {
+            setLoading(true)
+            setLoadError('')
+          }
+          try {
+            const result = await request(`/papers/${paperId}/summary`)
+            setMarkdown(result.markdown || '')
+            setVersion(result.version || '')
+            setUpdatedAt(result.updatedAt || '')
+            setAnnotations(Array.isArray(result.annotations) ? result.annotations : EMPTY)
+            setLoading(false)
+            setLoadError('')
+            // Vault drift is a hint, not a gate: remember it and keep going.
+            // Keep an existing dismissal so a silent reload (after apply, undo,
+            // restore) does not pop the banner back at the user.
+            const modified = Boolean(result.vaultModified)
+            setVaultState((current) => ({
+              modified,
+              time: noteFormatTime(result.vaultUpdatedAt || ''),
+              dismissed: Boolean(current && current.dismissed),
+            }))
+            if (modified) prefetchVaultBody()
+            return result
+          } catch (error) {
+            if (!silent) {
+              setLoadError(safeError(error) || t('noteLoadFailed'))
+              setLoading(false)
+            }
+            return null
+          }
+        },
+        [paperId, prefetchVaultBody],
+      )
+
+      useEffect(() => {
+        load(false)
+      }, [load])
+
+      // Autosave a local draft so an accidental refresh never loses work.
+      useEffect(() => {
+        if (mode !== 'edit' || !dirty || !paperId) return
+        const timer = setTimeout(() => {
+          writeNoteDraft(paperId, {
+            markdown: draft,
+            baseVersion: version,
+            savedAt: new Date().toISOString(),
+          })
+        }, 600)
+        return () => clearTimeout(timer)
+      }, [draft, dirty, mode, paperId, version])
+
+      // Close the "more" menu on an outside click.
+      useEffect(() => {
+        if (!moreOpen) return
+        const onDown = (event) => {
+          if (moreRef.current && !moreRef.current.contains(event.target)) setMoreOpen(false)
+        }
+        document.addEventListener('mousedown', onDown)
+        return () => document.removeEventListener('mousedown', onDown)
+      }, [moreOpen])
+
+      // The browser-level guard mirrors the in-app confirm: leaving the page
+      // with unsaved source would lose the edit even though a draft exists.
+      useEffect(() => {
+        if (mode !== 'edit' || !dirty) return
+        const onBeforeUnload = (event) => {
+          event.preventDefault()
+          event.returnValue = t('noteLeaveBody')
+          return event.returnValue
+        }
+        window.addEventListener('beforeunload', onBeforeUnload)
+        return () => window.removeEventListener('beforeunload', onBeforeUnload)
+      }, [dirty, mode])
+
+      // Selection -> floating toolbar. Only in preview mode and only for
+      // selections that start and end inside the document.
+      useEffect(() => {
+        if (mode !== 'preview') {
+          setToolbar(null)
+          pendingRef.current = null
+          return
+        }
+        const root = paperWrapRef.current
+        if (!root) return
+        let timer = 0
+        const measure = () => {
+          const selection = typeof window.getSelection === 'function' ? window.getSelection() : null
+          if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+            setToolbar(null)
+            return
+          }
+          const range = selection.getRangeAt(0)
+          if (!root.contains(range.startContainer) || !root.contains(range.endContainer)) {
+            setToolbar(null)
+            return
+          }
+          const span = noteSelectionSpan(root, range)
+          if (!span) {
+            setToolbar(null)
+            return
+          }
+          const text = parsed.projection.text.slice(span.from, span.to)
+          if (!/\S/.test(text)) {
+            setToolbar(null)
+            return
+          }
+          const rect = range.getBoundingClientRect()
+          const box = root.getBoundingClientRect()
+          pendingRef.current = { from: span.from, to: span.to, quote: text, start: range.startOffset }
+          setToolbar({
+            left: Math.max(64, Math.min(Math.max(64, box.width - 64), rect.left - box.left + rect.width / 2)),
+            top: Math.max(4, rect.top - box.top - 40),
+          })
+        }
+        const onUp = () => {
+          clearTimeout(timer)
+          timer = setTimeout(measure, 30)
+        }
+        const onSelectionChange = () => {
+          clearTimeout(timer)
+          timer = setTimeout(measure, 140)
+        }
+        document.addEventListener('mouseup', onUp)
+        document.addEventListener('selectionchange', onSelectionChange)
+        return () => {
+          clearTimeout(timer)
+          document.removeEventListener('mouseup', onUp)
+          document.removeEventListener('selectionchange', onSelectionChange)
+        }
+      }, [mode, parsed])
+
+      const openAnnotations = useMemo(
+        () => (annotations || []).filter((item) => item && item.status !== 'resolved' && item.status !== 'orphan'),
+        [annotations],
+      )
+      const orphanCount = useMemo(
+        () => (annotations || []).filter((item) => item && item.status === 'orphan').length,
+        [annotations],
+      )
+
+      function scrollToAnnotation(id) {
+        if (!id) return
+        const root = paperWrapRef.current
+        const node = root ? root.querySelector(`[data-ann="${String(id).replace(/"/g, '\\"')}"]`) : null
+        if (node) {
+          node.scrollIntoView({ block: 'center', behavior: 'smooth' })
+          return
+        }
+        scrollRef.current?.scrollTo?.({ top: 0, behavior: 'smooth' })
+      }
+
+      function requestBack() {
+        if (mode === 'edit' && dirty && !window.confirm(t('noteLeaveBody'))) return
+        onBack?.()
+      }
+
+      function enterEdit() {
+        setDraft(markdown)
+        setDirty(false)
+        setSaveState('saved')
+        setSaveError('')
+        setConflict(false)
+        setAnchorOffset(null)
+        const stored = paperId ? readNoteDraft(paperId) : null
+        setDraftOffer(stored && stored.markdown !== markdown ? stored : null)
+        setToolbar(null)
+        setMode('edit')
+      }
+
+      function leaveEdit() {
+        if (dirty && !window.confirm(t('noteLeaveEditBody'))) return
+        setMode('preview')
+        setDraftOffer(null)
+        setConflict(false)
+        setSaveError('')
+      }
+
+      function onChangeSource(next) {
+        setDraft(next)
+        setDirty(next !== markdown)
+        setSaveState(next === markdown ? 'saved' : 'unsaved')
+      }
+
+      async function saveSource(force) {
+        if (!paperId) return
+        setSaveState('saving')
+        setSaveError('')
+        try {
+          const result = await request(`/papers/${paperId}/summary`, {
+            method: 'PUT',
+            body: { markdown: draft, baseVersion: version, force: Boolean(force) },
+          })
+          const nextText = typeof result.markdown === 'string' ? result.markdown : draft
+          setMarkdown(nextText)
+          setVersion(result.version || version)
+          setUpdatedAt(result.updatedAt || new Date().toISOString())
+          if (Array.isArray(result.annotations)) setAnnotations(result.annotations)
+          setDraft(nextText)
+          setDirty(false)
+          setSaveState('saved')
+          setConflict(false)
+          if (paperId) clearNoteDraft(paperId)
+          // The host warns when this save replaced a newer hand edit in
+          // Obsidian. Local history cannot restore it, so say so precisely.
+          if (result.vaultOverwritten) {
+            setVaultState((current) => (current ? { ...current, modified: false, dismissed: true } : current))
+            setVaultPreview(null)
+            showToast?.(t('noteVaultOverwritten'), 'warn')
+          } else if (Array.isArray(result.lost) && result.lost.length > 0) {
+            showToast?.(t('noteAnnLost').split('{count}').join(String(result.lost.length)), 'warn')
+          } else {
+            showToast?.(t('noteSaved'), 'ok')
+          }
+          onPaperChanged?.({ updatedAt: result.updatedAt || '' })
+        } catch (error) {
+          setSaveState('error')
+          setSaveError(safeError(error) || t('noteSaveFailed'))
+          if (error && error.status === 409) setConflict(true)
+        }
+      }
+
+      async function reloadFromServer() {
+        setConflict(false)
+        setDraftOffer(null)
+        const result = await load(true)
+        if (result) {
+          setDraft(result.markdown || '')
+          setDirty(false)
+          setSaveState('saved')
+          setSaveError('')
+          if (paperId) clearNoteDraft(paperId)
+          showToast?.(t('noteReloaded'), 'ok')
+        }
+      }
+
+      async function persistAnnotations(next) {
+        setAnnotations(next)
+        if (!paperId) return
+        try {
+          const result = await request(`/papers/${paperId}/summary/annotations`, {
+            method: 'PUT',
+            body: { annotations: next },
+          })
+          if (Array.isArray(result.annotations)) setAnnotations(result.annotations)
+          setAnnError('')
+        } catch (error) {
+          setAnnError(safeError(error) || t('noteAnnSaveFailed'))
+          throw error
+        }
+      }
+
+      function makeAnnotation(draftInput) {
+        const projection = parsed.projection
+        const existing = draftInput.id ? (annotations || []).find((item) => item.id === draftInput.id) : null
+        if (existing) {
+          return {
+            ...existing,
+            note: draftInput.note,
+            color: draftInput.color,
+          }
+        }
+        const mapped = mapPlainToSource(projection, draftInput.from, draftInput.to)
+        if (!mapped) return null
+        const text = projection.text
+        return {
+          id: noteMakeId(),
+          quote: text.slice(draftInput.from, draftInput.to),
+          prefix: text.slice(Math.max(0, draftInput.from - 48), draftInput.from),
+          suffix: text.slice(draftInput.to, Math.min(text.length, draftInput.to + 48)),
+          start: mapped.start,
+          end: mapped.end,
+          note: draftInput.note,
+          color: draftInput.color,
+          status: 'open',
+          createdAt: new Date().toISOString(),
+          resolvedAt: '',
+          revision: 0,
+          reply: '',
+        }
+      }
+
+      async function saveAnnotation(draftInput) {
+        const annotation = makeAnnotation(draftInput)
+        if (!annotation) {
+          throw new Error(t('noteAnnFailedLocate'))
+        }
+        const exists = (annotations || []).some((item) => item.id === annotation.id)
+        const next = exists
+          ? (annotations || []).map((item) => (item.id === annotation.id ? annotation : item))
+          : [...(annotations || []), annotation]
+        await persistAnnotations(next)
+        setDialog(null)
+        const root = paperWrapRef.current
+        if (root) {
+          const range = typeof document.createRange === 'function' ? document.createRange() : null
+          if (range) range.selectNodeContents(root)
+          const selection = typeof window.getSelection === 'function' ? window.getSelection() : null
+          selection?.removeAllRanges?.()
+        }
+        setToolbar(null)
+        pendingRef.current = null
+        showToast?.(t('noteAnnSaved'), 'ok')
+      }
+
+      async function deleteAnnotation(id) {
+        const next = (annotations || []).filter((item) => item.id !== id)
+        await persistAnnotations(next)
+        setDialog(null)
+        showToast?.(t('noteAnnDeleted'), 'ok')
+      }
+
+      async function editAnnotation(id) {
+        const found = (annotations || []).find((item) => item.id === id)
+        if (!found) return
+        setDialog({
+          id: found.id,
+          quote: found.quote || '',
+          note: found.note || '',
+          color: found.color || 'amber',
+          reply: found.reply || '',
+        })
+      }
+
+      function onPickAnnotation(id) {
+        if (modeRef.current !== 'preview') return
+        editAnnotation(id)
+      }
+
+      async function applyAnnotations() {
+        if (!paperId || applying) return
+        const ids = openAnnotations.map((item) => item.id)
+        const extra = instruction.trim()
+        if (ids.length === 0 && !extra) return
+        setApplying({ label: t('noteApplying') })
+        setToolbar(null)
+        const controller = new AbortController()
+        applyAbort.current = controller
+        let finished = null
+        let failure = ''
+        try {
+          await streamSse(
+            `/papers/${paperId}/summary/revise`,
+            { ids, instruction: extra },
+            (event) => {
+              if (!event) return
+              if (event.type === 'status') {
+                setApplying({ label: event.label || t('noteApplying') })
+              } else if (event.type === 'figure') {
+                setApplying({
+                  label: t('noteApplyingFigure')
+                    .split('{index}')
+                    .join(String((event.index || 0) + 1))
+                    .split('{total}')
+                    .join(String(event.total || 1)),
+                })
+              } else if (event.type === 'done') {
+                finished = event
+              }
+            },
+            controller.signal,
+          )
+        } catch (error) {
+          if (error && error.name !== 'AbortError') failure = safeError(error) || t('noteApplyFailed')
+        } finally {
+          applyAbort.current = null
+        }
+        if (failure) {
+          setApplying(null)
+          showToast?.(failure, 'error')
+          return
+        }
+        if (!finished) {
+          setApplying(null)
+          showToast?.(t('noteApplyFailed'), 'error')
+          return
+        }
+        const applied = Array.isArray(finished.applied) ? finished.applied.length : 0
+        const unresolved = Array.isArray(finished.unresolved) ? finished.unresolved.length : 0
+        setMarkdown(typeof finished.markdown === 'string' ? finished.markdown : markdown)
+        if (finished.version) setVersion(finished.version)
+        setInstruction('')
+        await load(true)
+        setApplying(null)
+        // Same warning as an editor save: the revision replaced a newer hand
+        // edit in Obsidian, and local history does not contain that text.
+        const overwrote = Boolean(finished.vaultOverwritten)
+        if (overwrote) {
+          setVaultState((current) => (current ? { ...current, modified: false, dismissed: true } : current))
+          setVaultPreview(null)
+        }
+        const message = unresolved > 0
+          ? t('noteApplyUnresolved').split('{applied}').join(String(applied)).split('{unresolved}').join(String(unresolved))
+          : t('noteApplyDone').split('{count}').join(String(applied))
+        if (overwrote) {
+          showToast?.(`${message} · ${t('noteVaultOverwritten')}`, 'warn')
+        } else {
+          showToast?.(message, unresolved > 0 ? 'warn' : 'ok')
+        }
+        const first = Array.isArray(finished.applied) && finished.applied.length > 0 ? finished.applied[0] : null
+        const firstId = first && typeof first === 'object' ? first.id : first
+        setTimeout(() => {
+          if (firstId) scrollToAnnotation(firstId)
+          else scrollRef.current?.scrollTo?.({ top: 0, behavior: 'smooth' })
+        }, 80)
+      }
+
+      async function runFigures() {
+        if (!paperId || figures) return
+        const placeholders = findFigurePlaceholders(markdown)
+        if (placeholders.length === 0) {
+          showToast?.(t('noteNoPlaceholders'), 'warn')
+          return
+        }
+        setFigures({ running: true, total: placeholders.length, done: 0, label: t('noteFiguresRunning') })
+        const controller = new AbortController()
+        figuresAbort.current = controller
+        let created = 0
+        let failed = 0
+        let finished = null
+        try {
+          await streamSse(
+            `/papers/${paperId}/summary/figures`,
+            { placeholders },
+            (event) => {
+              if (!event) return
+              if (event.type === 'start') {
+                setFigures({
+                  running: true,
+                  total: Number(event.total) || placeholders.length,
+                  done: 0,
+                  label: t('noteFiguresRunning'),
+                })
+              } else if (event.type === 'status') {
+                setFigures((current) => (current ? { ...current, label: event.label || current.label } : current))
+              } else if (event.type === 'figure') {
+                if (event.ok) created += 1
+                else failed += 1
+                setFigures((current) =>
+                  current ? { ...current, done: (current.done || 0) + 1 } : current,
+                )
+              } else if (event.type === 'done') {
+                finished = event
+              }
+            },
+            controller.signal,
+          )
+        } catch (error) {
+          if (!error || error.name !== 'AbortError') {
+            showToast?.(safeError(error) || t('noteFiguresFailed'), 'error')
+          }
+        } finally {
+          figuresAbort.current = null
+          setFigures(null)
+        }
+        if (finished) {
+          setMarkdown(typeof finished.markdown === 'string' ? finished.markdown : markdown)
+          if (finished.version) setVersion(finished.version)
+          await load(true)
+          showToast?.(
+            t('noteFiguresDone')
+              .split('{created}')
+              .join(String(Number(finished.created) || created))
+              .split('{failed}')
+              .join(String(Number(finished.failed) || failed)),
+            failed > 0 || Number(finished.failed) > 0 ? 'warn' : 'ok',
+          )
+        }
+      }
+
+      async function openHistory() {
+        setHistoryOpen(true)
+        setMoreOpen(false)
+        setHistoryLoading(true)
+        setHistoryError('')
+        try {
+          const result = await request(`/papers/${paperId}/summary/history`)
+          setHistoryVersions(Array.isArray(result.versions) ? result.versions : EMPTY)
+        } catch (error) {
+          setHistoryError(safeError(error) || t('noteHistoryFailed'))
+        } finally {
+          setHistoryLoading(false)
+        }
+      }
+
+      async function previewHistory(item) {
+        setHistoryPreview({
+          loading: true,
+          item,
+          title: noteFormatTime(item.updatedAt || item.createdAt || ''),
+          markdown: '',
+        })
+        try {
+          const result = await request(
+            `/papers/${paperId}/summary/history/${encodeURIComponent(item.stamp || item.id || '')}`,
+          )
+          setHistoryPreview({
+            loading: false,
+            item,
+            title: noteFormatTime(item.updatedAt || item.createdAt || ''),
+            markdown: result.markdown || '',
+          })
+        } catch (error) {
+          setHistoryPreview(null)
+          showToast?.(safeError(error) || t('noteHistoryFailed'), 'error')
+        }
+      }
+
+      async function restoreHistory(item) {
+        if (!item || !paperId) return
+        if (!window.confirm(t('noteHistoryRestoreConfirm'))) return
+        try {
+          const result = await request(
+            `/papers/${paperId}/summary/history/${encodeURIComponent(item.stamp || item.id || '')}/restore`,
+            { method: 'POST' },
+          )
+          setHistoryOpen(false)
+          if (result && typeof result.markdown === 'string') setMarkdown(result.markdown)
+          if (result && result.version) setVersion(result.version)
+          await load(true)
+          setDirty(false)
+          if (paperId) clearNoteDraft(paperId)
+          showToast?.(t('noteRestoreDone'), 'ok')
+          onPaperChanged?.({ updatedAt: (result && result.updatedAt) || '' })
+        } catch (error) {
+          showToast?.(safeError(error) || t('noteRestoreFailed'), 'error')
+        }
+      }
+
+      function onInserted(result) {
+        if (result && typeof result.markdown === 'string') {
+          setMarkdown(result.markdown)
+          setDirty(false)
+          if (modeRef.current === 'edit') setDraft(result.markdown)
+        }
+        if (result && result.version) setVersion(result.version)
+        if (result && result.updatedAt) setUpdatedAt(result.updatedAt)
+        load(true)
+        onPaperChanged?.({ updatedAt: (result && result.updatedAt) || '' })
+      }
+
+      function openInsert() {
+        setAnchorOffset(null)
+        setInsertOpen(true)
+      }
+
+      if (loading) {
+        return h(
+          'div',
+          { className: 'lr-note' },
+          h('div', { className: 'lr-note-loading' }, h(Spinner, { size: 20 }), t('noteLoading')),
+        )
+      }
+
+      if (loadError) {
+        return h(
+          'div',
+          { className: 'lr-note' },
+          h(
+            'div',
+            { className: 'lr-note-empty' },
+            h('div', { className: 'lr-note-empty-icon' }, h(Icon, { name: 'note', size: 30 })),
+            h('div', { className: 'lr-note-empty-title' }, t('noteLoadFailed')),
+            h('div', { className: 'lr-note-empty-desc' }, loadError),
+            h(
+              'div',
+              { className: 'lr-note-empty-actions' },
+              h(
+                'button',
+                { type: 'button', className: 'lr-btn', onClick: requestBack },
+                h(Icon, { name: 'chevronLeft', size: 13 }),
+                t('noteBack'),
+              ),
+              h('button', { type: 'button', className: 'lr-btn', onClick: () => load(false) }, t('retry')),
+              onRegenerate
+                ? h(
+                    'button',
+                    { type: 'button', className: 'lr-btn primary', onClick: onRegenerate },
+                    h(Icon, { name: 'sparkle', size: 13 }),
+                    t('noteGenerate'),
+                  )
+                : null,
+            ),
+          ),
+        )
+      }
+
+      const saveLabel =
+        saveState === 'saving'
+          ? t('noteSaving')
+          : saveState === 'unsaved'
+            ? t('noteUnsaved')
+            : saveState === 'error'
+              ? t('noteSaveFailedShort')
+              : t('noteSaved')
+
+      const annotationForDialog = dialog || null
+
+      return h(
+        'div',
+        { className: 'lr-note' },
+        h(
+          'header',
+          { className: 'lr-note-head' },
+          h(
+            'button',
+            {
+              type: 'button',
+              className: 'lr-btn small lr-note-back',
+              onClick: requestBack,
+              title: t('noteBack'),
+            },
+            h(Icon, { name: 'chevronLeft', size: 13 }),
+            h('span', { className: 'lr-note-btn-label' }, t('noteBack')),
+          ),
+          h(
+            'div',
+            { className: 'lr-note-head-title' },
+            h('div', { className: 'lr-note-head-name', title: paper?.title || '' }, paper?.title || ''),
+            h(
+              'div',
+              { className: 'lr-note-head-meta' },
+              // Positioning line: this is a quick-recall summary, not a notebook.
+              h('span', { className: 'lr-note-head-kind' }, t('noteKind')),
+              ' · ',
+              t('noteWordCount').split('{count}').join(String(noteWordCount(markdown))),
+              updatedAt ? ` · ${noteFormatTime(updatedAt)}` : '',
+            ),
+          ),
+          h(
+            'div',
+            { className: 'lr-note-tabs', role: 'tablist' },
+            h(
+              'button',
+              {
+                type: 'button',
+                role: 'tab',
+                className: `lr-note-tab${mode === 'preview' ? ' active' : ''}`,
+                'aria-selected': mode === 'preview',
+                onClick: () => {
+                  if (mode === 'edit') leaveEdit()
+                },
+              },
+              h(Icon, { name: 'book', size: 12 }),
+              t('notePreviewTab'),
+            ),
+            h(
+              'button',
+              {
+                type: 'button',
+                role: 'tab',
+                className: `lr-note-tab${mode === 'edit' ? ' active' : ''}`,
+                'aria-selected': mode === 'edit',
+                onClick: () => {
+                  if (mode === 'preview') enterEdit()
+                },
+              },
+              h(Icon, { name: 'pen', size: 12 }),
+              t('noteEditorTab'),
+            ),
+          ),
+          h('span', { className: `lr-note-save-state ${saveState}` }, saveLabel),
+          h(
+            'div',
+            { className: 'lr-note-head-actions' },
+            h(
+              'button',
+              {
+                type: 'button',
+                className: 'lr-btn small',
+                onClick: openInsert,
+                disabled: Boolean(applying) || Boolean(figures),
+                title: t('noteInsertImage'),
+              },
+              h(Icon, { name: 'expand', size: 13 }),
+              h('span', { className: 'lr-note-btn-label' }, t('noteInsertImage')),
+            ),
+            h(
+              'button',
+              {
+                type: 'button',
+                className: 'lr-btn small',
+                onClick: runFigures,
+                disabled: Boolean(applying) || Boolean(figures),
+                title: t('noteFixFigures'),
+              },
+              figures ? h(Spinner, { size: 12 }) : h(Icon, { name: 'sparkle', size: 13 }),
+              h(
+                'span',
+                { className: 'lr-note-btn-label' },
+                figures
+                  ? t('noteFiguresProgress')
+                      .split('{index}')
+                      .join(String(Math.min(figures.done + 1, figures.total)))
+                      .split('{total}')
+                      .join(String(figures.total))
+                  : t('noteFixFigures'),
+              ),
+            ),
+            h(
+              'button',
+              {
+                type: 'button',
+                className: 'lr-btn small',
+                onClick: openHistory,
+                disabled: Boolean(applying),
+                title: t('noteHistory'),
+              },
+              h(Icon, { name: 'refresh', size: 13 }),
+              h('span', { className: 'lr-note-btn-label' }, t('noteHistory')),
+            ),
+            h(
+              'div',
+              { className: 'lr-note-more', ref: moreRef },
+              h(
+                'button',
+                {
+                  type: 'button',
+                  className: 'lr-btn icon small',
+                  onClick: () => setMoreOpen((value) => !value),
+                  title: t('noteMore'),
+                  'aria-expanded': moreOpen,
+                },
+                h(Icon, { name: 'list', size: 13 }),
+              ),
+              moreOpen
+                ? h(
+                    'div',
+                    { className: 'lr-note-more-menu' },
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        className: 'lr-note-more-item',
+                        onClick: () => {
+                          setMoreOpen(false)
+                          onRegenerate?.()
+                        },
+                      },
+                      h(Icon, { name: 'sparkle', size: 12 }),
+                      t('regenerateSummary'),
+                    ),
+                    onOpenObsidian
+                      ? h(
+                          'button',
+                          {
+                            type: 'button',
+                            className: 'lr-note-more-item',
+                            onClick: () => {
+                              setMoreOpen(false)
+                              onOpenObsidian()
+                            },
+                          },
+                          h(Icon, { name: 'note', size: 12 }),
+                          t('openObsidian'),
+                        )
+                      : null,
+                  )
+                : null,
+            ),
+            h(
+              'button',
+              {
+                type: 'button',
+                className: `lr-btn icon small lr-note-panel-toggle${panelOpen ? ' active' : ''}`,
+                onClick: () => setPanelOpen((value) => !value),
+                title: t('noteAnnPanelToggle'),
+                'aria-expanded': panelOpen,
+              },
+              h(Icon, { name: 'quote', size: 13 }),
+              annotations.length > 0
+                ? h('span', { className: 'lr-note-panel-count' }, String(annotations.length))
+                : null,
+            ),
+          ),
+        ),
+        annError
+          ? h(
+              'div',
+              { className: 'lr-note-banner warn' },
+              h(Icon, { name: 'close', size: 13 }),
+              h('span', null, annError),
+              h(
+                'button',
+                { type: 'button', className: 'lr-note-banner-close', onClick: () => setAnnError('') },
+                h(Icon, { name: 'close', size: 11 }),
+              ),
+            )
+          : null,
+        // Purely advisory: Obsidian has text we are about to replace. Nothing
+        // here disables editing or saving — the plugin stays the writing surface.
+        vaultState?.modified && !vaultState.dismissed
+          ? h(
+              'div',
+              { className: 'lr-note-banner vault' },
+              h(Icon, { name: 'note', size: 13 }),
+              h(
+                'span',
+                null,
+                t('noteVaultBanner').split('{time}').join(vaultState.time || ''),
+              ),
+              h(
+                'button',
+                { type: 'button', className: 'lr-btn small', onClick: openVaultPreview },
+                h(Icon, { name: 'quote', size: 12 }),
+                t('noteVaultView'),
+              ),
+              onOpenObsidian
+                ? h(
+                    'button',
+                    { type: 'button', className: 'lr-btn small', onClick: () => onOpenObsidian() },
+                    h(Icon, { name: 'expand', size: 12 }),
+                    t('openObsidian'),
+                  )
+                : null,
+              h(
+                'button',
+                {
+                  type: 'button',
+                  className: 'lr-note-banner-close',
+                  title: t('close'),
+                  onClick: () => setVaultState((current) => (current ? { ...current, dismissed: true } : current)),
+                },
+                h(Icon, { name: 'close', size: 11 }),
+              ),
+            )
+          : null,
+        conflict
+          ? h(
+              'div',
+              { className: 'lr-note-banner conflict' },
+              h(Icon, { name: 'close', size: 13 }),
+              h('span', null, t('noteConflictBody')),
+              h(
+                'button',
+                { type: 'button', className: 'lr-btn small', onClick: reloadFromServer },
+                t('noteConflictReload'),
+              ),
+              h(
+                'button',
+                { type: 'button', className: 'lr-btn small primary', onClick: () => saveSource(true) },
+                t('noteConflictOverwrite'),
+              ),
+            )
+          : null,
+        h(
+          'div',
+          { className: `lr-note-stage${panelOpen ? ' panel-open' : ''}` },
+          // Below 1100px the rail is an overlay, so a click on the paper has to
+          // be able to dismiss it without hunting for the close button.
+          panelOpen
+            ? h('div', { className: 'lr-ann-panel-scrim', onClick: () => setPanelOpen(false) })
+            : null,
+          h(
+            'div',
+            { className: 'lr-note-scroll', ref: scrollRef },
+            h(
+              'div',
+              { className: 'lr-note-paper-wrap', ref: paperWrapRef },
+              mode === 'edit'
+                ? h(NoteEditor, {
+                    value: draft,
+                    onChange: onChangeSource,
+                    onSave: () => saveSource(false),
+                    onCancel: leaveEdit,
+                    dirty,
+                    saving: saveState === 'saving',
+                    error: saveError,
+                    draftOffer,
+                    onRestoreDraft: () => {
+                      if (!draftOffer) return
+                      setDraft(draftOffer.markdown)
+                      setDirty(draftOffer.markdown !== markdown)
+                      setSaveState(draftOffer.markdown === markdown ? 'saved' : 'unsaved')
+                      setDraftOffer(null)
+                    },
+                    onDiscardDraft: () => {
+                      if (paperId) clearNoteDraft(paperId)
+                      setDraftOffer(null)
+                    },
+                    onInsertImage: openInsert,
+                    onCursor: setAnchorOffset,
+                  })
+                : h(
+                    'article',
+                    { className: 'lr-note-paper' },
+                    markdown.trim()
+                      ? h(MarkdownDoc, {
+                          text: markdown,
+                          parsed,
+                          paperId,
+                          annotations,
+                          onCite: onCitePage,
+                          onAnnPick: onPickAnnotation,
+                          onImage: (src, alt) => setLightbox({ src, alt }),
+                        })
+                      : h(
+                          'div',
+                          { className: 'lr-note-paper-empty' },
+                          h(Icon, { name: 'note', size: 24 }),
+                          h('div', null, t('noteEmptyBody')),
+                          h('div', { className: 'lr-note-paper-empty-hint' }, t('noteEmptyHint')),
+                          onRegenerate
+                            ? h(
+                                'button',
+                                { type: 'button', className: 'lr-btn small primary', onClick: onRegenerate },
+                                h(Icon, { name: 'sparkle', size: 12 }),
+                                t('noteGenerate'),
+                              )
+                            : null,
+                        ),
+                  ),
+              mode === 'preview'
+                ? h(NoteSelectionToolbar, {
+                    toolbar,
+                    onAnnotate: () => {
+                      const pending = pendingRef.current
+                      if (!pending) return
+                      setDialog({
+                        id: '',
+                        quote: pending.quote,
+                        note: '',
+                        color: 'amber',
+                        from: pending.from,
+                        to: pending.to,
+                      })
+                      setToolbar(null)
+                    },
+                    onDismiss: () => {
+                      setToolbar(null)
+                      pendingRef.current = null
+                      const selection = typeof window.getSelection === 'function' ? window.getSelection() : null
+                      selection?.removeAllRanges?.()
+                    },
+                  })
+                : null,
+            ),
+          ),
+          mode === 'preview'
+            ? h(NoteAnnotationPanel, {
+                annotations,
+                open: panelOpen,
+                collapsed: false,
+                onToggle: () => {},
+                onClose: () => setPanelOpen(false),
+                onLocate: (id) => scrollToAnnotation(id),
+                onEdit: editAnnotation,
+                onDelete: async (id) => {
+                  if (!window.confirm(t('noteAnnDeleteConfirm'))) return
+                  try {
+                    await deleteAnnotation(id)
+                  } catch (error) {
+                    showToast?.(safeError(error) || t('noteAnnSaveFailed'), 'error')
+                  }
+                },
+              })
+            : null,
+        ),
+        mode === 'preview'
+          ? h(NoteApplyBar, {
+              pendingCount: openAnnotations.length,
+              running: Boolean(applying),
+              label: applying ? applying.label : '',
+              instruction,
+              onInstruction: setInstruction,
+              onApply: applyAnnotations,
+              onOpenPanel: () => setPanelOpen(true),
+              orphanCount,
+              disabled: false,
+            })
+          : null,
+        figures
+          ? h(
+              'div',
+              { className: 'lr-note-progress' },
+              h(Spinner, { size: 13 }),
+              h('span', null, figures.label || t('noteFiguresRunning')),
+              h(
+                'span',
+                { className: 'lr-note-progress-count' },
+                `${Math.min(figures.done, figures.total)}/${figures.total}`,
+              ),
+              h(
+                'button',
+                {
+                  type: 'button',
+                  className: 'lr-btn small',
+                  onClick: () => figuresAbort.current?.abort(),
+                },
+                t('stop'),
+              ),
+            )
+          : null,
+        annotationForDialog
+          ? h(NoteAnnotationDialog, {
+              draft: annotationForDialog,
+              onClose: () => setDialog(null),
+              onLocate: (id) => {
+                setDialog(null)
+                scrollToAnnotation(id)
+              },
+              onSave: saveAnnotation,
+              onDelete: async (id) => {
+                try {
+                  await deleteAnnotation(id)
+                } catch (error) {
+                  throw error
+                }
+              },
+            })
+          : null,
+        insertOpen
+          ? h(NoteInsertDialog, {
+              paper,
+              markdown,
+              anchorOffset,
+              onClose: () => setInsertOpen(false),
+              onInserted: onInserted,
+              showToast,
+            })
+          : null,
+        h(NoteHistoryDrawer, {
+          open: historyOpen,
+          loading: historyLoading,
+          versions: historyVersions,
+          error: historyError,
+          busy: false,
+          onClose: () => setHistoryOpen(false),
+          onPreview: previewHistory,
+          onRestore: restoreHistory,
+        }),
+        historyPreview
+          ? h(
+              Modal,
+              {
+                title: t('noteHistoryPreviewTitle'),
+                subtitle: historyPreview.title,
+                onClose: () => setHistoryPreview(null),
+                wide: true,
+              },
+              historyPreview.loading
+                ? h('div', { className: 'lr-modal-loading' }, h(Spinner, { size: 18 }), t('noteHistoryLoading'))
+                : h(
+                    'div',
+                    { className: 'lr-note-preview' },
+                    h(MarkdownDoc, { text: historyPreview.markdown, paperId }),
+                    h(
+                      'div',
+                      { className: 'lr-note-preview-actions' },
+                      h('span', { className: 'lr-note-preview-note' }, t('noteHistoryPreviewReadOnly')),
+                      h(
+                        'button',
+                        {
+                          type: 'button',
+                          className: 'lr-btn small primary',
+                          onClick: () => {
+                            const item = historyPreview.item
+                            setHistoryPreview(null)
+                            restoreHistory(item)
+                          },
+                        },
+                        h(Icon, { name: 'undo', size: 13 }),
+                        t('noteHistoryRestore'),
+                      ),
+                    ),
+                  ),
+            )
+          : null,
+        // Same read-only shape as the history preview, so it costs no new layout.
+        vaultPreview?.open
+          ? h(
+              Modal,
+              {
+                title: t('noteVaultTitle'),
+                subtitle: vaultPreview.updatedAt ? noteFormatTime(vaultPreview.updatedAt) : '',
+                onClose: () => setVaultPreview(null),
+                wide: true,
+              },
+              vaultPreview.loading
+                ? h('div', { className: 'lr-modal-loading' }, h(Spinner, { size: 18 }), t('noteHistoryLoading'))
+                : vaultPreview.error
+                  ? h('div', { className: 'lr-note-vault-missing' }, h(Icon, { name: 'note', size: 18 }), vaultPreview.error)
+                  : h(
+                      'div',
+                      { className: 'lr-note-preview' },
+                      h(MarkdownDoc, { text: vaultPreview.markdown, paperId }),
+                      h(
+                        'div',
+                        { className: 'lr-note-preview-actions' },
+                        h('span', { className: 'lr-note-preview-note' }, t('noteVaultReadOnly')),
+                        h(
+                          'button',
+                          {
+                            type: 'button',
+                            className: 'lr-btn small primary',
+                            onClick: () => {
+                              const text = vaultPreview.markdown || ''
+                              const done = () => showToast?.(t('noteVaultCopied'), 'ok')
+                              const fail = () => showToast?.(t('noteVaultCopyFailed'), 'error')
+                              try {
+                                const clip = typeof navigator !== 'undefined' ? navigator.clipboard : null
+                                if (clip && typeof clip.writeText === 'function') {
+                                  clip.writeText(text).then(done).catch(fail)
+                                  return
+                                }
+                              } catch {
+                                // fall through to the manual fallback
+                              }
+                              fail()
+                            },
+                          },
+                          h(Icon, { name: 'note', size: 13 }),
+                          t('noteVaultCopy'),
+                        ),
+                      ),
+                    ),
+            )
+          : null,
+        lightbox ? h(NoteLightbox, { image: lightbox, onClose: () => setLightbox(null) }) : null,
+      )
+    }
+
     function LiteratureReader() {
       const [papers, setPapers] = useState([])
       const [paper, setPaper] = useState(null)
@@ -2854,6 +6976,9 @@ window.__ModuleLoader__.load({
       const [question, setQuestion] = useState('')
       const [sending, setSending] = useState(false)
       const [summary, setSummary] = useState(null)
+      // Pending glossary confirmation: { include, questions } while the dialog
+      // is open. Null means no dialog.
+      const [glossaryAsk, setGlossaryAsk] = useState(null)
       const [toast, setToast] = useState(null)
       const [error, setError] = useState('')
       const [booting, setBooting] = useState(true)
@@ -4073,8 +8198,67 @@ window.__ModuleLoader__.load({
         }
       }
 
+      /**
+       * Ask the host which vocabulary terms are genuinely this paper's
+       * technical terms. Returns null on any problem — the caller then runs the
+       * old flow untouched, because a glossary question must never block a
+       * summary the reader asked for.
+       */
+      async function prepareGlossary() {
+        // Bound the wait: a hung prepare must not leave the button spinning
+        // forever. Timing out simply falls back to the single-phase flow.
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 20000)
+        try {
+          const result = await request(`/papers/${paper.id}/summary/prepare`, {
+            method: 'POST',
+            body: {},
+            signal: controller.signal,
+          })
+          if (!result || !result.ok) return null
+          const include = Array.isArray(result.include)
+            ? result.include.filter((item) => item && item.term)
+            : []
+          const questions = Array.isArray(result.questions)
+            ? result.questions.filter((item) => item && item.term)
+            : []
+          return { include, questions, excluded: Number(result.excluded) || 0, total: Number(result.total) || 0 }
+        } catch {
+          // Silent by design: 404 from an older host, a timeout, or a model
+          // hiccup all fall back to the pre-existing single-phase behaviour.
+          return null
+        } finally {
+          clearTimeout(timer)
+        }
+      }
+
+      /**
+       * `glossaryOverride` is a FULL REPLACEMENT for the glossary, not a delta.
+       * The host stops reading the vocabulary note entirely when it is present,
+       * so it must always carry `include` *plus* whatever the reader ticked.
+       * Sending only the ticked terms would silently drop every term the model
+       * was already sure about — the summary still generates, just with fewer
+       * glossary entries, which is easy to miss.
+       */
+      function glossaryOverrideFor(include, picked) {
+        const seen = new Set()
+        const out = []
+        // Picked terms go first: when the host's 50-entry cap forces a trim,
+        // what the reader deliberately ticked must survive ahead of the model's
+        // own picks.
+        for (const item of [...(picked || []), ...(include || [])]) {
+          const term = String(item?.term || '').trim()
+          if (!term) continue
+          const key = term.toLowerCase()
+          if (seen.has(key)) continue
+          seen.add(key)
+          out.push({ term, translation: String(item?.translation || '') })
+        }
+        return out.slice(0, 50)
+      }
+
       async function runSummary() {
-        if (!paper || sending || summaryRunning) return
+        if (!paper || sending || summaryRunning || glossaryAsk) return
         if (Number(paper.chars) <= 0 && !paper.analysisReady) {
           setError(t('summaryNeedsText'))
           return
@@ -4083,6 +8267,26 @@ window.__ModuleLoader__.load({
           const ok = window.confirm(t('summaryExists'))
           if (!ok) return
         }
+        // Phase 1: classify the vocabulary note. This is a plain request, not a
+        // stream, so a failure here is recoverable and never leaves a dangling
+        // SSE behind.
+        setSummary({ running: true, label: t('summaryPreparing') })
+        setError('')
+        const prepared = await prepareGlossary()
+        if (prepared && prepared.questions.length > 0) {
+          setSummary(null)
+          setGlossaryAsk(prepared)
+          return
+        }
+        await generateSummary(glossaryOverrideFor(prepared?.include, []))
+      }
+
+      async function generateSummary(glossaryOverride) {
+        if (!paper) return
+        const payload = Array.isArray(glossaryOverride) && glossaryOverride.length > 0
+          ? { glossaryOverride }
+          : {}
+
         setSummary({ running: true, label: t('summaryRunning') })
         setError('')
         const controller = new AbortController()
@@ -4091,7 +8295,7 @@ window.__ModuleLoader__.load({
         try {
           await streamSse(
             `/papers/${paper.id}/summary`,
-            {},
+            payload,
             (event) => {
               if (event.type === 'status') {
                 setSummary({ running: true, label: event.label || t('summaryRunning') })
@@ -4203,6 +8407,15 @@ window.__ModuleLoader__.load({
         } catch (noteError) {
           setError(safeError(noteError))
         }
+      }
+
+      // Enter the full-screen summary view. No request here: the view loads
+      // GET /summary itself so it can also be refreshed in place.
+      function openStudyNote() {
+        if (!paper) return
+        if (view === 'note') return
+        setError('')
+        setView('note')
       }
 
       async function handleFile(file) {
@@ -4746,6 +8959,7 @@ window.__ModuleLoader__.load({
               summaryRunning,
               onOpenNote: openNote,
               onPreview: openSummaryPreview,
+              onStudyNote: openStudyNote,
             }) : null,
             paper && isProcessing ? h(ProgressCard, {
               paper,
@@ -4789,10 +9003,16 @@ window.__ModuleLoader__.load({
                         h(
                           'div',
                           { className: 'lr-summary-actions' },
+                          h(
+                            'button',
+                            { type: 'button', className: 'lr-btn small primary', onClick: openStudyNote },
+                            h(Icon, { name: 'book', size: 13 }),
+                            t('noteOpen'),
+                          ),
                           summaryResult.hasNote
                             ? h(
                                 'button',
-                                { type: 'button', className: 'lr-btn small primary', onClick: openNote },
+                                { type: 'button', className: 'lr-btn small', onClick: openNote },
                                 h(Icon, { name: 'note', size: 13 }),
                                 t('openObsidian'),
                               )
@@ -4822,7 +9042,13 @@ window.__ModuleLoader__.load({
                       { className: 'lr-summary-actions' },
                       h(
                         'button',
-                        { type: 'button', className: 'lr-btn small primary', onClick: openNote },
+                        { type: 'button', className: 'lr-btn small primary', onClick: openStudyNote },
+                        h(Icon, { name: 'book', size: 13 }),
+                        t('noteOpen'),
+                      ),
+                      h(
+                        'button',
+                        { type: 'button', className: 'lr-btn small', onClick: openNote },
                         h(Icon, { name: 'note', size: 13 }),
                         t('openObsidian'),
                       ),
@@ -5200,6 +9426,37 @@ window.__ModuleLoader__.load({
         })
       }
 
+      if (view === 'note' && paper) {
+        return h(
+          'div',
+          { className: 'lr-root lr-note-root', style: { '--lr-fs': String(textScale / 100) } },
+          h('style', null, CSS),
+          h(NoteView, {
+            paper,
+            onBack: () => setView('reader'),
+            onCitePage: (pageNumber) => {
+              setView('reader')
+              setTimeout(() => scrollToPage(pageNumber), 60)
+            },
+            onOpenObsidian: openNote,
+            onRegenerate: () => {
+              setView('reader')
+              setTimeout(() => runSummary(), 60)
+            },
+            showToast,
+            onPaperChanged: (patch) => {
+              setPaper((current) => (current ? { ...current, hasSummary: true, ...patch } : current))
+              setPapers((current) =>
+                current.map((item) =>
+                  item.id === paper.id ? { ...item, hasSummary: true, ...patch } : item,
+                ),
+              )
+            },
+          }),
+          h(Toast, { toast }),
+        )
+      }
+
       if (view === 'library') {
         return h(
           'div',
@@ -5402,6 +9659,22 @@ window.__ModuleLoader__.load({
               ),
             ),
         renderImportOverlay(),
+        // Phase 1 of summary generation: only shown when the host says some
+        // vocabulary terms are genuinely ambiguous. Closing it cancels the run
+        // without ever opening the SSE stream.
+        glossaryAsk
+          ? h(GlossaryConfirmDialog, {
+              questions: glossaryAsk.questions,
+              includeCount: (glossaryAsk.include || []).length,
+              onClose: () => setGlossaryAsk(null),
+              onConfirm: (picked) => {
+                const include = glossaryAsk.include || []
+                setGlossaryAsk(null)
+                // Full replacement: include + picked. Never picked alone.
+                generateSummary(glossaryOverrideFor(include, picked))
+              },
+            })
+          : null,
         analysisModal
           ? h(
               Modal,
@@ -5427,7 +9700,32 @@ window.__ModuleLoader__.load({
               },
               summaryModal.loading
                 ? h('div', { className: 'lr-modal-loading' }, h(Spinner, { size: 18 }), t('summaryRunning'))
-                : h(Markdown, { text: summaryModal.markdown, onCite: (pageNumber) => { setSummaryModal(null); scrollToPage(pageNumber) } }),
+                : h(
+                    'div',
+                    { className: 'lr-note-preview' },
+                    h(Markdown, { text: summaryModal.markdown, onCite: (pageNumber) => { setSummaryModal(null); scrollToPage(pageNumber) } }),
+                    // The preview stays read-only; this is the only way into the
+                    // editor from here, so the modal has to offer it.
+                    paper
+                      ? h(
+                          'div',
+                          { className: 'lr-note-preview-actions' },
+                          h(
+                            'button',
+                            {
+                              type: 'button',
+                              className: 'lr-btn small primary',
+                              onClick: () => {
+                                setSummaryModal(null)
+                                openStudyNote()
+                              },
+                            },
+                            h(Icon, { name: 'book', size: 13 }),
+                            t('noteOpen'),
+                          ),
+                        )
+                      : null,
+                  ),
             )
           : null,
         expandedMessage
@@ -5775,6 +10073,17 @@ window.__ModuleLoader__.load({
 .lr-modal-title{font-size:14px;font-weight:650;line-height:1.3}
 .lr-modal-subtitle{margin-top:3px;font-size:10.5px;color:var(--dsw-alias-label-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72vw}
 .lr-modal-body{flex:1;min-height:0;overflow:auto;padding:20px 24px 26px;font-size:13px;line-height:1.7}
+.lr-glossary{display:flex;flex-direction:column;gap:12px}
+.lr-glossary-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lr-glossary-count{margin-left:auto;font-size:11px;color:var(--dsw-alias-label-tertiary)}
+.lr-glossary-list{display:flex;flex-direction:column;gap:2px;max-height:min(52vh,420px);overflow:auto;border:1px solid var(--lr-line);border-radius:10px;padding:4px}
+.lr-glossary-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:12.5px;line-height:1.5}
+.lr-glossary-row:hover{background:color-mix(in srgb,var(--dsw-alias-label-primary) 5%,transparent)}
+.lr-glossary-row.checked{background:color-mix(in srgb,var(--lr-accent) 9%,transparent)}
+.lr-glossary-row input{flex:0 0 auto;width:14px;height:14px;accent-color:var(--lr-accent);cursor:pointer}
+.lr-glossary-term{font-weight:600;color:var(--dsw-alias-label-primary)}
+.lr-glossary-trans{color:var(--dsw-alias-label-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lr-glossary-actions{display:flex;justify-content:flex-end;gap:8px;padding-top:2px}
 .lr-modal-body .lr-md{font-size:13px;line-height:1.75}
 .lr-modal-body .lr-md-h1{font-size:19px}
 .lr-modal-body .lr-md-h2{font-size:17px}
@@ -6188,6 +10497,279 @@ window.__ModuleLoader__.load({
 @media(max-width:860px){.lr-library-head{flex-wrap:wrap;gap:8px}.lr-library-actions{width:100%;justify-content:flex-end}.lr-library-body{flex-direction:column}.lr-folder-pane{flex:0 0 auto;width:100%;max-height:150px;border-right:0;border-bottom:1px solid var(--dsw-alias-border-l1)}.lr-pdf-grid{grid-template-columns:1fr}.lr-library-main{padding:12px 12px 30px}.lr-library-sync{display:none}}
 @media(max-width:980px){.lr-subtitle{max-width:32vw}.lr-tool span{display:none}.lr-tool{padding:0 7px}.lr-feature-grid{grid-template-columns:1fr}.lr-empty-title{font-size:20px}.lr-width-control span:first-child{display:none}}
 @media(max-width:860px){.lr-split{display:flex;flex-direction:column}.lr-viewer{flex:1 1 auto;width:100%;min-width:0;min-height:0}.lr-chat{flex:0 0 42%;min-width:0;border-top:1px solid var(--dsw-alias-border-l1)}.lr-divider{display:none}.lr-chat-scroll{max-height:none}.lr-hint-pill{display:none}.lr-title{max-width:46vw}}
+
+/* ── Summary view ───────────────────────────────────────────────────────── */
+.lr-note{position:relative;display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-size:calc(12px * var(--lr-fs,1))}
+.lr-note-loading{display:flex;flex:1;align-items:center;justify-content:center;gap:10px;color:var(--dsw-alias-label-secondary);font-size:12px}
+.lr-note-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 14px;border-bottom:1px solid var(--lr-line);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 82%,var(--dsw-alias-bg-base));backdrop-filter:blur(10px)}
+.lr-note-back{flex:0 0 auto;height:26px;font-size:11.5px;gap:3px}
+.lr-note-head-title{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 200px}
+.lr-note-head-name{font-size:12.5px;font-weight:600;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr-note-head-meta{font-size:10px;color:var(--dsw-alias-label-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr-note-head-kind{color:color-mix(in srgb,var(--lr-accent) 62%,var(--dsw-alias-label-secondary));font-weight:600;letter-spacing:.01em}
+.lr-note-tabs{display:flex;align-items:center;gap:2px;padding:2px;border-radius:9px;background:color-mix(in srgb,var(--dsw-alias-label-secondary) 7%,transparent);border:1px solid var(--lr-line);flex:0 0 auto}
+.lr-note-tab{display:inline-flex;align-items:center;gap:5px;height:23px;padding:0 10px;border:0;border-radius:7px;background:transparent;color:var(--dsw-alias-label-secondary);font-family:inherit;font-size:11px;cursor:pointer;white-space:nowrap;transition:background .14s ease,color .14s ease}
+.lr-note-tab:hover{color:var(--dsw-alias-label-primary)}
+.lr-note-tab.active{background:var(--dsw-alias-bg-base);color:var(--lr-ink,var(--dsw-alias-label-primary));font-weight:600;box-shadow:0 1px 3px color-mix(in srgb,#000 12%,transparent)}
+.lr-note-tab svg{width:12px;height:12px}
+.lr-note-save-state{font-size:10px;color:var(--dsw-alias-label-secondary);white-space:nowrap;flex:0 0 auto}
+.lr-note-save-state.unsaved{color:var(--dsw-alias-state-warn-primary,var(--lr-warm,var(--dsw-alias-label-secondary)))}
+.lr-note-save-state.saving{color:color-mix(in srgb,var(--lr-accent) 70%,var(--dsw-alias-label-secondary))}
+.lr-note-save-state.error{color:var(--dsw-alias-state-error-primary)}
+.lr-note-head-actions{display:flex;align-items:center;gap:5px;margin-left:auto;flex:0 0 auto}
+.lr-note-more{position:relative}
+.lr-note-more-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:40;display:flex;flex-direction:column;min-width:168px;padding:4px;border:1px solid var(--dsw-alias-border-l1);border-radius:10px;background:var(--dsw-alias-bg-layer-1);box-shadow:0 14px 34px color-mix(in srgb,#000 22%,transparent)}
+.lr-note-more-item{display:flex;align-items:center;gap:7px;height:28px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:var(--dsw-alias-label-primary);font-family:inherit;font-size:11.5px;text-align:left;cursor:pointer}
+.lr-note-more-item:hover{background:var(--dsw-alias-bg-layer-2)}
+.lr-note-panel-toggle{position:relative}
+.lr-note-panel-toggle.active{background:color-mix(in srgb,var(--lr-accent) 14%,transparent);border-color:color-mix(in srgb,var(--lr-accent) 34%,var(--lr-line))}
+.lr-note-panel-count{position:absolute;top:-4px;right:-4px;min-width:14px;height:14px;padding:0 3px;border-radius:8px;background:var(--dsw-alias-brand-primary);color:var(--dsw-alias-label-primary-foreground);font-size:8.5px;line-height:14px;text-align:center;font-weight:600}
+.lr-note-banner{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:11.5px;border-bottom:1px solid var(--lr-line)}
+.lr-note-banner.warn{background:color-mix(in srgb,var(--dsw-alias-state-warn-primary,#c98a00) 10%,transparent);color:color-mix(in srgb,var(--dsw-alias-state-warn-primary,#c98a00) 78%,var(--dsw-alias-label-primary))}
+.lr-note-banner.conflict{background:color-mix(in srgb,var(--dsw-alias-state-error-primary) 9%,transparent);color:var(--dsw-alias-label-primary);flex-wrap:wrap}
+.lr-note-banner.vault{background:color-mix(in srgb,var(--lr-warm,#e2a03f) 13%,transparent);color:color-mix(in srgb,var(--dsw-alias-label-primary) 92%,var(--lr-warm,#e2a03f));flex-wrap:wrap;border-bottom-color:color-mix(in srgb,var(--lr-warm,#e2a03f) 30%,var(--lr-line))}
+.lr-note-banner.vault .lr-btn{flex:0 0 auto}
+.lr-note-vault-missing{display:flex;align-items:center;gap:10px;padding:28px 22px;font-size:12px;line-height:1.6;color:var(--dsw-alias-label-secondary)}
+.lr-note-banner span{flex:1 1 auto;min-width:120px;line-height:1.45}
+.lr-note-banner-close{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:0;border-radius:6px;background:transparent;color:inherit;cursor:pointer;opacity:.7}
+.lr-note-banner-close:hover{opacity:1;background:color-mix(in srgb,currentColor 12%,transparent)}
+.lr-note-stage{display:flex;flex:1;min-height:0;min-width:0}
+.lr-note-scroll{position:relative;flex:1;min-width:0;min-height:0;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;background:radial-gradient(circle at 50% 0,color-mix(in srgb,var(--lr-accent) 5%,transparent),transparent 420px),var(--dsw-alias-bg-base)}
+.lr-note-paper-wrap{position:relative;max-width:820px;margin:0 auto;padding:22px 26px 90px}
+.lr-note-paper{font-size:calc(12.5px * var(--lr-fs,1));line-height:1.78;color:var(--dsw-alias-label-primary);word-break:break-word}
+.lr-note-paper-empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:70px 20px;color:var(--dsw-alias-label-secondary);font-size:12px;text-align:center}
+.lr-note-paper-empty-hint{max-width:420px;font-size:11.5px;line-height:1.7;color:var(--dsw-alias-label-tertiary)}
+.lr-note-empty{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:60px 24px;text-align:center}
+.lr-note-empty-icon{display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:16px;background:color-mix(in srgb,var(--lr-accent) 10%,transparent);color:color-mix(in srgb,var(--lr-accent) 70%,var(--dsw-alias-label-secondary))}
+.lr-note-empty-title{font-size:14px;font-weight:600}
+.lr-note-empty-desc{font-size:11.5px;color:var(--dsw-alias-label-secondary);max-width:420px;line-height:1.6}
+.lr-note-empty-actions{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;justify-content:center}
+/* Rendered Markdown */
+.lr-note-doc>*:first-child{margin-top:0}
+.lr-note-doc>*:last-child{margin-bottom:0}
+.lr-note-h{margin:26px 0 10px;line-height:1.32;font-weight:650;letter-spacing:-.01em;scroll-margin-top:16px}
+.lr-note-h1{font-size:calc(20px * var(--lr-fs,1));padding-bottom:7px;border-bottom:1px solid var(--lr-line)}
+.lr-note-h2{font-size:calc(16px * var(--lr-fs,1))}
+.lr-note-h3{font-size:calc(14px * var(--lr-fs,1))}
+.lr-note-h4{font-size:calc(12.5px * var(--lr-fs,1))}
+.lr-note-p{margin:10px 0;line-height:1.78}
+.lr-note-p-pending{position:relative}
+.lr-note-figure-flag{margin-right:5px;color:color-mix(in srgb,var(--lr-accent) 70%,var(--dsw-alias-label-secondary))}
+.lr-note-doc-list{margin:10px 0;padding-left:22px;display:flex;flex-direction:column;gap:4px}
+.lr-note-doc-list li{line-height:1.7}
+.lr-note-quote{margin:12px 0;padding:2px 0 2px 14px;border-left:2.5px solid color-mix(in srgb,var(--lr-accent) 34%,var(--lr-line));color:color-mix(in srgb,var(--dsw-alias-label-primary) 82%,var(--dsw-alias-label-secondary))}
+.lr-note-quote-body>*:first-child{margin-top:0}
+.lr-note-quote-body>*:last-child{margin-bottom:0}
+.lr-note-callout{margin:14px 0;padding:10px 12px;border:1px solid var(--lr-line);border-left:3px solid var(--lr-accent);border-radius:9px;background:color-mix(in srgb,var(--lr-accent) 5%,var(--dsw-alias-bg-layer-1))}
+.lr-note-callout-head{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:11px;font-weight:650;color:color-mix(in srgb,var(--lr-accent) 62%,var(--dsw-alias-label-primary));letter-spacing:.01em}
+.lr-note-callout-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lr-note-callout-body>*:first-child{margin-top:0}
+.lr-note-callout-body>*:last-child{margin-bottom:0}
+.lr-note-callout-warning,.lr-note-callout-danger,.lr-note-callout-caution,.lr-note-callout-bug{border-left-color:var(--dsw-alias-state-warn-primary,#c98a00);background:color-mix(in srgb,var(--dsw-alias-state-warn-primary,#c98a00) 6%,var(--dsw-alias-bg-layer-1))}
+.lr-note-callout-warning .lr-note-callout-head,.lr-note-callout-danger .lr-note-callout-head,.lr-note-callout-caution .lr-note-callout-head,.lr-note-callout-bug .lr-note-callout-head{color:color-mix(in srgb,var(--dsw-alias-state-warn-primary,#c98a00) 80%,var(--dsw-alias-label-primary))}
+.lr-note-callout-tip,.lr-note-callout-success,.lr-note-callout-check,.lr-note-callout-done{border-left-color:var(--lr-teal,var(--lr-accent));background:color-mix(in srgb,var(--lr-teal,var(--lr-accent)) 6%,var(--dsw-alias-bg-layer-1))}
+.lr-note-callout-tip .lr-note-callout-head,.lr-note-callout-success .lr-note-callout-head,.lr-note-callout-check .lr-note-callout-head,.lr-note-callout-done .lr-note-callout-head{color:color-mix(in srgb,var(--lr-teal,var(--lr-accent)) 74%,var(--dsw-alias-label-primary))}
+.lr-note-callout-question,.lr-note-callout-faq,.lr-note-callout-help{border-left-color:var(--lr-rose,var(--lr-accent));background:color-mix(in srgb,var(--lr-rose,var(--lr-accent)) 6%,var(--dsw-alias-bg-layer-1))}
+.lr-note-callout-question .lr-note-callout-head,.lr-note-callout-faq .lr-note-callout-head,.lr-note-callout-help .lr-note-callout-head{color:color-mix(in srgb,var(--lr-rose,var(--lr-accent)) 74%,var(--dsw-alias-label-primary))}
+.lr-note-hr{margin:22px 0;border:0;border-top:1px solid var(--lr-line)}
+.lr-note-pre{margin:12px 0;padding:11px 13px;border:1px solid var(--lr-line);border-radius:9px;background:color-mix(in srgb,var(--dsw-alias-label-primary) 4%,var(--dsw-alias-bg-layer-1));overflow-x:auto;font-size:calc(11px * var(--lr-fs,1));line-height:1.62}
+.lr-note-pre code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre}
+.lr-note-inline-code{padding:1px 4px;border-radius:4px;background:color-mix(in srgb,var(--dsw-alias-label-primary) 8%,transparent);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em}
+.lr-note-table-wrap{margin:14px 0;overflow-x:auto;border:1px solid var(--lr-line);border-radius:9px}
+.lr-note-table{width:100%;border-collapse:collapse;font-size:calc(11.5px * var(--lr-fs,1))}
+.lr-note-table th,.lr-note-table td{padding:6px 10px;border-bottom:1px solid var(--lr-line);text-align:left;vertical-align:top;line-height:1.6}
+.lr-note-table th{background:color-mix(in srgb,var(--dsw-alias-label-primary) 4%,transparent);font-weight:600;white-space:nowrap}
+.lr-note-table tr:last-child td{border-bottom:0}
+.lr-note-figure{margin:16px 0;display:flex;flex-direction:column;align-items:center;gap:7px}
+.lr-note-figure img{max-width:100%;border:1px solid var(--lr-line);border-radius:9px;background:var(--dsw-alias-bg-layer-1);cursor:zoom-in;transition:border-color .15s ease,transform .15s ease}
+.lr-note-figure img:hover{border-color:color-mix(in srgb,var(--lr-accent) 44%,var(--lr-line));transform:translateY(-1px)}
+.lr-note-figure figcaption{font-size:10.5px;color:var(--dsw-alias-label-secondary);text-align:center;line-height:1.55}
+.lr-note-doc-link{color:color-mix(in srgb,var(--lr-accent) 76%,var(--dsw-alias-label-primary));text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px;cursor:pointer}
+.lr-note-doc-link:hover{color:color-mix(in srgb,var(--lr-accent) 92%,var(--dsw-alias-label-primary))}
+.lr-note-cite{display:inline-flex;align-items:center;height:16px;padding:0 5px;margin:0 1px;border:1px solid color-mix(in srgb,var(--lr-accent) 26%,var(--lr-line));border-radius:5px;background:color-mix(in srgb,var(--lr-accent) 8%,transparent);color:color-mix(in srgb,var(--lr-accent) 72%,var(--dsw-alias-label-secondary));font-family:inherit;font-size:9.5px;font-weight:600;line-height:1;vertical-align:1px;cursor:pointer;transition:background .14s ease}
+.lr-note-cite:hover{background:color-mix(in srgb,var(--lr-accent) 18%,transparent);border-color:color-mix(in srgb,var(--lr-accent) 42%,var(--lr-line))}
+/* Annotation highlights */
+.lr-note-t{white-space:pre-wrap}
+.lr-ann-mark{border-radius:3px;padding:1px 0;color:inherit;background:transparent;cursor:pointer;box-decoration-break:clone;-webkit-box-decoration-break:clone;transition:background .14s ease}
+.lr-ann-mark.lr-ann-amber{background:color-mix(in srgb,var(--lr-warm,#e2a03f) 24%,transparent);box-shadow:inset 0 -1.5px 0 color-mix(in srgb,var(--lr-warm,#e2a03f) 52%,transparent)}
+.lr-ann-mark.lr-ann-rose{background:color-mix(in srgb,var(--lr-rose,#dd5f7d) 22%,transparent);box-shadow:inset 0 -1.5px 0 color-mix(in srgb,var(--lr-rose,#dd5f7d) 50%,transparent)}
+.lr-ann-mark.lr-ann-sky{background:color-mix(in srgb,var(--lr-accent,#4c8dd8) 22%,transparent);box-shadow:inset 0 -1.5px 0 color-mix(in srgb,var(--lr-accent,#4c8dd8) 50%,transparent)}
+.lr-ann-mark.lr-ann-mint{background:color-mix(in srgb,var(--lr-teal,#3aa88f) 24%,transparent);box-shadow:inset 0 -1.5px 0 color-mix(in srgb,var(--lr-teal,#3aa88f) 52%,transparent)}
+.lr-ann-mark:hover{filter:brightness(1.05);background:color-mix(in srgb,currentColor 14%,transparent)}
+.lr-ann-mark.is-resolved{opacity:.55;background:transparent;box-shadow:inset 0 -1px 0 color-mix(in srgb,var(--dsw-alias-label-secondary) 40%,transparent)}
+.lr-ann-mark.is-orphan{opacity:.4;background:transparent;box-shadow:none}
+.lr-ann-seq{display:inline-flex;align-items:center;justify-content:center;min-width:14px;height:14px;padding:0 3px;margin:0 1px 0 2px;border-radius:7px;color:#fff;font-size:8.5px;font-weight:700;line-height:1;vertical-align:3px;cursor:pointer;user-select:none}
+.lr-ann-seq-amber{background:color-mix(in srgb,var(--lr-warm,#e2a03f) 92%,#000)}
+.lr-ann-seq-rose{background:color-mix(in srgb,var(--lr-rose,#dd5f7d) 92%,#000)}
+.lr-ann-seq-sky{background:color-mix(in srgb,var(--lr-accent,#4c8dd8) 92%,#000)}
+.lr-ann-seq-mint{background:color-mix(in srgb,var(--lr-teal,#3aa88f) 92%,#000)}
+/* Floating selection toolbar */
+.lr-ann-toolbar{position:absolute;z-index:30;display:flex;align-items:center;gap:2px;padding:3px;border:1px solid var(--dsw-alias-border-l1);border-radius:9px;background:var(--dsw-alias-bg-layer-1);box-shadow:0 10px 26px color-mix(in srgb,#000 20%,transparent);transform:translateX(-50%);animation:lr-pop .14s ease}
+.lr-ann-toolbar-btn{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-primary);font-family:inherit;font-size:11px;font-weight:550;cursor:pointer;white-space:nowrap}
+.lr-ann-toolbar-btn:hover{background:var(--dsw-alias-bg-layer-2)}
+.lr-ann-toolbar-btn.primary{background:color-mix(in srgb,var(--lr-accent) 16%,transparent);color:color-mix(in srgb,var(--lr-accent) 78%,var(--dsw-alias-label-primary))}
+.lr-ann-toolbar-btn.primary:hover{background:color-mix(in srgb,var(--lr-accent) 26%,transparent)}
+.lr-ann-toolbar-close{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary);cursor:pointer}
+.lr-ann-toolbar-close:hover{background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary)}
+/* Annotation dialog */
+.lr-ann-dialog{display:flex;flex-direction:column;gap:10px}
+.lr-ann-quote-box{padding:8px 10px;border-left:2.5px solid color-mix(in srgb,var(--lr-accent) 40%,var(--lr-line));border-radius:0 7px 7px 0;background:color-mix(in srgb,var(--lr-accent) 6%,var(--dsw-alias-bg-layer-1));font-size:11.5px;line-height:1.6;color:var(--dsw-alias-label-secondary);max-height:96px;overflow-y:auto}
+.lr-ann-input{width:100%;padding:8px 10px;border:1px solid var(--dsw-alias-border-l1);border-radius:8px;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-family:inherit;font-size:12px;line-height:1.65;resize:vertical;min-height:74px}
+.lr-ann-input:focus{outline:2px solid color-mix(in srgb,var(--lr-accent) 40%,transparent);outline-offset:1px;border-color:color-mix(in srgb,var(--lr-accent) 40%,var(--dsw-alias-border-l1))}
+.lr-ann-dialog-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lr-ann-label{font-size:11px;color:var(--dsw-alias-label-secondary);flex:0 0 auto}
+.lr-ann-colors{display:inline-flex;align-items:center;gap:5px}
+.lr-ann-color{width:20px;height:20px;padding:0;border:1.5px solid transparent;border-radius:50%;cursor:pointer;transition:transform .12s ease,border-color .12s ease;position:relative}
+.lr-ann-color:hover{transform:scale(1.1)}
+.lr-ann-color.active{border-color:var(--dsw-alias-label-primary);box-shadow:0 0 0 2px var(--dsw-alias-bg-base) inset}
+.lr-ann-color-amber{background:color-mix(in srgb,var(--lr-warm,#e2a03f) 82%,#fff)}
+.lr-ann-color-rose{background:color-mix(in srgb,var(--lr-rose,#dd5f7d) 82%,#fff)}
+.lr-ann-color-sky{background:color-mix(in srgb,var(--lr-accent,#4c8dd8) 82%,#fff)}
+.lr-ann-color-mint{background:color-mix(in srgb,var(--lr-teal,#3aa88f) 82%,#fff)}
+.lr-ann-reply{padding:7px 9px;border-radius:7px;background:color-mix(in srgb,var(--lr-teal,var(--lr-accent)) 8%,transparent);font-size:11px;line-height:1.6;color:var(--dsw-alias-label-secondary)}
+.lr-ann-error{padding:6px 9px;border-radius:7px;background:color-mix(in srgb,var(--dsw-alias-state-error-primary) 10%,transparent);color:var(--dsw-alias-state-error-primary);font-size:11px;line-height:1.5}
+.lr-ann-dialog-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.lr-ann-spacer{flex:1 1 auto}
+.lr-ann-hint{font-size:10px;color:var(--dsw-alias-label-secondary);text-align:right}
+/* Annotation rail */
+.lr-ann-panel{display:none;flex:0 0 300px;width:300px;min-width:0;flex-direction:column;border-left:1px solid var(--lr-line);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 60%,var(--dsw-alias-bg-base))}
+.lr-ann-panel.open{display:flex}
+.lr-ann-panel-scrim{display:none}
+@media(max-width:1100px){.lr-note-stage.panel-open .lr-ann-panel-scrim{display:block;position:absolute;inset:0;z-index:19;background:color-mix(in srgb,#000 26%,transparent);animation:lr-fade .14s ease}}
+.lr-ann-panel-head{display:flex;align-items:center;gap:6px;padding:9px 10px;border-bottom:1px solid var(--lr-line);color:var(--dsw-alias-label-secondary);flex:0 0 auto}
+.lr-ann-panel-close:hover{background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary)}
+.lr-ann-panel-title{flex:1 1 auto;min-width:0;font-size:11px;font-weight:600;color:var(--dsw-alias-label-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr-ann-panel-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:6px}
+.lr-ann-empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:36px 18px;color:var(--dsw-alias-label-secondary);font-size:11px;text-align:center;line-height:1.6}
+.lr-ann-empty-hint{font-size:10px;opacity:.8;max-width:200px;line-height:1.6}
+.lr-ann-group{margin-bottom:6px}
+.lr-ann-group-head{display:flex;align-items:center;gap:5px;width:100%;padding:5px 6px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary);font-family:inherit;font-size:10.5px;font-weight:600;letter-spacing:.02em;cursor:pointer}
+.lr-ann-group-head:hover{background:var(--dsw-alias-bg-layer-2)}
+.lr-ann-group-head svg{transition:transform .14s ease}
+.lr-ann-group:not(.collapsed) .lr-ann-group-head svg{transform:rotate(90deg)}
+.lr-ann-group-count{margin-left:auto;padding:0 5px;height:15px;line-height:15px;border-radius:8px;background:color-mix(in srgb,var(--dsw-alias-label-secondary) 14%,transparent);font-size:9px;font-weight:600}
+.lr-ann-group-body{display:flex;flex-direction:column;gap:4px;padding:2px 0 4px}
+.lr-ann-item{display:flex;align-items:flex-start;gap:7px;padding:7px 8px;border:1px solid transparent;border-radius:8px;transition:background .14s ease,border-color .14s ease}
+.lr-ann-item:hover{background:var(--dsw-alias-bg-layer-2);border-color:var(--lr-line)}
+.lr-ann-item.is-resolved,.lr-ann-item.lr-ann-item-resolved{opacity:.62}
+.lr-ann-item.lr-ann-item-orphan{opacity:.5}
+.lr-ann-badge{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:8px;color:#fff;font-size:9px;font-weight:700;line-height:1;margin-top:2px}
+.lr-ann-item-main{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
+.lr-ann-item-quote{padding:0;border:0;background:transparent;color:var(--dsw-alias-label-secondary);font-family:inherit;font-size:10.5px;line-height:1.5;text-align:left;cursor:pointer;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.lr-ann-item-quote:hover{color:color-mix(in srgb,var(--lr-accent) 70%,var(--dsw-alias-label-primary))}
+.lr-ann-item-note{font-size:11px;line-height:1.55;color:var(--dsw-alias-label-primary);word-break:break-word}
+.lr-ann-item-reply{font-size:10px;line-height:1.5;color:var(--dsw-alias-label-secondary);font-style:italic}
+.lr-ann-item-actions{flex:0 0 auto;display:flex;flex-direction:column;gap:2px;opacity:.55;transition:opacity .14s ease}
+.lr-ann-item:hover .lr-ann-item-actions,.lr-ann-item:focus-within .lr-ann-item-actions{opacity:1}
+.lr-ann-item-actions .lr-btn.icon.small{width:20px;height:20px}
+/* Apply bar */
+.lr-note-applybar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px;border-top:1px solid var(--lr-line);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 86%,var(--dsw-alias-bg-base));backdrop-filter:blur(10px);flex:0 0 auto}
+.lr-note-applybar.running{background:color-mix(in srgb,var(--lr-accent) 8%,var(--dsw-alias-bg-layer-1))}
+.lr-note-applybar-info{display:flex;align-items:center;gap:8px;flex:0 1 auto;min-width:0;flex-wrap:wrap}
+.lr-note-applybar-count{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border:1px solid color-mix(in srgb,var(--lr-accent) 24%,var(--lr-line));border-radius:7px;background:color-mix(in srgb,var(--lr-accent) 8%,transparent);color:color-mix(in srgb,var(--lr-accent) 70%,var(--dsw-alias-label-primary));font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap}
+.lr-note-applybar-count:hover{background:color-mix(in srgb,var(--lr-accent) 15%,transparent)}
+.lr-note-applybar-hint{font-size:10px;color:var(--dsw-alias-label-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+.lr-note-applybar-warn{font-size:10px;color:var(--dsw-alias-state-warn-primary,#c98a00);white-space:nowrap}
+.lr-note-applybar-input{flex:1 1 200px;min-width:120px;height:28px;padding:0 10px;border:1px solid var(--lr-line);border-radius:8px;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-family:inherit;font-size:11.5px}
+.lr-note-applybar-input:focus{outline:2px solid color-mix(in srgb,var(--lr-accent) 38%,transparent);outline-offset:1px;border-color:color-mix(in srgb,var(--lr-accent) 38%,var(--lr-line))}
+.lr-note-applybar-input:disabled{opacity:.55}
+.lr-note-apply-btn{flex:0 0 auto;height:28px;font-size:11.5px;gap:5px}
+/* Editor */
+.lr-note-editor{display:flex;flex-direction:column;gap:8px;min-height:0}
+.lr-note-editor-bar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;position:sticky;top:-22px;z-index:5;padding:7px 0;background:color-mix(in srgb,var(--dsw-alias-bg-base) 92%,transparent);backdrop-filter:blur(8px)}
+.lr-note-editor-words{font-size:10px;color:var(--dsw-alias-label-secondary);white-space:nowrap}
+.lr-note-editor-hint{font-size:10px;color:var(--dsw-alias-label-secondary);white-space:nowrap}
+.lr-note-draft-banner{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:7px 10px;border:1px solid color-mix(in srgb,var(--dsw-alias-state-warn-primary,#c98a00) 30%,var(--lr-line));border-radius:8px;background:color-mix(in srgb,var(--dsw-alias-state-warn-primary,#c98a00) 8%,transparent);font-size:11px;color:var(--dsw-alias-label-primary)}
+.lr-note-editor-error{padding:6px 10px;border-radius:7px;background:color-mix(in srgb,var(--dsw-alias-state-error-primary) 10%,transparent);color:var(--dsw-alias-state-error-primary);font-size:11px}
+.lr-note-editor-body{display:flex;min-height:0}
+.lr-note-source{width:100%;min-height:60vh;padding:14px 16px;border:1px solid var(--lr-line);border-radius:10px;background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:calc(11.5px * var(--lr-fs,1));line-height:1.72;resize:vertical;tab-size:2}
+.lr-note-source:focus{outline:2px solid color-mix(in srgb,var(--lr-accent) 34%,transparent);outline-offset:1px;border-color:color-mix(in srgb,var(--lr-accent) 34%,var(--lr-line))}
+/* Insert-image dialog */
+.lr-note-insert{display:flex;flex-direction:column;gap:11px}
+.lr-note-tabs{display:flex;gap:3px;padding:3px;border-radius:9px;background:color-mix(in srgb,var(--dsw-alias-label-secondary) 7%,transparent);border:1px solid var(--lr-line)}
+.lr-note-tabs .lr-note-tab{flex:1 1 0;justify-content:center;height:26px}
+.lr-note-upload{display:flex;flex-direction:column;gap:9px;align-items:flex-start}
+.lr-note-upload-pick{position:relative;display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:1px dashed color-mix(in srgb,var(--lr-accent) 34%,var(--lr-line));border-radius:8px;background:color-mix(in srgb,var(--lr-accent) 6%,transparent);color:color-mix(in srgb,var(--lr-accent) 72%,var(--dsw-alias-label-primary));font-size:11.5px;font-weight:550;cursor:pointer}
+.lr-note-upload-pick:hover{background:color-mix(in srgb,var(--lr-accent) 12%,transparent)}
+.lr-note-upload-preview{max-width:100%;max-height:230px;border:1px solid var(--lr-line);border-radius:9px;background:var(--dsw-alias-bg-layer-1)}
+.lr-note-crop{display:flex;flex-direction:column;gap:8px}
+.lr-note-crop-bar{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.lr-note-crop-page{font-size:11px;font-weight:600;color:var(--dsw-alias-label-primary);white-space:nowrap}
+.lr-note-crop-hint{font-size:10px;color:var(--dsw-alias-label-secondary);margin-left:auto}
+.lr-note-crop-stage{position:relative;align-self:center;max-width:100%;max-height:46vh;overflow:auto;border:1px solid var(--lr-line);border-radius:9px;background:var(--dsw-alias-bg-layer-1);touch-action:none;display:flex}
+.lr-note-crop-stage img{max-width:100%;max-height:46vh;user-select:none;cursor:crosshair;object-fit:contain}
+.lr-note-crop-box{position:absolute;border:1.5px solid color-mix(in srgb,var(--lr-accent) 80%,#fff);background:color-mix(in srgb,var(--lr-accent) 18%,transparent);border-radius:2px;pointer-events:none;box-shadow:0 0 0 1px color-mix(in srgb,#fff 50%,transparent) inset}
+.lr-note-crop-box.locked{border-style:solid;background:color-mix(in srgb,var(--lr-accent) 12%,transparent)}
+.lr-note-crop-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px;background:color-mix(in srgb,var(--dsw-alias-bg-base) 72%,transparent);font-size:11px;color:var(--dsw-alias-label-secondary)}
+.lr-note-crop-result{display:flex;align-items:center;gap:9px;font-size:10.5px;color:var(--dsw-alias-label-secondary)}
+.lr-note-crop-result img{max-height:74px;border:1px solid var(--lr-line);border-radius:7px}
+.lr-note-insert-input{width:100%;height:30px;padding:0 10px;border:1px solid var(--lr-line);border-radius:8px;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-family:inherit;font-size:11.5px}
+.lr-note-insert-input:focus{outline:2px solid color-mix(in srgb,var(--lr-accent) 38%,transparent);outline-offset:1px}
+.lr-note-pos{display:inline-flex;gap:3px;padding:2px;border-radius:8px;background:color-mix(in srgb,var(--dsw-alias-label-secondary) 7%,transparent);border:1px solid var(--lr-line);flex-wrap:wrap}
+.lr-note-pos-btn{height:22px;padding:0 8px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary);font-family:inherit;font-size:10.5px;cursor:pointer;white-space:nowrap}
+.lr-note-pos-btn:hover{color:var(--dsw-alias-label-primary)}
+.lr-note-pos-btn.active{background:var(--dsw-alias-bg-base);color:color-mix(in srgb,var(--lr-accent) 74%,var(--dsw-alias-label-primary));font-weight:600;box-shadow:0 1px 2px color-mix(in srgb,#000 12%,transparent)}
+.lr-note-section-select{width:100%;max-width:none}
+.lr-note-cursor-hint{font-size:10.5px;color:var(--dsw-alias-label-secondary);line-height:1.55}
+/* needs_question state */
+.lr-note-question{display:flex;flex-direction:column;gap:10px}
+.lr-note-question-badge{align-self:flex-start;padding:2px 7px;border-radius:6px;background:color-mix(in srgb,var(--lr-accent) 12%,transparent);color:color-mix(in srgb,var(--lr-accent) 74%,var(--dsw-alias-label-primary));font-size:10px;font-weight:600}
+.lr-note-question-text{padding:10px 12px;border-left:2.5px solid color-mix(in srgb,var(--lr-accent) 44%,var(--lr-line));border-radius:0 8px 8px 0;background:color-mix(in srgb,var(--lr-accent) 6%,var(--dsw-alias-bg-layer-1));font-size:12px;line-height:1.68}
+.lr-note-question-suggest{font-size:11px;color:var(--dsw-alias-label-secondary);line-height:1.6}
+/* Figure progress */
+.lr-note-progress{display:flex;align-items:center;gap:8px;padding:7px 14px;border-top:1px solid var(--lr-line);background:color-mix(in srgb,var(--lr-accent) 7%,var(--dsw-alias-bg-layer-1));font-size:11px;color:var(--dsw-alias-label-secondary);flex:0 0 auto}
+.lr-note-progress-count{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:600;color:var(--dsw-alias-label-primary)}
+/* History drawer */
+.lr-note-history-mask{position:fixed;inset:0;z-index:120;display:flex;justify-content:flex-end;background:color-mix(in srgb,#000 32%,transparent);animation:lr-fade .16s ease}
+.lr-note-history{display:flex;flex-direction:column;width:min(400px,92vw);height:100%;background:var(--dsw-alias-bg-layer-1);border-left:1px solid var(--dsw-alias-border-l1);box-shadow:-18px 0 44px color-mix(in srgb,#000 26%,transparent);animation:lr-slide-right .2s ease}
+.lr-note-history-head{display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid var(--lr-line);color:var(--dsw-alias-label-secondary)}
+.lr-note-history-title{flex:1 1 auto;font-size:12px;font-weight:600;color:var(--dsw-alias-label-primary)}
+.lr-note-history-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:8px}
+.lr-note-history-empty{display:flex;flex-direction:column;align-items:center;gap:7px;padding:44px 18px;color:var(--dsw-alias-label-secondary);font-size:11px;text-align:center}
+.lr-note-history-row{display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid transparent;border-radius:9px}
+.lr-note-history-row:hover{background:var(--dsw-alias-bg-layer-2);border-color:var(--lr-line)}
+.lr-note-history-main{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
+.lr-note-history-time{font-size:11.5px;font-weight:550;color:var(--dsw-alias-label-primary)}
+.lr-note-history-meta{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--dsw-alias-label-secondary)}
+.lr-note-history-tag{padding:1px 6px;border-radius:5px;background:color-mix(in srgb,var(--lr-accent) 10%,transparent);color:color-mix(in srgb,var(--lr-accent) 70%,var(--dsw-alias-label-secondary));font-weight:600}
+.lr-note-preview{display:flex;flex-direction:column;gap:10px}
+.lr-note-preview-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-top:8px;border-top:1px solid var(--lr-line)}
+.lr-note-preview-note{margin-right:auto;font-size:11.5px;color:var(--dsw-alias-label-secondary)}
+.lr-note-history-actions{display:flex;gap:4px;flex:0 0 auto}
+/* Lightbox */
+.lr-note-lightbox{position:fixed;inset:0;z-index:140;display:flex;align-items:center;justify-content:center;padding:32px;background:color-mix(in srgb,#000 76%,transparent);animation:lr-fade .16s ease;cursor:zoom-out}
+.lr-note-lightbox img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 24px 70px color-mix(in srgb,#000 55%,transparent);cursor:default}
+.lr-note-lightbox-close{position:absolute;top:16px;right:16px;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid color-mix(in srgb,#fff 26%,transparent);border-radius:9px;background:color-mix(in srgb,#000 42%,transparent);color:#fff;cursor:pointer}
+.lr-note-lightbox-close:hover{background:color-mix(in srgb,#000 62%,transparent)}
+@keyframes lr-slide-right{from{transform:translateX(22px);opacity:.4}to{transform:none;opacity:1}}
+@media(max-width:1100px){
+  .lr-ann-panel{position:absolute;right:0;bottom:0;top:0;z-index:20;width:min(320px,86vw);flex-basis:auto;box-shadow:-14px 0 34px color-mix(in srgb,#000 20%,transparent);background:var(--dsw-alias-bg-layer-1)}
+  .lr-note-stage{position:relative}
+  .lr-note-head{gap:7px;padding:8px 11px}
+  .lr-note-head-name{font-size:12px}
+  .lr-note-applybar-hint{display:none}
+  .lr-note-paper-wrap{padding:18px 18px 80px}
+}
+@media(max-width:900px){
+  .lr-note-btn-label{display:none}
+  .lr-note-head-actions .lr-btn.small{width:26px;padding:0}
+  .lr-note-head-actions .lr-btn.small svg{width:13px;height:13px}
+  .lr-note-head-actions .lr-btn{padding:0 8px}
+  .lr-note-applybar{gap:7px;padding:7px 10px}
+  .lr-note-applybar-input{flex-basis:100%;order:3}
+  .lr-note-apply-btn{order:2;margin-left:auto}
+  .lr-note-paper-wrap{padding:14px 14px 74px}
+  .lr-note-tabs .lr-note-tab{padding:0 8px}
+  .lr-note-crop-hint{display:none}
+}
+@media(max-width:620px){
+  .lr-note-head-meta{display:none}
+  .lr-note-save-state{display:none}
+  .lr-note-h1{font-size:calc(17px * var(--lr-fs,1))}
+  .lr-note-h2{font-size:calc(14.5px * var(--lr-fs,1))}
+  .lr-note-applybar-count{font-size:10.5px}
+}
+
 `
 
     return {

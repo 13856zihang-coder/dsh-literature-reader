@@ -11,12 +11,45 @@ import {
   pdfInfo,
   resolvePoppler,
 } from './lib/pdf.js'
-import { detectVault, openInObsidian, writeSummaryNote } from './lib/obsidian.js'
+import {
+  detectVault,
+  openInObsidian,
+  readNoteBody,
+  updateSummaryNote,
+  writeSummaryNote,
+} from './lib/obsidian.js'
+import { applyReplacements, findFigurePlaceholders } from './lib/markdown-core.js'
+import {
+  anchorAnnotations,
+  figureDir,
+  figurePath,
+  HISTORY_DIR,
+  isFigureName,
+  isHistoryStamp,
+  listHistory,
+  readAnnotations as readSummaryAnnotations,
+  readSummary,
+  restoreHistory,
+  saveFigure,
+  summaryPath,
+  summaryVersion,
+  writeAnnotations as writeSummaryAnnotations,
+  writeSummary,
+} from './lib/summary-note.js'
+import {
+  autoFigureName,
+  bboxToPixels,
+  copyFigureToVault,
+  cropPageRegion,
+  pageSizePoints,
+} from './lib/figures.js'
 import {
   DEFAULT_WORD_NOTE,
   extractVocabularyAnswer,
   isVocabularyKind,
   looksLikeVocabularyAnswer,
+  MAX_GLOSSARY_ENTRIES,
+  readGlossary,
   recordWord,
 } from './lib/words.js'
 import {
@@ -57,8 +90,29 @@ import { normalizePreference, readPreference, writePreference } from './lib/sett
 const ROUTE_PREFIX = '/literature-reader'
 const PREFIX = '/literature-reader/'
 const API_PREFIX = '/literature-reader/api'
-const VERSION = '1.4.0'
+const VERSION = '2.0.0'
 const MAX_UPLOAD = 350 * 1024 * 1024
+const SUMMARY_MAX_CHARS = 400 * 1024
+const IMAGE_MAX_BYTES = 8 * 1024 * 1024
+const PENDING_IMAGE_TTL = 24 * 60 * 60 * 1000
+const DEFAULT_SUMMARY_FIGURES = 5
+const MAX_SUMMARY_FIGURES = 10
+const MAX_FIGURE_PLACEHOLDERS = 12
+const MAX_PLACEMENT_ASKS = 2
+const FIGURE_DPI = 200
+const FIGURES_BLOCK_RE = /!\[[^\]]*\]\(_附件\//g
+// Two writes of the same save land milliseconds apart, and some filesystems
+// only keep whole-second mtimes. A small window keeps a single save from
+// reporting itself as an external edit.
+const VAULT_MTIME_TOLERANCE_MS = 2000
+
+/** Study-note figure limit: 0 disables images, invalid values fall back to 5. */
+function normalizeFigureLimit(value) {
+  if (value === undefined || value === null || value === '') return DEFAULT_SUMMARY_FIGURES
+  const parsed = Number.parseInt(String(value), 10)
+  if (!Number.isFinite(parsed)) return DEFAULT_SUMMARY_FIGURES
+  return Math.min(MAX_SUMMARY_FIGURES, Math.max(0, parsed))
+}
 
 function normalizeConfig(config = {}) {
   return {
@@ -72,6 +126,7 @@ function normalizeConfig(config = {}) {
     popplerDir: config.popplerDir || undefined,
     importFolder: config.importFolder || '',
     wordNote: String(config.wordNote || DEFAULT_WORD_NOTE).trim() || DEFAULT_WORD_NOTE,
+    maxSummaryFigures: normalizeFigureLimit(config.maxSummaryFigures),
   }
 }
 
@@ -133,6 +188,202 @@ function extractCitations(text) {
     if (match[2]) found.add(Number(match[2]))
   }
   return [...found].filter((n) => Number.isFinite(n)).sort((a, b) => a - b).slice(0, 40)
+}
+
+function padNumber(value, size = 2) {
+  return String(value).padStart(size, '0')
+}
+
+/** `img-20261105-221500-ab12.png` — the upload naming scheme of spec §2.1. */
+function uploadedImageName(date, mediaType) {
+  const day = `${date.getFullYear()}${padNumber(date.getMonth() + 1)}${padNumber(date.getDate())}`
+  const time = `${padNumber(date.getHours())}${padNumber(date.getMinutes())}${padNumber(date.getSeconds())}`
+  const suffix = randomUUID().replace(/-/g, '').slice(0, 4)
+  return `img-${day}-${time}-${suffix}.${mediaType === 'image/png' ? 'png' : 'jpg'}`
+}
+
+/** Magic-number check: only PNG and JPEG are accepted for note images. */
+function detectImageType(buffer) {
+  if (!Buffer.isBuffer(buffer) || buffer.length < 8) return ''
+  const png =
+    buffer[0] === 0x89 &&
+    buffer[1] === 0x50 &&
+    buffer[2] === 0x4e &&
+    buffer[3] === 0x47 &&
+    buffer[4] === 0x0d &&
+    buffer[5] === 0x0a &&
+    buffer[6] === 0x1a &&
+    buffer[7] === 0x0a
+  if (png) return 'image/png'
+  if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+    return 'image/jpeg'
+  }
+  return ''
+}
+
+/** Decode one uploaded data URL, enforcing type, magic number and size. */
+function decodeImageUpload(value, mediaTypeHint) {
+  const raw = stripDataUrl(String(value || ''))
+  if (!raw) throw new HttpError(400, '缺少图片数据')
+  const buffer = Buffer.from(raw, 'base64')
+  if (buffer.length === 0) throw new HttpError(400, '图片内容为空')
+  if (buffer.length > IMAGE_MAX_BYTES) throw new HttpError(413, '图片不能超过 8MB')
+  const hint = String(mediaTypeHint || '').toLowerCase()
+  if (hint && !['image/png', 'image/jpeg', 'image/jpg'].includes(hint)) {
+    throw new HttpError(400, '只支持 PNG 或 JPEG 图片')
+  }
+  const detected = detectImageType(buffer)
+  if (!detected) throw new HttpError(400, '只支持 PNG 或 JPEG 图片')
+  if (hint === 'image/png' && detected !== 'image/png') {
+    throw new HttpError(400, '图片内容与声明的类型不一致')
+  }
+  if ((hint === 'image/jpeg' || hint === 'image/jpg') && detected !== 'image/jpeg') {
+    throw new HttpError(400, '图片内容与声明的类型不一致')
+  }
+  return { buffer, mediaType: detected }
+}
+
+function figureFileType(name) {
+  return /\.png$/i.test(String(name || '')) ? 'image/png' : 'image/jpeg'
+}
+
+/** One-line caption that can live inside Markdown link text. */
+function sanitizeCaption(value, max = 160) {
+  return String(value || '')
+    .replace(/[\r\n]+/g, ' ')
+    .replace(/[[\]]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, max)
+}
+
+function countNoteFigures(markdown) {
+  const matches = String(markdown || '').match(/!\[[^\]]*\]\(_附件\//g)
+  return matches ? matches.length : 0
+}
+
+/**
+ * True when the vault note is newer than the local body by more than the
+ * tolerance window. `localTime` may be 0 (no local file yet), in which case
+ * any existing note counts as external content, not as an edit of ours.
+ */
+function vaultIsNewer(vaultTime, localTime) {
+  if (!Number.isFinite(vaultTime) || vaultTime <= 0) return false
+  return vaultTime - (Number.isFinite(localTime) ? localTime : 0) > VAULT_MTIME_TOLERANCE_MS
+}
+
+/** How many terms the dialog may ask about before we quietly keep the rest. */
+const MAX_GLOSSARY_QUESTIONS = 10
+
+/**
+ * Validate a caller-supplied glossary. Returns a clean list or throws, because
+ * a malformed override would otherwise reach the prompt as `[object Object]`.
+ */
+function normalizeGlossaryOverride(value) {
+  if (!Array.isArray(value)) throw new HttpError(400, 'glossaryOverride 必须是数组')
+  if (value.length > MAX_GLOSSARY_ENTRIES) {
+    throw new HttpError(400, `glossaryOverride 最多 ${MAX_GLOSSARY_ENTRIES} 条`)
+  }
+  return value.map((item, index) => {
+    if (!item || typeof item !== 'object') {
+      throw new HttpError(400, `glossaryOverride 第 ${index + 1} 条格式不正确`)
+    }
+    const term = String(item.term ?? '').trim()
+    if (!term) throw new HttpError(400, `glossaryOverride 第 ${index + 1} 条缺少 term`)
+    return { term, translation: String(item.translation ?? '').trim(), source: 'translated' }
+  })
+}
+
+function lineStartAt(text, offset) {
+  const source = String(text || '')
+  const safe = Math.max(0, Math.min(source.length, Math.trunc(Number(offset) || 0)))
+  if (safe === 0) return 0
+  const newline = source.lastIndexOf('\n', safe - 1)
+  return newline === -1 ? 0 : newline + 1
+}
+
+/**
+ * Find the single heading line matching `candidate`. The name may omit the
+ * `##` prefix; an ambiguous name resolves to null so the caller never guesses.
+ */
+function findHeadingLine(text, candidate) {
+  const wanted = String(candidate || '')
+    .replace(/^#+\s*/, '')
+    .replace(/\s+#+\s*$/, '')
+    .trim()
+  if (!wanted) return null
+  const compact = (value) => value.replace(/\s+/g, ' ')
+  let hit = null
+  let offset = 0
+  for (const line of String(text || '').split('\n')) {
+    const match = /^(#{1,6})\s+(.+?)\s*$/.exec(line)
+    if (match) {
+      const title = match[2].replace(/\s+#+\s*$/, '').trim()
+      if (title === wanted || compact(title) === compact(wanted)) {
+        if (hit) return null
+        hit = { level: match[1].length, offset }
+      }
+    }
+    offset += line.length + 1
+  }
+  return hit
+}
+
+/** Offset right before the next heading of the same or a higher level. */
+function sectionEndOffset(text, heading) {
+  const source = String(text || '')
+  let offset = 0
+  for (const line of source.split('\n')) {
+    const lineStart = offset
+    offset += line.length + 1
+    if (lineStart <= heading.offset) continue
+    const match = /^(#{1,6})\s+/.exec(line)
+    if (match && match[1].length <= heading.level) return lineStart
+  }
+  return source.length
+}
+
+/** Resolve an explicit `{ heading, afterOffset }` anchor to an insert offset. */
+function resolveAnchorOffset(markdown, anchor) {
+  const text = String(markdown || '')
+  const raw = Number(anchor?.afterOffset)
+  if (anchor?.afterOffset !== undefined && anchor?.afterOffset !== null && anchor?.afterOffset !== '') {
+    if (Number.isFinite(raw) && raw >= 0 && raw <= text.length) {
+      return lineStartAt(text, raw)
+    }
+  }
+  const heading = findHeadingLine(text, anchor?.heading)
+  if (heading) return sectionEndOffset(text, heading)
+  return null
+}
+
+/** Insert a standalone Markdown block at a line-aligned offset. */
+function insertBlockAt(text, offset, block) {
+  const source = String(text || '')
+  const safe = Math.max(0, Math.min(source.length, Math.trunc(Number(offset) || 0)))
+  const before = source.slice(0, safe)
+  const after = source.slice(safe)
+  const lead = before === '' ? '' : before.endsWith('\n\n') ? '' : before.endsWith('\n') ? '\n' : '\n\n'
+  const tail = after === '' || after.startsWith('\n') ? '' : '\n'
+  return `${before}${lead}${block}${tail}${after}`
+}
+
+function figureMarkdownFor(paperId, name, caption, page) {
+  const label = sanitizeCaption(caption) || (page ? `第 ${page} 页的图` : '插图')
+  const lines = [`![${label}](_附件/${paperId}/${name})`]
+  if (page) {
+    const note = sanitizeCaption(caption) || '图片'
+    lines.push(`*${note} · p.${page}*`)
+  }
+  return `${lines.join('\n')}\n`
+}
+
+// The failure callout is part of the contract (spec §3.2): exactly two quote
+// lines. The machine-readable reason travels in the SSE/JSON payload instead.
+function figureFailureMarkdown(caption, page) {
+  const label = sanitizeCaption(caption) || '这张图'
+  const title = `> [!figure] 图未自动截取：${label}${page ? `（p.${page}）` : ''}`
+  return `${title}\n> 可在编辑模式下自行插入图片。\n`
 }
 
 function validateStrokes(input, pageCount) {
@@ -280,6 +531,9 @@ export function apply(ctx, rawConfig = {}) {
   const uploads = new Map()
   const busy = new Set()
   const controllers = new Map()
+  // Pending image placements (`imageId` -> record); answers arrive up to 24h
+  // later, so they cannot live in the request scope.
+  const pendingImages = new Map()
   const ready = ensureBaseDirs(dirs)
   // Load the saved model preference once the data directory exists. Calls that
   // arrive before it settles simply use the deployment config.
@@ -393,6 +647,305 @@ export function apply(ctx, rawConfig = {}) {
   async function saveAnnotations(id, strokes) {
     const dir = paperDirOf(id)
     await writeJson(path.join(dir, 'annotations.json'), { strokes, updatedAt: nowIso() })
+  }
+
+  // ---- study-note helpers (spec §7) -------------------------------------
+
+  async function loadNoteAnnotations(id) {
+    return readSummaryAnnotations(paperDirOf(id))
+  }
+
+  async function noteState(id) {
+    const dir = paperDirOf(id)
+    const summary = await readSummary(dir)
+    const annotations = await readSummaryAnnotations(dir)
+    return { dir, ...summary, annotations }
+  }
+
+  /**
+   * Mirror the local body into the Obsidian note. A missing vault is not an
+   * error: the local copy stays authoritative and the failure is reported.
+   */
+  async function syncNoteToVault(meta, markdown) {
+    const dir = paperDirOf(meta.id)
+    const tags = mergeTags(meta.tags, ['文献阅读'])
+    try {
+      const vault = await getVaultInfo()
+      if (!vault) throw new Error('未找到 Obsidian 库，请在插件配置里填写 obsidianVault')
+      const existing = Boolean(meta.summaryPath) && existsSync(meta.summaryPath)
+      if (existing) {
+        const note = await updateSummaryNote({ vault, config, meta, body: markdown, tags })
+        return { notePath: note.path, noteRelative: note.relative, noteCreated: false, noteError: '' }
+      }
+      // A fresh note gets the full source frontmatter, not just the tags.
+      const sourcePdf = await sourcePathFor(meta, dir).catch(() => '')
+      const note = await writeSummaryNote({
+        vault,
+        config,
+        meta,
+        body: markdown,
+        tags,
+        pdfPath: sourcePdf && existsSync(sourcePdf) ? sourcePdf : path.join(dir, 'source.pdf'),
+      })
+      meta.summaryPath = note.path
+      return { notePath: note.path, noteRelative: note.relative, noteCreated: true, noteError: '' }
+    } catch (error) {
+      return {
+        notePath: meta.summaryPath || '',
+        noteRelative: '',
+        noteCreated: false,
+        noteError: errorMessage(error),
+      }
+    }
+  }
+
+  /**
+   * Refresh meta and mirror an already-written body into Obsidian. Used by
+   * every mutation so the local file, the note and `meta.json` never drift.
+   */
+  async function finishWrittenNote(meta, markdown, written) {
+    meta.summaryUpdatedAt = written.updatedAt
+    meta.summaryVersion = written.version
+    meta.summaryFigureCount = countNoteFigures(markdown)
+    const synced = await syncNoteToVault(meta, markdown)
+    if (!meta.summarizedAt) meta.summarizedAt = written.updatedAt
+    await saveMeta(meta).catch(() => {})
+    return { ...written, ...synced }
+  }
+
+  /** Write the local body (snapshotting the old one), then finish the sync. */
+  async function persistNoteBody(meta, markdown, options = {}) {
+    // Sample the vault *before* the local write: afterwards both mtimes are
+    // ours and the comparison would always look clean. Obsidian is read-only
+    // for us, so a note newer than `summary.md` means a hand edit is about to
+    // be replaced — we still honour the save, but say so in the response.
+    const before = await vaultState(meta).catch(() => ({ vaultModified: false }))
+    const written = await writeSummary(paperDirOf(meta.id), markdown, {
+      source: options.source || 'manual',
+      label: options.label || '',
+    })
+    const done = await finishWrittenNote(meta, markdown, written)
+    return { ...done, vaultOverwritten: Boolean(before.vaultModified) }
+  }
+
+  /** Re-anchor annotations after the body changed, persisting the result. */
+  async function reanchorNote(id, markdown) {
+    const dir = paperDirOf(id)
+    const existing = await readSummaryAnnotations(dir)
+    const anchored = anchorAnnotations(markdown, existing)
+    const saved = await writeSummaryAnnotations(dir, anchored.annotations)
+    return { annotations: saved.annotations, anchors: anchored, lost: anchored.orphans }
+  }
+
+  /** Note metadata for the GET /summary payload. */
+  async function noteInfo(meta) {
+    const notePath = meta.summaryPath || ''
+    const exists = Boolean(notePath) && existsSync(notePath)
+    let relative = ''
+    if (exists) {
+      const vault = await getVaultInfo()
+      if (vault) relative = path.relative(vault.path, notePath).split(path.sep).join('/')
+    }
+    return { path: notePath, relative, exists }
+  }
+
+  /**
+   * Compare the vault note's mtime with the local body's. The plugin is the
+   * only writer; Obsidian is read-only (user decision), so a note that is
+   * clearly newer than `summary.md` can only come from a hand edit there.
+   * Any stat failure answers "not modified" — a GET must never fail over this.
+   */
+  async function vaultState(meta, localUpdatedAt) {
+    const notePath = meta.summaryPath || ''
+    const blank = { vaultModified: false, vaultUpdatedAt: '', localUpdatedAt: localUpdatedAt || '' }
+    if (!notePath) return blank
+    const [noteStat, localStat] = await Promise.all([
+      stat(notePath).catch(() => undefined),
+      stat(summaryPath(paperDirOf(meta.id))).catch(() => undefined),
+    ])
+    if (!noteStat?.isFile()) return blank
+    const vaultUpdatedAt = noteStat.mtime.toISOString()
+    const localTime = localStat?.isFile() ? localStat.mtime.getTime() : 0
+    return {
+      vaultModified: vaultIsNewer(noteStat.mtime.getTime(), localTime),
+      vaultUpdatedAt,
+      localUpdatedAt: localStat?.isFile() ? localStat.mtime.toISOString() : localUpdatedAt || '',
+    }
+  }
+
+  /** Pending image records expire after 24h; drop stale entries lazily. */
+  function pendingImageFor(imageId, id) {
+    const record = pendingImages.get(String(imageId || ''))
+    if (!record) throw new HttpError(404, '图片已过期，请重新插入')
+    if (Date.now() - record.createdAt > PENDING_IMAGE_TTL) {
+      pendingImages.delete(record.imageId)
+      throw new HttpError(404, '图片已过期，请重新插入')
+    }
+    if (record.paperId !== id) throw new HttpError(404, '图片已过期，请重新插入')
+    return record
+  }
+
+  /**
+   * Copy one local figure into the vault attachment folder. A missing vault is
+   * not an error: the note keeps the relative link and the local copy.
+   */
+  async function mirrorFigureToVault(id, name) {
+    const vault = await getVaultInfo()
+    if (!vault?.path) return { copied: false, reason: '未找到 Obsidian 库' }
+    try {
+      await copyFigureToVault({
+        vaultPath: vault.path,
+        notesFolder: config.notesFolder,
+        paperId: id,
+        localFile: path.join(figureDir(paperDirOf(id)), name),
+        name,
+      })
+      return { copied: true, reason: '' }
+    } catch (error) {
+      return { copied: false, reason: errorMessage(error) }
+    }
+  }
+
+  /**
+   * Crop one figure out of the PDF. Returns the stored name, or a readable
+   * failure reason. Never throws: one bad figure must not stop the others.
+   */
+  async function captureFigure(meta, dir, pdf, placeholder, signal) {
+    const page = Number(placeholder?.page)
+    if (!Number.isInteger(page) || page < 1) return { ok: false, reason: '页码无效' }
+    if (meta.pageCount && page > meta.pageCount) {
+      return { ok: false, reason: `第 ${page} 页超出文献范围` }
+    }
+    try {
+      const pageFile = await ensurePageImage(pdf, dir, page, { config })
+      const pageImage = { data: await readFile(pageFile), page, mediaType: 'image/jpeg' }
+      const pageSize = await pageSizePoints(pdf, page, { config }).catch(() => undefined)
+      const located = await ai.locateFigure({
+        meta,
+        pageImage,
+        caption: placeholder.caption || '',
+        hint: placeholder.hint || '',
+        pageSize,
+        signal,
+      })
+      if (!located?.found || !Array.isArray(located.bbox)) {
+        return { ok: false, reason: located?.note || '没有在页面上找到这张图' }
+      }
+      const size = pageSize || (await pageSizePoints(pdf, page, { config }))
+      const pixels = bboxToPixels({
+        widthPt: size.width,
+        heightPt: size.height,
+        dpi: FIGURE_DPI,
+        bboxNorm: located.bbox,
+      })
+      if (!pixels) return { ok: false, reason: '框选范围无效' }
+      let index = 1
+      let name = autoFigureName(page, index)
+      const outDir = figureDir(dir)
+      while (existsSync(path.join(outDir, name))) {
+        index += 1
+        if (index > 99) return { ok: false, reason: '这一页的图片太多' }
+        name = autoFigureName(page, index)
+      }
+      await cropPageRegion(pdf, path.join(outDir, name), page, located.bbox, {
+        dpi: FIGURE_DPI,
+        config,
+      })
+      const mirrored = await mirrorFigureToVault(meta.id, name)
+      return {
+        ok: true,
+        name,
+        page,
+        // The raw label the vision model gave ("图 3"). The caller decides
+        // which caption wins (spec §3.2: the placeholder's own caption does).
+        label: located.label || '',
+        note: mirrored.copied ? '' : mirrored.reason,
+      }
+    } catch (error) {
+      return { ok: false, reason: errorMessage(error) }
+    }
+  }
+
+  /**
+   * Replace every pending `[[FIGURE: ...]]` placeholder with either an image
+   * block or a "not captured" callout. Offsets are taken from one body and
+   * applied from the end, so a later failure never shifts an earlier range.
+   */
+  async function resolveFigures(meta, dir, markdown, placeholders, onProgress, signal) {
+    const items = Array.isArray(placeholders) && placeholders.length
+      ? placeholders
+      : findFigurePlaceholders(markdown)
+    const created = []
+    const failed = []
+    if (items.length === 0) return { markdown, created, failed, total: 0 }
+    const pdf = await sourcePathFor(meta, dir).catch(() => '')
+    if (!pdf || !existsSync(pdf)) {
+      const reason = 'PDF 文件不存在，无法自动截取图片'
+      for (const placeholder of items) {
+        failed.push({ page: placeholder.page, caption: placeholder.caption, reason })
+        onProgress?.(placeholder, false, reason, '')
+      }
+      const replacements = items.map((placeholder) => ({
+        start: placeholder.start,
+        end: placeholder.end,
+        replacement: figureFailureMarkdown(placeholder.caption, placeholder.page),
+      }))
+      const applied = applyReplacements(markdown, replacements)
+      return { markdown: applied.text, created, failed, total: items.length }
+    }
+    const replacements = []
+    for (let index = 0; index < items.length; index += 1) {
+      const placeholder = items[index]
+      onProgress?.(placeholder, null, '', '')
+      const result = await captureFigure(meta, dir, pdf, placeholder, signal)
+      if (result.ok) {
+        // Spec §3.2: the caption of a captured figure comes from the
+        // placeholder the note author wrote, not from the vision model's short
+        // label. `result.label` is only the fallback for an empty caption.
+        const caption = placeholder.caption || result.label || ''
+        created.push({ name: result.name, page: result.page, caption })
+        replacements.push({
+          start: placeholder.start,
+          end: placeholder.end,
+          replacement: figureMarkdownFor(meta.id, result.name, caption, result.page),
+        })
+        onProgress?.(placeholder, true, '', result.name)
+      } else {
+        failed.push({ page: placeholder.page, caption: placeholder.caption, reason: result.reason })
+        replacements.push({
+          start: placeholder.start,
+          end: placeholder.end,
+          replacement: figureFailureMarkdown(placeholder.caption, placeholder.page),
+        })
+        onProgress?.(placeholder, false, result.reason, '')
+      }
+    }
+    const applied = applyReplacements(markdown, replacements)
+    return { markdown: applied.text, created, failed, total: items.length }
+  }
+
+  /**
+   * SSE helper: send figure progress for one placeholder. `index` is 0-based
+   * and `total` rides along so the client can render "i/N" without guessing.
+   */
+  function figureProgressSender(sse, total) {
+    let index = 0
+    return (placeholder, ok, reason, name) => {
+      if (ok === null) {
+        sse.send({ type: 'status', label: `正在截取第 ${index + 1}/${total} 张图…` })
+        return
+      }
+      sse.send({
+        type: 'figure',
+        index,
+        total,
+        page: placeholder?.page || 0,
+        ok: Boolean(ok),
+        name: name || '',
+        reason: reason || '',
+      })
+      index += 1
+    }
   }
 
   async function setProgress(meta, label, done = 0, total = 1) {
@@ -1160,8 +1713,66 @@ export function apply(ctx, rawConfig = {}) {
     }
   }
 
+  /**
+   * POST /papers/:id/summary/prepare — read the vocabulary note and ask the
+   * model which of those terms belong in this paper's glossary.
+   *
+   * Two-phase by design: the summary itself is one long SSE stream, and asking
+   * the reader a question halfway through it would need a bidirectional
+   * connection that nothing else in this plugin uses. A separate, retryable
+   * call keeps the dialog stateless — if it fails or the reader closes the tab,
+   * `POST /summary` still runs with whatever glossary it can read itself.
+   */
+  async function handleSummaryPrepare(req, res, id) {
+    const meta = await loadMeta(id)
+    const empty = { ok: true, total: 0, include: [], excluded: 0, questions: [] }
+    const candidates = await readGlossary({
+      vault: await getVaultInfo().catch(() => null),
+      config,
+      meta,
+    }).catch(() => [])
+    if (!candidates.length) {
+      json(res, 200, empty)
+      return
+    }
+    // Classification is best-effort: a failure falls back to "include
+    // everything", which is exactly what single-phase generation used to do.
+    const classified = await ai
+      .classifyGlossary({ meta, candidates })
+      .catch(() => ({ include: candidates, exclude: [], uncertain: [] }))
+    const include = Array.isArray(classified?.include) ? classified.include : candidates
+    const uncertain = Array.isArray(classified?.uncertain) ? classified.uncertain : []
+    const excluded = Array.isArray(classified?.exclude) ? classified.exclude.length : 0
+    // `guess: false` means the model leans towards excluding it, so those are
+    // the questions worth asking first when the list has to be trimmed.
+    const ranked = [...uncertain].sort(
+      (a, b) => Number(a?.guess === false ? 0 : 1) - Number(b?.guess === false ? 0 : 1),
+    )
+    const questions = ranked.slice(0, MAX_GLOSSARY_QUESTIONS).map((item) => ({
+      term: String(item?.term || ''),
+      translation: String(item?.translation || ''),
+      guess: item?.guess !== false,
+    }))
+    json(res, 200, {
+      ok: true,
+      total: candidates.length,
+      include: include.map((item) => ({
+        term: String(item?.term || ''),
+        translation: String(item?.translation || ''),
+      })),
+      excluded,
+      questions,
+    })
+  }
+
   async function handleSummary(req, res, id) {
     if (busy.has(id)) throw new HttpError(409, '当前还有回答或总结正在生成，请稍候')
+    // Read the body before the stream opens: once SSE headers are sent we can
+    // no longer answer with a plain 400. An empty body means "no override".
+    const body = await readJsonBody(req, 1024 * 1024)
+    const override = body?.glossaryOverride === undefined
+      ? null
+      : normalizeGlossaryOverride(body.glossaryOverride)
     const meta = await loadMeta(id)
     const dir = paperDirOf(id)
     const textState = await loadText(id)
@@ -1180,16 +1791,52 @@ export function apply(ctx, rawConfig = {}) {
     try {
       sse.send({ type: 'status', label: '正在综合全文和你的提问…' })
       sse.send({ type: 'start' })
+      const maxFigures = config.maxSummaryFigures
+      // The reader's own lookups carry the terms they actually cared about, so
+      // they win over the model's guesses. Failure here is silent by design: a
+      // missing or unreadable vocabulary note must not block the summary.
+      // An explicit override from the confirm dialog replaces both: the reader
+      // already saw and trimmed that list, so re-reading the note would undo it.
+      const glossary = override ?? await readGlossary({
+        vault: await getVaultInfo().catch(() => null),
+        config,
+        meta,
+      }).catch(() => [])
       const result = await ai.summarize({
         meta,
         pages: textState.pages,
         analysis,
         history: chat,
         signal: controller.signal,
+        maxFigures,
+        glossary,
       })
       if (!result.body.trim()) throw new Error('AI 没有返回有效的总结内容')
-      const summaryPath = path.join(dir, 'summary.md')
-      await writeFileAtomic(summaryPath, `${result.body.trim()}\n`)
+      let body = result.body.trim()
+      let figures = []
+      let figureFailures = []
+      // Crop the placeholders the model asked for before anything is written,
+      // so the local copy and the Obsidian note carry the final image links.
+      if (maxFigures > 0) {
+        const placeholders = findFigurePlaceholders(body)
+        if (placeholders.length > 0) {
+          sse.send({ type: 'status', label: `正在截取图片（共 ${placeholders.length} 张）…` })
+          const resolved = await resolveFigures(
+            meta,
+            dir,
+            body,
+            placeholders,
+            figureProgressSender(sse, placeholders.length),
+          )
+          body = resolved.markdown
+          figures = resolved.created
+          figureFailures = resolved.failed
+        }
+      }
+      const written = await writeSummary(dir, body, { source: 'generate' })
+      meta.summaryUpdatedAt = written.updatedAt
+      meta.summaryVersion = written.version
+      meta.summaryFigureCount = countNoteFigures(body)
       let note
       let openResult
       let openError = ''
@@ -1201,7 +1848,7 @@ export function apply(ctx, rawConfig = {}) {
           vault,
           config,
           meta,
-          body: result.body,
+          body,
           tags: result.tags,
           pdfPath: existsSync(sourcePdf) ? sourcePdf : path.join(dir, 'source.pdf'),
         })
@@ -1222,14 +1869,676 @@ export function apply(ctx, rawConfig = {}) {
       sse.send({
         type: 'done',
         tags: result.tags,
-        chars: result.body.length,
+        chars: body.length,
         path: note?.path || '',
         relative: note?.relative || '',
         obsidianUrl: note ? `${API_PREFIX}/papers/${id}/open-note` : '',
         opened: Boolean(openResult),
         openError,
         hasNote: Boolean(note),
-        localSummary: summaryPath,
+        localSummary: path.join(dir, 'summary.md'),
+        version: written.version,
+        updatedAt: written.updatedAt,
+        figures,
+        figureFailures,
+      })
+      finished = true
+      sse.end()
+    } catch (error) {
+      if (controller.signal.aborted) {
+        finished = true
+        sse.end()
+        return
+      }
+      sse.send({ type: 'error', message: errorMessage(error) })
+      finished = true
+      sse.end()
+    } finally {
+      busy.delete(id)
+    }
+  }
+
+  /** GET /papers/:id/summary — body + version + annotations + note metadata. */
+  async function handleSummaryGet(req, res, id) {
+    const meta = await loadMeta(id)
+    const state = await noteState(id)
+    if (!state.markdown) throw new HttpError(404, '还没有生成总结')
+    json(res, 200, {
+      markdown: state.markdown,
+      path: meta.summaryPath || '',
+      updatedAt: state.updatedAt,
+      version: state.version,
+      annotations: state.annotations,
+      note: await noteInfo(meta),
+      // Spec §7.1 extension: expose hand edits made in Obsidian, which is
+      // read-only for us. Additive only — older clients ignore these.
+      ...(await vaultState(meta, state.updatedAt)),
+    })
+  }
+
+  /** PUT /papers/:id/summary — manual Markdown save with conflict detection. */
+  async function handleSummaryPut(req, res, id) {
+    const body = await readJsonBody(req, 1024 * 1024)
+    const meta = await loadMeta(id)
+    const dir = paperDirOf(id)
+    const markdown = String(body.markdown ?? '')
+    if (!markdown.trim()) throw new HttpError(400, '正文不能为空')
+    if (markdown.length > SUMMARY_MAX_CHARS) throw new HttpError(413, '正文不能超过 400KB')
+    const current = await readSummary(dir)
+    if (!body.force && body.baseVersion && body.baseVersion !== current.version) {
+      json(res, 409, {
+        error: '笔记已在别处更新',
+        conflict: true,
+        markdown: current.markdown,
+        version: current.version,
+      })
+      return
+    }
+    const written = await persistNoteBody(meta, markdown, { source: 'manual' })
+    const anchored = await reanchorNote(id, markdown)
+    json(res, 200, {
+      ok: true,
+      markdown,
+      version: written.version,
+      updatedAt: written.updatedAt,
+      notePath: written.notePath,
+      noteError: written.noteError,
+      historyStamp: written.snapshot || '',
+      annotations: anchored.annotations,
+      lost: anchored.lost,
+      // Additive warning: this save replaced hand edits made in Obsidian. The
+      // old body is already in history, so the client can offer a rollback.
+      vaultOverwritten: written.vaultOverwritten,
+    })
+  }
+
+  /** PUT /papers/:id/summary/annotations — clean, re-anchor, persist. */
+  async function handleSummaryAnnotationsPut(req, res, id) {
+    const body = await readJsonBody(req, 1024 * 1024)
+    if (!Array.isArray(body.annotations)) throw new HttpError(400, 'annotations 必须是数组')
+    const dir = paperDirOf(id)
+    const state = await readSummary(dir)
+    if (!state.markdown) throw new HttpError(404, '还没有生成总结')
+    const anchored = anchorAnnotations(state.markdown, body.annotations)
+    const saved = await writeSummaryAnnotations(dir, anchored.annotations)
+    json(res, 200, {
+      ok: true,
+      annotations: saved.annotations,
+      updatedAt: saved.updatedAt,
+      orphans: anchored.orphans,
+    })
+  }
+
+  /** POST /papers/:id/summary/revise — AI revision driven by annotations. */
+  async function handleSummaryRevise(req, res, id) {
+    const body = await readJsonBody(req, 1024 * 1024)
+    if (busy.has(id)) throw new HttpError(409, '当前还有回答或总结正在生成，请稍候')
+    const meta = await loadMeta(id)
+    const dir = paperDirOf(id)
+    const state = await readSummary(dir)
+    if (!state.markdown) throw new HttpError(404, '还没有生成总结')
+    const instruction = String(body.instruction || '').trim().slice(0, 2000)
+    const wantedIds = Array.isArray(body.ids)
+      ? body.ids.map((value) => String(value || '').trim()).filter(Boolean)
+      : []
+    const existing = await readSummaryAnnotations(dir)
+    const anchored = anchorAnnotations(state.markdown, existing)
+    const openList = anchored.annotations.filter((item) => item.status === 'open')
+    const selected = wantedIds.length
+      ? openList.filter((item) => wantedIds.includes(item.id))
+      : openList.slice()
+    if (selected.length === 0 && !instruction) {
+      throw new HttpError(400, '没有待应用的标注，也没有补充要求')
+    }
+    const controller = new AbortController()
+    let finished = false
+    const sse = makeSse(res, () => {
+      if (!finished) controller.abort()
+    })
+    busy.add(id)
+    try {
+      sse.send({ type: 'status', label: '正在按你的标注修改…' })
+      let answer
+      try {
+        answer = await ai.reviseNote({
+          meta,
+          markdown: state.markdown,
+          annotations: selected,
+          instruction,
+          signal: controller.signal,
+        })
+      } catch (error) {
+        if (controller.signal.aborted) {
+          finished = true
+          sse.end()
+          return
+        }
+        sse.send({ type: 'error', message: errorMessage(error) })
+        finished = true
+        sse.end()
+        return
+      }
+      const byId = new Map(selected.map((item) => [item.id, item]))
+      const replacements = []
+      for (const edit of answer.edits || []) {
+        const annotation = byId.get(edit.id)
+        if (!annotation) continue
+        replacements.push({
+          id: annotation.id,
+          start: annotation.start,
+          end: annotation.end,
+          // An empty replacement means "delete this fragment", not "skip".
+          replacement: String(edit.replacement ?? ''),
+          why: edit.why || '',
+        })
+      }
+      const result = applyReplacements(state.markdown, replacements)
+      const appliedIds = new Set(result.applied.map((item) => item.id))
+      const unresolved = (answer.unresolved || []).filter((item) => byId.has(item.id))
+      const unresolvedIds = new Set(unresolved.map((item) => item.id))
+      const missed = selected.filter(
+        (item) => !appliedIds.has(item.id) && !unresolvedIds.has(item.id),
+      )
+      const nextRevision = Math.max(0, ...existing.map((item) => Number(item.revision) || 0)) + 1
+      const revisionAt = nowIso()
+      const nextAnnotations = anchored.annotations.map((item) => {
+        if (appliedIds.has(item.id)) {
+          const hit = replacements.find((entry) => entry.id === item.id)
+          return {
+            ...item,
+            status: 'resolved',
+            resolvedAt: revisionAt,
+            revision: nextRevision,
+            reply: hit?.why || answer.reply || '已按标注修改',
+          }
+        }
+        if (unresolvedIds.has(item.id)) {
+          const hit = unresolved.find((entry) => entry.id === item.id)
+          return { ...item, reply: hit?.reason || '无法按要求修改' }
+        }
+        return item
+      })
+      let markdown = result.text
+      let figures = { created: [], failed: [] }
+      let historyStamp = ''
+      let vaultOverwritten = false
+      const baseVersion = summaryVersion(markdown)
+      const placeholders = findFigurePlaceholders(markdown)
+      if (placeholders.length > 0 && config.maxSummaryFigures > 0) {
+        sse.send({ type: 'status', label: `正在截取图片（共 ${placeholders.length} 张）…` })
+        const resolved = await resolveFigures(
+          meta,
+          dir,
+          markdown,
+          placeholders,
+          figureProgressSender(sse, placeholders.length),
+          controller.signal,
+        )
+        markdown = resolved.markdown
+        figures = { created: resolved.created, failed: resolved.failed }
+      }
+      if (!controller.signal.aborted) {
+        const written = await persistNoteBody(meta, markdown, { source: 'revision' })
+        historyStamp = written.snapshot || ''
+        vaultOverwritten = Boolean(written.vaultOverwritten)
+        await writeSummaryAnnotations(dir, nextAnnotations)
+      }
+      sse.send({
+        type: 'done',
+        reply: answer.reply || '',
+        markdown,
+        version: summaryVersion(markdown),
+        beforeVersion: state.version,
+        baseVersion,
+        updatedAt: nowIso(),
+        applied: [...appliedIds].map((entry) => {
+          const annotation = byId.get(entry)
+          const hit = replacements.find((item) => item.id === entry)
+          return { id: entry, why: hit?.why || '', quote: annotation?.quote || '' }
+        }),
+        unresolved: unresolved.map((item) => ({
+          id: item.id,
+          reason: item.reason,
+          quote: byId.get(item.id)?.quote || '',
+        })),
+        skipped: missed.map((item) => ({ id: item.id, reason: '未返回处理结果' })),
+        orphans: anchored.orphans,
+        annotations: await loadNoteAnnotations(id),
+        figures: { created: figures.created.length, failed: figures.failed.length, items: figures.created },
+        figureFailures: figures.failed,
+        notePath: meta.summaryPath || '',
+        historyStamp,
+        // Additive warning, same meaning as in PUT /summary.
+        vaultOverwritten,
+      })
+      finished = true
+      sse.end()
+    } catch (error) {
+      if (controller.signal.aborted) {
+        finished = true
+        sse.end()
+        return
+      }
+      sse.send({ type: 'error', message: errorMessage(error) })
+      finished = true
+      sse.end()
+    } finally {
+      busy.delete(id)
+    }
+  }
+
+  /** GET /papers/:id/summary/history */
+  async function handleSummaryHistory(req, res, id) {
+    const meta = await loadMeta(id)
+    const versions = await listHistory(paperDirOf(id))
+    json(res, 200, {
+      versions,
+      notePath: meta.summaryPath || '',
+      note: await noteInfo(meta),
+    })
+  }
+
+  /** GET /papers/:id/summary/history/:stamp — read one snapshot, read-only. */
+  async function handleSummaryHistoryItem(req, res, id, stamp) {
+    // Spec §7.1: a malformed stamp is reported as "not found" too, so the
+    // preview route never leaks the difference between bad input and a
+    // version that was pruned.
+    if (!isHistoryStamp(stamp)) throw new HttpError(404, '历史版本不存在')
+    const dir = paperDirOf(id)
+    const historyDir = path.join(dir, HISTORY_DIR)
+    const file = path.join(historyDir, `${stamp}.md`)
+    // The stamp regex already excludes separators; keep the resolved path
+    // inside the history directory as a second line of defence.
+    if (path.dirname(path.resolve(file)) !== path.resolve(historyDir)) {
+      throw new HttpError(404, '历史版本不存在')
+    }
+    let content
+    let info
+    try {
+      ;[content, info] = await Promise.all([readFile(file, 'utf8'), stat(file)])
+    } catch (error) {
+      if (error?.code === 'ENOENT') throw new HttpError(404, '历史版本不存在')
+      throw error
+    }
+    const markdown = String(content).replace(/\r\n?/g, '\n')
+    json(res, 200, {
+      stamp,
+      markdown,
+      chars: markdown.length,
+      updatedAt: info.mtime.toISOString(),
+      version: summaryVersion(markdown),
+    })
+  }
+
+  /**
+   * GET /papers/:id/summary/vault-body — the Obsidian note's body, read-only.
+   * Lets the client show what a hand edit changed before it is overwritten.
+   */
+  async function handleSummaryVaultBody(req, res, id) {
+    const meta = await loadMeta(id)
+    const notePath = meta.summaryPath || ''
+    const body = await readNoteBody(notePath)
+    if (!body) throw new HttpError(404, 'Obsidian 笔记不存在')
+    const info = await stat(notePath).catch(() => undefined)
+    json(res, 200, {
+      ok: true,
+      markdown: body.markdown,
+      updatedAt: info ? info.mtime.toISOString() : '',
+    })
+  }
+
+  /** POST /papers/:id/summary/history/:stamp/restore */
+  async function handleSummaryRestore(req, res, id, stamp) {    const meta = await loadMeta(id)
+    const dir = paperDirOf(id)
+    // `restoreHistory` already snapshots the current body and writes the file,
+    // so only the Obsidian mirror and meta remain.
+    const restored = await restoreHistory(dir, stamp)
+    const current = await readSummary(dir)
+    const written = await finishWrittenNote(meta, restored.markdown, {
+      updatedAt: current.updatedAt || nowIso(),
+      version: restored.version,
+      snapshot: restored.snapshot || '',
+    })
+    const anchored = await reanchorNote(id, restored.markdown)
+    json(res, 200, {
+      ok: true,
+      markdown: restored.markdown,
+      version: restored.version,
+      updatedAt: written.updatedAt,
+      notePath: written.notePath,
+      noteError: written.noteError,
+      annotations: anchored.annotations,
+      lost: anchored.lost,
+      historyStamp: written.snapshot || '',
+    })
+  }
+
+  /**
+   * Insert one uploaded/cropped image into the note body at an anchor the
+   * model (or the user) picked. Returns the new body; never writes the note.
+   * `offset` is null when an explicit anchor could not be resolved.
+   */
+  async function insertImageIntoBody(meta, markdown, name, options) {
+    const caption = sanitizeCaption(options.caption || options.instruction || '', 200)
+    const block = figureMarkdownFor(meta.id, name, caption, 0)
+    const hasAnchor =
+      Boolean(options.heading) ||
+      (options.afterOffset !== undefined && options.afterOffset !== null && options.afterOffset !== '')
+    const offset = resolveAnchorOffset(markdown, {
+      heading: options.heading,
+      afterOffset: options.afterOffset,
+    })
+    if (hasAnchor && offset === null) return { markdown, offset: null, caption }
+    const target = offset === null ? String(markdown).length : offset
+    return { markdown: insertBlockAt(markdown, target, block), offset: target, caption }
+  }
+
+  function imagePreviewUrl(id, name) {
+    return `${API_PREFIX}/papers/${id}/figure/${encodeURIComponent(name)}`
+  }
+
+  /** Persist an inserted image, re-anchor annotations and answer the client. */
+  async function commitImageInsertion(res, meta, imageId, previewUrl, markdown, extra = {}) {
+    const written = await persistNoteBody(meta, markdown, { source: 'manual' })
+    const anchored = await reanchorNote(meta.id, markdown)
+    json(res, 200, {
+      status: 'inserted',
+      markdown,
+      version: written.version,
+      updatedAt: written.updatedAt,
+      notePath: written.notePath,
+      noteError: written.noteError,
+      previewUrl,
+      imageId,
+      annotations: anchored.annotations,
+      lost: anchored.lost,
+      ...extra,
+    })
+  }
+
+  /** Append the image at the very end of the note (the documented fallback). */
+  function appendImageBlock(meta, markdown, name, caption) {
+    return insertBlockAt(markdown, String(markdown).length, figureMarkdownFor(meta.id, name, caption, 0))
+  }
+
+  /**
+   * Where an `action:'insert'` plan wants the image (spec §7.3 step 3):
+   * `afterOffset` wins, then the section named by `heading`. `anchored` is
+   * false only when the model gave neither, so the caller can report the
+   * end-of-note fallback to the client.
+   */
+  function plannedInsertTarget(markdown, plan) {
+    const text = String(markdown || '')
+    const raw = Number(plan?.afterOffset)
+    if (
+      plan?.afterOffset !== undefined &&
+      plan?.afterOffset !== null &&
+      plan?.afterOffset !== '' &&
+      Number.isFinite(raw)
+    ) {
+      const clamped = Math.max(0, Math.min(text.length, Math.trunc(raw)))
+      return { offset: lineStartAt(text, clamped), anchored: true }
+    }
+    const heading = findHeadingLine(text, plan?.heading)
+    if (heading) return { offset: sectionEndOffset(text, heading), anchored: true }
+    return { offset: text.length, anchored: false }
+  }
+
+  /** POST /papers/:id/summary/images — upload and place (or ask where). */
+  async function handleSummaryImage(req, res, id) {
+    if (busy.has(id)) throw new HttpError(409, '当前还有模型任务正在进行，请稍候')
+    const body = await readJsonBody(req, IMAGE_MAX_BYTES * 2)
+    const meta = await loadMeta(id)
+    const dir = paperDirOf(id)
+    const state = await readSummary(dir)
+    if (!state.markdown) throw new HttpError(404, '还没有生成总结')
+    // Validate and store the bytes before touching the model or the note, so a
+    // bad upload never leaves a half-inserted reference behind.
+    const image = decodeImageUpload(body.dataUrl ?? body.data, body.mediaType)
+    const name = uploadedImageName(new Date(), image.mediaType)
+    await saveFigure(dir, name, image.buffer)
+    const mirrored = await mirrorFigureToVault(id, name)
+    const imageId = name
+    const previewUrl = imagePreviewUrl(id, name)
+    const instruction = String(body.instruction || '').trim().slice(0, 2000)
+    const caption = String(body.caption || '').trim() || instruction
+    const anchor = body.anchor && typeof body.anchor === 'object' ? body.anchor : {}
+    const hasAnchor =
+      Boolean(anchor.heading) ||
+      (anchor.afterOffset !== undefined && anchor.afterOffset !== null && anchor.afterOffset !== '')
+    if (hasAnchor) {
+      // An explicit anchor must resolve: silently asking instead would hide a
+      // client bug behind a question the user cannot answer.
+      const placed = await insertImageIntoBody(meta, state.markdown, name, {
+        heading: anchor.heading,
+        afterOffset: anchor.afterOffset,
+        caption,
+      })
+      if (placed.offset === null) {
+        throw new HttpError(400, '指定的插入位置在正文里不存在，请重新选择章节')
+      }
+      pendingImages.delete(imageId)
+      await commitImageInsertion(res, meta, imageId, previewUrl, placed.markdown, {
+        imageName: name,
+        vaultCopied: mirrored.copied,
+      })
+      return
+    }
+    busy.add(id)
+    let plan
+    try {
+      plan = await ai.planImagePlacement({
+        meta,
+        markdown: state.markdown,
+        instruction,
+        image: { data: image.buffer, mediaType: image.mediaType, name },
+      })
+    } finally {
+      busy.delete(id)
+    }
+    if (plan.action === 'insert') {
+      const block = figureMarkdownFor(meta.id, name, plan.caption || caption, 0)
+      const target = plannedInsertTarget(state.markdown, plan)
+      pendingImages.delete(imageId)
+      await commitImageInsertion(res, meta, imageId, previewUrl, insertBlockAt(state.markdown, target.offset, block), {
+        imageName: name,
+        vaultCopied: mirrored.copied,
+        ...(target.anchored ? {} : { fallback: 'end' }),
+      })
+      return
+    }
+    pendingImages.set(imageId, {
+      imageId,
+      paperId: id,
+      name,
+      instruction,
+      caption: String(body.caption || ''),
+      asks: 1,
+      createdAt: Date.now(),
+    })
+    json(res, 200, {
+      status: 'needs_question',
+      question: plan.question || '这张图应该放在哪一节？',
+      suggestion: plan.suggestion || '',
+      imageId,
+      previewUrl,
+      imageName: name,
+      vaultCopied: mirrored.copied,
+      notePath: meta.summaryPath || '',
+      round: 1,
+    })
+  }
+
+  /** POST /papers/:id/summary/images/:imageId/place — answer the question. */
+  async function handleSummaryImagePlace(req, res, id, imageId) {
+    if (busy.has(id)) throw new HttpError(409, '当前还有模型任务正在进行，请稍候')
+    const body = await readJsonBody(req, 1024 * 1024)
+    const meta = await loadMeta(id)
+    const dir = paperDirOf(id)
+    const record = pendingImageFor(imageId, id)
+    const state = await readSummary(dir)
+    if (!state.markdown) throw new HttpError(404, '还没有生成总结')
+    const answer = String(body.answer || '').trim().slice(0, 2000)
+    const caption = String(body.caption || '').trim() || record.caption || record.instruction
+    const previewUrl = imagePreviewUrl(id, record.name)
+    const wantsExplicit =
+      Boolean(body.heading) ||
+      (body.afterOffset !== undefined && body.afterOffset !== null && body.afterOffset !== '')
+    if (wantsExplicit) {
+      // A section/offset from the user always wins over another model round.
+      const explicit = await insertImageIntoBody(meta, state.markdown, record.name, {
+        heading: body.heading,
+        afterOffset: body.afterOffset,
+        caption,
+      })
+      if (explicit.offset === null) {
+        throw new HttpError(400, '指定的插入位置在正文里不存在，请重新选择章节')
+      }
+      pendingImages.delete(record.imageId)
+      await commitImageInsertion(res, meta, record.imageId, previewUrl, explicit.markdown)
+      return
+    }
+    if (body.force === true) {
+      // "Let the AI decide" with no anchor: append rather than ask again.
+      pendingImages.delete(record.imageId)
+      await commitImageInsertion(res, meta, record.imageId, previewUrl, appendImageBlock(meta, state.markdown, record.name, caption), {
+        fallback: 'end',
+      })
+      return
+    }
+    let buffer
+    try {
+      buffer = await readFile(path.join(figureDir(dir), record.name))
+    } catch {
+      pendingImages.delete(record.imageId)
+      throw new HttpError(404, '图片已过期，请重新插入')
+    }
+    busy.add(id)
+    let plan
+    try {
+      plan = await ai.planImagePlacement({
+        meta,
+        markdown: state.markdown,
+        instruction: record.instruction,
+        image: { data: buffer, mediaType: figureFileType(record.name), name: record.name },
+        answer,
+      })
+    } finally {
+      busy.delete(id)
+    }
+    if (plan.action === 'insert') {
+      const block = figureMarkdownFor(meta.id, record.name, plan.caption || caption, 0)
+      const target = plannedInsertTarget(state.markdown, plan)
+      pendingImages.delete(record.imageId)
+      await commitImageInsertion(
+        res,
+        meta,
+        record.imageId,
+        previewUrl,
+        insertBlockAt(state.markdown, target.offset, block),
+        target.anchored ? {} : { fallback: 'end' },
+      )
+      return
+    }
+    record.asks += 1
+    if (record.asks > MAX_PLACEMENT_ASKS) {
+      // Two rounds of questions are the contract; after that the image must
+      // land somewhere instead of looping forever.
+      pendingImages.delete(record.imageId)
+      await commitImageInsertion(res, meta, record.imageId, previewUrl, appendImageBlock(meta, state.markdown, record.name, caption), {
+        fallback: 'end',
+      })
+      return
+    }
+    pendingImages.set(record.imageId, record)
+    json(res, 200, {
+      status: 'needs_question',
+      question: plan.question || '这张图应该放在哪一节？',
+      suggestion: plan.suggestion || '',
+      imageId: record.imageId,
+      previewUrl,
+      round: record.asks,
+    })
+  }
+
+  /** POST /papers/:id/summary/figures — SSE figure completion. */
+  async function handleSummaryFigures(req, res, id) {
+    if (busy.has(id)) throw new HttpError(409, '当前还有回答或总结正在生成，请稍候')
+    const body = await readJsonBody(req, 1024 * 1024).catch(() => ({}))
+    const meta = await loadMeta(id)
+    const dir = paperDirOf(id)
+    const state = await readSummary(dir)
+    if (!state.markdown) throw new HttpError(404, '还没有生成总结')
+    const requested = Array.isArray(body.placeholders)
+      ? body.placeholders
+          .filter((item) => item && Number.isFinite(Number(item.start)) && Number.isFinite(Number(item.end)))
+          .slice(0, MAX_FIGURE_PLACEHOLDERS)
+          .map((item) => ({
+            start: Math.max(0, Math.trunc(Number(item.start))),
+            end: Math.max(0, Math.trunc(Number(item.end))),
+            page: Number.parseInt(String(item.page), 10) || 0,
+            caption: sanitizeCaption(item.caption, 200),
+            hint: String(item.hint || '').slice(0, 400),
+          }))
+          // A client body can lag behind a server-side save; only trust offsets
+          // that still cover a placeholder line, so a stale range never
+          // splices an image into unrelated text.
+          .filter(
+            (item) =>
+              item.end > item.start &&
+              item.end <= state.markdown.length &&
+              state.markdown.slice(item.start, item.end).includes('[[FIGURE'),
+          )
+      : []
+    const placeholders = requested.length ? requested : findFigurePlaceholders(state.markdown)
+    const controller = new AbortController()
+    let finished = false
+    const sse = makeSse(res, () => {
+      if (!finished) controller.abort()
+    })
+    busy.add(id)
+    try {
+      if (placeholders.length === 0) {
+        sse.send({ type: 'start', total: 0 })
+        sse.send({
+          type: 'done',
+          markdown: state.markdown,
+          version: state.version,
+          updatedAt: state.updatedAt,
+          created: [],
+          failed: [],
+          total: 0,
+          notePath: meta.summaryPath || '',
+        })
+        finished = true
+        sse.end()
+        return
+      }
+      sse.send({ type: 'start', total: placeholders.length })
+      const resolved = await resolveFigures(
+        meta,
+        dir,
+        state.markdown,
+        placeholders,
+        figureProgressSender(sse, placeholders.length),
+        controller.signal,
+      )
+      if (controller.signal.aborted) {
+        finished = true
+        sse.end()
+        return
+      }
+      const written = await persistNoteBody(meta, resolved.markdown, { source: 'figures' })
+      sse.send({
+        type: 'done',
+        markdown: resolved.markdown,
+        version: written.version,
+        updatedAt: written.updatedAt,
+        created: resolved.created,
+        failed: resolved.failed,
+        total: resolved.total,
+        notePath: written.notePath,
+        noteError: written.noteError,
       })
       finished = true
       sse.end()
@@ -1347,14 +2656,69 @@ export function apply(ctx, rawConfig = {}) {
       await handleOutline(req, res, id)
       return
     }
-    if (resource === 'summary' && method === 'POST') {
+    if (resource === 'summary' && a === 'prepare' && method === 'POST') {
+      await handleSummaryPrepare(req, res, id)
+      return
+    }
+    if (resource === 'summary' && !a && method === 'POST') {
       await handleSummary(req, res, id)
       return
     }
-    if (resource === 'summary' && method === 'GET') {
-      const summary = await readFile(path.join(dir, 'summary.md'), 'utf8').catch(() => '')
-      if (!summary) throw new HttpError(404, '还没有生成总结')
-      json(res, 200, { markdown: summary, path: meta.summaryPath || '' })
+    if (resource === 'summary' && !a && method === 'GET') {
+      await handleSummaryGet(req, res, id)
+      return
+    }
+    if (resource === 'summary' && !a && method === 'PUT') {
+      await handleSummaryPut(req, res, id)
+      return
+    }
+    if (resource === 'summary' && a === 'annotations' && method === 'PUT') {
+      await handleSummaryAnnotationsPut(req, res, id)
+      return
+    }
+    if (resource === 'summary' && a === 'annotations' && method === 'GET') {
+      const state = await noteState(id)
+      json(res, 200, { annotations: state.annotations })
+      return
+    }
+    if (resource === 'summary' && a === 'revise' && method === 'POST') {
+      await handleSummaryRevise(req, res, id)
+      return
+    }
+    if (resource === 'summary' && a === 'history' && !b && method === 'GET') {
+      await handleSummaryHistory(req, res, id)
+      return
+    }
+    if (resource === 'summary' && a === 'history' && b && rest[3] === 'restore' && method === 'POST') {
+      await handleSummaryRestore(req, res, id, b)
+      return
+    }
+    if (resource === 'summary' && a === 'history' && b && !rest[3] && method === 'GET') {
+      await handleSummaryHistoryItem(req, res, id, b)
+      return
+    }
+    if (resource === 'summary' && a === 'vault-body' && !b && method === 'GET') {
+      await handleSummaryVaultBody(req, res, id)
+      return
+    }
+    if (resource === 'summary' && a === 'images' && !b && method === 'POST') {
+      await handleSummaryImage(req, res, id)
+      return
+    }
+    if (resource === 'summary' && a === 'images' && b && rest[3] === 'place' && method === 'POST') {
+      await handleSummaryImagePlace(req, res, id, b)
+      return
+    }
+    if (resource === 'summary' && a === 'figures' && method === 'POST') {
+      await handleSummaryFigures(req, res, id)
+      return
+    }
+    if (resource === 'figure' && method === 'GET') {
+      const file = figurePath(dir, String(a || ''))
+      if (!file) throw new HttpError(400, '无效的图片文件名')
+      const info = await stat(file).catch(() => undefined)
+      if (!info?.isFile()) throw new HttpError(404, '图片不存在')
+      await serveFile(res, file, figureFileType(a))
       return
     }
     if (resource === 'analysis' && method === 'GET') {

@@ -7,5 +7,7 @@
         notesFolder: '文献阅读'
         wordNote: '英文单词'
         autoOpenObsidian: true
+        # 学习总结里最多自动从 PDF 截取多少张图片；0 表示关闭自动插图。
+        maxSummaryFigures: 5
         # 留空表示跟随所选模型的默认档位；面板里的选择优先于这一项。
         reasoningEffort: ''
