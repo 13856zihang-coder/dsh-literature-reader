@@ -22,6 +22,7 @@ import {
   noteHash,
   readQuestions,
   readReaderNoteFile,
+  splitEntry,
   readReaderNoteHistoryVersion,
   readerNoteFolder,
   readerNoteRelativePath,
@@ -191,46 +192,84 @@ test('buildReaderNoteFile writes the tripod frontmatter, the callout and the fir
 
 // ── entry titles ────────────────────────────────────────────────────────────
 
-test('entryTitle handles the six boundary cases', () => {
+test('splitEntry turns the first line with text into the title and leaves the body', () => {
+  // The confirmed workflow: type a title line, press Enter, then the body.
+  assert.deepEqual(splitEntry('预加重补偿 ISI\n正文第一段\n\n正文第二段'), {
+    title: '预加重补偿 ISI',
+    body: '正文第一段\n\n正文第二段',
+  })
+  // A one-line entry is all title: the body is empty, not a duplicate.
+  assert.deepEqual(splitEntry('只是一个标题'), { title: '只是一个标题', body: '' })
+  // Leading blank lines are skipped, they never become the title.
+  assert.deepEqual(splitEntry('\n\n真正的首行\n正文'), { title: '真正的首行', body: '正文' })
+  // Whitespace-only input has no title and no body.
+  assert.equal(splitEntry('   \n\n ').title, '')
+  assert.equal(splitEntry('').title, '')
+
+  // The title line is removed, never repeated at the top of the body.
+  const single = splitEntry('标题\n正文')
+  assert.equal(single.body.includes('标题'), false, 'the heading must not repeat in the body')
+})
+
+test('splitEntry keeps inline Markdown in the title because the line leaves the body', () => {
+  // Stripping `**`, backticks, `$` or link targets here would delete content
+  // that no longer exists anywhere else — Obsidian renders all of it in a heading.
+  assert.equal(splitEntry('**重点**：这是结论\n细节').title, '**重点**：这是结论')
+  assert.equal(splitEntry('$E=mc^2$ 的含义\n推导').title, '$E=mc^2$ 的含义')
+  assert.equal(splitEntry('用 `code()` 计算\n例子').title, '用 `code()` 计算')
+  assert.equal(
+    splitEntry('见 [论文正文](https://x.test/a) 第二节\n下文').title,
+    '见 [论文正文](https://x.test/a) 第二节',
+  )
+  assert.equal(splitEntry('见 [[a.pdf|原文]] 的图\n下图').title, '见 [[a.pdf|原文]] 的图')
+})
+
+test('splitEntry drops leading block markers but keeps signs and decimals', () => {
+  assert.equal(splitEntry('# 标题\n正文').title, '标题')
+  assert.equal(splitEntry('> 引用\n正文').title, '引用')
+  assert.equal(splitEntry('- 列表\n正文').title, '列表')
+  assert.equal(splitEntry('1. 有序\n正文').title, '有序')
+  assert.equal(splitEntry('1、有序\n正文').title, '有序')
+  assert.equal(splitEntry('| 表格 |\n正文').title, '表格 |')
+  // A marker needs a following space (or 、): these are content, not markers.
+  assert.equal(splitEntry('-5 dB 是什么\n说明').title, '-5 dB 是什么')
+  assert.equal(splitEntry('1.5 倍提升\n说明').title, '1.5 倍提升')
+  // Whitespace runs collapse so the heading stays on one line.
+  assert.equal(splitEntry('第一行  有   空格\n第二行').title, '第一行 有 空格')
+})
+
+test('splitEntry skips an image-only line instead of losing the image', () => {
+  // The image has no text to show as a heading, so it stays in the body and the
+  // next text line becomes the title.
+  assert.deepEqual(splitEntry('![图](a.png)\n图注说明'), {
+    title: '图注说明',
+    body: '![图](a.png)',
+  })
+  // Nothing to title: the image is kept under a bare `## HH:mm`.
+  assert.deepEqual(splitEntry('![图](_附件/paper-abc/img-1.png)'), {
+    title: '',
+    body: '![图](_附件/paper-abc/img-1.png)',
+  })
+  assert.deepEqual(splitEntry('![[a.png]]'), { title: '', body: '![[a.png]]' })
+})
+
+test('the first line is never truncated, so no text is lost with it', () => {
   const at = new Date(2026, 10, 7, 21, 3)
-
-  // 1. empty body / whitespace only → bare `## HH:mm`
-  assert.equal(entryTitle('', at), '## 21:03')
-  assert.equal(entryTitle('   \n\n  ', at), '## 21:03')
-  // 2. image-only entry has no text either
-  assert.equal(entryTitle('![](x.png)', at), '## 21:03')
-  assert.equal(entryTitle('![图](_附件/paper-abc/img-1.png)', at), '## 21:03')
-  assert.equal(entryTitle('![[a.png]]', at), '## 21:03')
-
-  // 3. more than 24 code points is clipped, CJK counts as one each
   const long = '一二三四五六七八九十甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午'
   assert.equal([...long].length, 27)
-  const clipped = entryTitle(long, at)
-  assert.equal(clipped, `## 21:03 · ${[...long].slice(0, 24).join('')}…`)
-  assert.equal([...clipped.slice('## 21:03 · '.length)].length, 25) // 24 + ellipsis
-  // Exactly 24 code points is not clipped.
-  const exact = [...long].slice(0, 24).join('')
-  assert.equal(entryTitle(exact, at), `## 21:03 · ${exact}`)
-  // Surrogate pairs (emoji) count as one code point, not two UTF-16 units.
+  // It used to clip at 24 code points; that would now delete the tail outright.
+  assert.equal(entryTitle(long, at), `## 21:03 · ${long}`)
+  // Emoji still count as one code point each when measured for length.
   const emoji = '🙂'.repeat(30)
-  assert.equal(entryTitle(emoji, at), `## 21:03 · ${'🙂'.repeat(24)}…`)
+  assert.equal(entryTitle(emoji, at), `## 21:03 · ${emoji}`)
+})
 
-  // 4. links keep their visible text and lose the target
-  assert.equal(entryTitle('见 [论文正文](https://x.test/a) 第二节', at), '## 21:03 · 见 论文正文 第二节')
-  assert.equal(entryTitle('见 [[a.pdf|原文]] 的图', at), '## 21:03 · 见 原文 的图')
-
-  // 5. inline code loses its backticks, math loses its dollars
-  assert.equal(entryTitle('用 `code()` 计算', at), '## 21:03 · 用 code() 计算')
-  assert.equal(entryTitle('公式 $E=mc^2$ 的含义', at), '## 21:03 · 公式 E=mc^2 的含义')
-
-  // Leading Markdown markers (heading/quote/list/ordered/table) are dropped.
-  assert.equal(entryTitle('# 标题', at), '## 21:03 · 标题')
-  assert.equal(entryTitle('> 引用', at), '## 21:03 · 引用')
-  assert.equal(entryTitle('- 列表', at), '## 21:03 · 列表')
-  assert.equal(entryTitle('1. 有序', at), '## 21:03 · 有序')
-  assert.equal(entryTitle('| 表格 |', at), '## 21:03 · 表格 |')
-  // Whitespace runs collapse; the first line wins.
-  assert.equal(entryTitle('第一行  有   空格\n第二行', at), '## 21:03 · 第一行 有 空格')
+test('entryTitle renders the clock and the first line', () => {
+  const at = new Date(2026, 10, 7, 21, 3)
+  assert.equal(entryTitle('标题\n正文', at), '## 21:03 · 标题')
+  // No text at all degrades to a bare heading.
+  assert.equal(entryTitle('', at), '## 21:03')
+  assert.equal(entryTitle('   \n\n  ', at), '## 21:03')
   // Minutes are zero padded.
   assert.equal(entryTitle('x', new Date(2026, 10, 7, 9, 5)), '## 09:05 · x')
 })
@@ -268,46 +307,50 @@ test('appendEntryToBody appends inside today, or opens a new day group', () => {
   const later = new Date(2026, 10, 7, 21, 3)
   const tomorrow = new Date(2026, 10, 8, 9, 5)
 
-  // Same day: no new day heading, exactly one blank line between blocks.
+  // Same day: no new day heading. A one-line entry is heading only (spec §2).
   const first = appendEntryToBody({ body: '', markdown: '第一条', at: day })
   assert.equal(first.needsDayHeader, true)
-  assert.equal(first.body, `# ${dayOf(day)}\n\n## 08:00 · 第一条\n\n第一条\n`)
+  assert.equal(first.body, `# ${dayOf(day)}\n\n## 08:00 · 第一条\n`)
   assert.equal(first.entry.heading, '## 08:00 · 第一条')
+  assert.equal(first.body.slice(first.anchor.start, first.anchor.end), '## 08:00 · 第一条')
 
-  const second = appendEntryToBody({ body: first.body, markdown: '第二条\n\n第二段', at: later })
+  // First line = title, the rest = body, one blank line between blocks.
+  const second = appendEntryToBody({ body: first.body, markdown: '第二条\n第二段', at: later })
   assert.equal(second.needsDayHeader, false)
-  assert.equal(
-    second.body,
-    `${first.body}\n## 21:03 · 第二条\n\n第二条\n\n第二段\n`,
-  )
+  assert.equal(second.body, `${first.body}\n## 21:03 · 第二条\n\n第二段\n`)
   // The anchor covers exactly the inserted block (heading + body), no blank line.
-  assert.equal(second.body.slice(second.anchor.start, second.anchor.end), '## 21:03 · 第二条\n\n第二条\n\n第二段')
-  assert.equal(second.anchor.end - second.anchor.start, '## 21:03 · 第二条\n\n第二条\n\n第二段'.length)
+  assert.equal(second.body.slice(second.anchor.start, second.anchor.end), '## 21:03 · 第二条\n\n第二段')
+  assert.equal(second.anchor.end - second.anchor.start, '## 21:03 · 第二条\n\n第二段'.length)
 
   // A different day inserts the day heading before the entry.
-  const nextDay = appendEntryToBody({ body: second.body, markdown: '次日', at: tomorrow })
+  const nextDay = appendEntryToBody({ body: second.body, markdown: '次日\n正文', at: tomorrow })
   assert.equal(nextDay.needsDayHeader, true)
   assert.equal(
     nextDay.body.slice(nextDay.anchor.start, nextDay.anchor.end),
-    '## 09:05 · 次日\n\n次日',
+    '## 09:05 · 次日\n\n正文',
   )
-  assert.ok(nextDay.body.endsWith(`\n\n# ${dayOf(tomorrow)}\n\n## 09:05 · 次日\n\n次日\n`))
+  assert.ok(nextDay.body.endsWith(`\n\n# ${dayOf(tomorrow)}\n\n## 09:05 · 次日\n\n正文\n`))
 
   // buildEntryBlock reports the same decision without mutating a body.
-  const block = buildEntryBlock({ markdown: '新条目', at: later, body: first.body })
+  const block = buildEntryBlock({ markdown: '新条目\n说明', at: later, body: first.body })
   assert.equal(block.needsDayHeader, false)
-  assert.equal(block.text, '## 21:03 · 新条目\n\n新条目')
+  assert.equal(block.text, '## 21:03 · 新条目\n\n说明')
   assert.equal(buildEntryBlock({ markdown: 'x', at: later, body: '' }).needsDayHeader, true)
 })
 
-test('an entry whose body keeps its own Markdown is stored verbatim', () => {
+test('the body keeps the Markdown after the title line verbatim', () => {
   const at = new Date(2026, 10, 7, 21, 3)
-  const markdown = '- 第一点\n- 第二点\n\n```js\nconst a = 1\n```'
+  const markdown = '代码片段\n\n```js\nconst a = 1\n```\n\n- 第一点\n- 第二点'
   const result = appendEntryToBody({ body: '', markdown, at })
-  assert.ok(result.body.endsWith(`${markdown}\n`))
+  // The first line becomes the heading and leaves the body.
+  assert.ok(result.body.endsWith('## 21:03 · 代码片段\n\n```js\nconst a = 1\n```\n\n- 第一点\n- 第二点\n'))
+  assert.equal(result.body.includes('代码片段\n\n代码片段'), false, 'no duplicated title')
   // Trailing/leading blank lines are trimmed, inner structure is untouched.
   const padded = appendEntryToBody({ body: '', markdown: `\n\n${markdown}\n\n`, at })
   assert.equal(padded.body, result.body)
+  // A whitespace-only entry appends a bare heading, not a blank tail.
+  const blank = appendEntryToBody({ body: '', markdown: '   \n\n ', at })
+  assert.equal(blank.body, `# ${dayOf(at)}\n\n## 21:03\n`)
 })
 
 // ── vault reads and writes ──────────────────────────────────────────────────

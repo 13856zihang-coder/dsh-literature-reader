@@ -213,8 +213,25 @@ test('entries append under a day heading with `## HH:mm · 首句` and keep lega
     assert.ok(anchored.startsWith('## '))
     assert.ok(anchored.includes('第一条：25 Gb/s 下功耗降低 30%。'))
 
+    // The confirmed workflow end to end (spec §2): first line = title, the rest
+    // is the body, and the title line is never repeated inside the body.
+    const twoLine = await appendEntry(
+      app,
+      '眼图与 ISI\n预加重把高频分量抬起来。\n\n均衡器再补一次。',
+      dayOne.toISOString(),
+    )
+    assert.match(twoLine.entry.heading, /^## \d{2}:\d{2} · 眼图与 ISI$/)
+    const anchoredTwoLine = twoLine.markdown.slice(twoLine.anchor.start, twoLine.anchor.end)
+    assert.equal(
+      anchoredTwoLine,
+      `${twoLine.entry.heading}\n\n预加重把高频分量抬起来。\n\n均衡器再补一次。`,
+    )
+    // The heading text appears once, not again at the top of the body.
+    assert.equal(twoLine.markdown.split('眼图与 ISI').length - 1, 1)
+    assert.equal(twoLine.entryCount, 2)
+
     const second = await appendEntry(app, '第二条：眼图张开度提升 30%。', dayTwo.toISOString())
-    assert.equal(second.entryCount, 2)
+    assert.equal(second.entryCount, 3, 'first + twoLine + second')
     assert.match(second.entry.heading, /^## \d{2}:\d{2} · 第二条/)
     const days = second.markdown.match(/^# \d{4}-\d{2}-\d{2}$/gm) || []
     assert.equal(days.length, 2, 'a new local day gets its own `# YYYY-MM-DD` heading')
@@ -228,9 +245,9 @@ test('entries append under a day heading with `## HH:mm · 首句` and keep lega
       'utf8',
     )
     const listed = (await app.get(`/papers/${PAPER_ID}/reader-note`)).json()
-    assert.equal(listed.entryCount, 3)
+    assert.equal(listed.entryCount, 4, 'three new-format entries + the legacy one')
     const third = await appendEntry(app, '第三条：新格式继续追加。')
-    assert.equal(third.entryCount, 4)
+    assert.equal(third.entryCount, 5)
     assert.ok(third.markdown.includes('## 21:03 记录'), 'the legacy heading is preserved verbatim')
     assert.ok(third.markdown.includes('旧格式（v0）的记录正文。'))
     // Only one blank line between blocks (the file stays diff-friendly).

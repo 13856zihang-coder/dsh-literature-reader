@@ -100,8 +100,34 @@ updated: "<ISO>"
 - `summary_note` 取 `meta.summaryPath` 的 basename（去扩展名）；速览总结尚未生成时用速览总结的**预命名**
   `safeFileName(title) + (' (' + year + ')' 若需)`，此刻是空链接，Obsidian 里显示为灰色，生成总结后自然命中，不需要插件回填。
 - `tags` = `mergeTags(meta.tags, ['文献阅读', '阅读笔记'])`，最多 18 个。
-- 正文第一天用 `# YYYY-MM-DD`（本地时区）作为日分组标题；每条记录是 `## HH:mm 记录`。本地时区、24 小时制、分钟补零。
-- 每条记录正文严格保留用户输入的 Markdown（只做行尾归一与首尾空行裁剪），不得改写。
+- 正文第一天用 `# YYYY-MM-DD`（本地时区）作为日分组标题。本地时区、24 小时制、分钟补零。
+
+**条目标题 = 用户输入的第一行文字**（用户 2026-11-07 确认的书写习惯）：
+
+```
+用户输入                          落盘结果
+────────────────────────────────  ──────────────────────────────────────
+眼图与 ISI                        ## 21:03 · 眼图与 ISI
+预加重把高频分量抬起来。           （空行）
+                                  预加重把高频分量抬起来。
+```
+
+规则（`splitEntry`）：
+
+1. **从上往下找第一行有文字的**（空行跳过），该行成为 `## HH:mm · <该行>` 的标题部分。
+2. 该行**从正文里移除**——正文 = 其余所有行按原顺序拼接，首尾空行裁掉。所以标题文字在文件里
+   **只出现一次**，不会在标题和正文里各显示一遍。
+3. **不截断、不转义 Markdown**。以前会截到 24 码点并剥掉 `**`/`` ` ``/`$`/链接目标——那在「首行还留在正文里」
+   时是合理的摘要，但现在这一行被移出了正文，截断等于**直接删掉用户写的内容**，剥掉标记等于**毁掉格式**。
+   Obsidian 在标题里能正常渲染 `**粗体**`、`` `代码` ``、`$公式$`、`[[双链]]`。
+4. 只去掉**行首块级标记**（`#`、`>`、`-`、`*`、`1.`/`1、`、`|`），因为它们会让 `## HH:mm · - 列表` 读起来别扭。
+   **标记后面必须跟空格**（或 `、`），因此 `-5 dB`、`1.5 倍` 这类正文内容不会被误伤。
+5. **整行只有图片**时跳过该行（图片没有可显示的文字，且必须留在正文里，否则图片会丢），
+   继续找下一行；若整条没有任何文字，退化为 `## HH:mm`，图片原样留在正文。
+6. 只有一行输入 = 只有标题、没有正文的条目，落盘为单独一行 `## HH:mm · xxx`（不再追加空行正文）。
+
+- 每条记录正文严格保留用户输入的 Markdown（只做行尾归一与首尾空行裁剪），不得改写
+  ——**除标题行以外**，标题行按上面规则移出正文。
 - 条目之间、以及与前后块之间恰好一个空行。
 - 同一分钟内多条记录允许重复标题（不强制去重）。
 - 写入一律 `writeFileAtomic`；每次写前先快照（§4）。
@@ -275,7 +301,8 @@ export function attachmentRelPath(paperId, name, sub)        // '_附件/<paperI
 export function splitNoteFile(raw)                   // { frontmatter, body }（frontmatter 不含 --- 分隔行）
 export function noteHash(body)                       // sha256 前 16 hex
 export function buildReaderNoteFile({ meta, summaryStem, tags, now })   // 完整文件字符串（PDF 名/路径取自 meta）
-export function entryTitle(markdown, at)                        // '## HH:mm · <首句摘要>'（规则见 §2）
+export function splitEntry(markdown)                            // { title, body }：首行即标题，其余为正文（§2）
+export function entryTitle(markdown, at)                        // '## HH:mm · <首行>'（规则见 §2）
 export function buildEntryBlock({ markdown, at, body })   // { text, needsDayHeader }
 export function appendEntryToBody({ body, markdown, at }) // { body, anchor, entry, needsDayHeader }
 export function countEntries(body)
@@ -733,7 +760,9 @@ body 或 query 传 `vaultFiles`：
    `vaultFigureDir(vaultPath, notesFolder, paperId, sub)` 增加第四个参数 `sub`，**仅四参调用**才进子目录（三参调用保持 `_附件/<id>/`，旧链接不失效）（保持对既有
    `copyFigureToVault` 调用方的兼容）；图片路由对笔记传 `'笔记'`。
    已有笔记里的旧相对链接 `_附件/<id>/<name>` 不迁移、不改写，文件也不搬。
-3. **条目标题 `## HH:mm · <首句摘要>`**（§2）。摘要最多 24 个 Unicode 码点，超出加 `…`；取不到文字时退化为 `## HH:mm`。
+3. **条目标题 `## HH:mm · <首行>`**（§2，2026-11-07 由「首句摘要 + 24 码点截断」改为「首行即标题」）。
+   用户的实际写法是：先写一行标题、回车、再写正文；第一行成为条目标题**并从正文中移除**，不重复显示。
+   **不截断**——行被移出正文后，截断等于直接删掉内容。取不到文字（如整条只有一张图）时退化为 `## HH:mm`。
    旧格式 `## HH:mm 记录` 仍被识别（正则 `/^## \d{2}:\d{2}(?: · |\s|$)/`），不改写已存在的旧标题。
 4. **整理笔记的模型与代价**：「整理笔记」直接用当前选中的模型，不加二次确认弹窗（点了就干）。
    若被 `busy` 占用或模型任务进行中，返回 409 并提示「当前模型任务正在进行，请稍候」。
