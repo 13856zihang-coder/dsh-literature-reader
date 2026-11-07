@@ -254,31 +254,36 @@ test('splitEntry skips an image-only line instead of losing the image', () => {
   assert.deepEqual(splitEntry('![[a.png]]'), { title: '', body: '![[a.png]]' })
 })
 
-test('a title longer than 30 code points is clipped for the heading', () => {
-  const at = new Date(2026, 10, 7, 21, 3)
-  assert.equal(MAX_ENTRY_TITLE_CHARS, 30)
+test('a title longer than 60 code points is clipped for the heading', () => {
+  assert.equal(MAX_ENTRY_TITLE_CHARS, 60)
 
-  // Exactly 30 is untouched; 31 clips to 30 plus the ellipsis.
-  const thirty = '中'.repeat(30)
-  assert.equal(splitEntry(thirty).title, thirty)
-  const thirtyOne = '中'.repeat(31)
-  assert.equal(splitEntry(thirtyOne).title, `${'中'.repeat(30)}…`)
+  // Exactly 60 is untouched; 61 clips to 60 plus the ellipsis.
+  const sixty = '中'.repeat(60)
+  assert.equal(splitEntry(sixty).title, sixty)
+  const sixtyOne = '中'.repeat(61)
+  assert.equal(splitEntry(sixtyOne).title, `${'中'.repeat(60)}…`)
 
   // Code points, not UTF-16 units: an emoji is one each.
-  const emoji = '🙂'.repeat(31)
-  assert.equal([...splitEntry(emoji).title].length, 31, '30 emoji + ellipsis')
-  assert.equal(splitEntry(emoji).title, `${'🙂'.repeat(30)}…`)
+  const emoji = '🙂'.repeat(61)
+  assert.equal([...splitEntry(emoji).title].length, 61, '60 emoji + ellipsis')
+  assert.equal(splitEntry(emoji).title, `${'🙂'.repeat(60)}…`)
 })
 
 test('a clipped title keeps its full line in the body so nothing is lost', () => {
   // This is the whole reason the cap is safe: the heading is a shortened view,
   // and the line it came from stays in the body verbatim.
-  const line = '预加重在发射端把高频分量抬起来补偿信道损耗，均衡在接收端再做一次补偿'
-  assert.ok([...line].length > 30)
+  const line = '预加重在发射端把高频分量抬起来补偿信道损耗，均衡在接收端再做一次补偿，两边配合才能把眼图重新张开并且留出足够的裕量给温度和工艺漂移'
+  assert.ok([...line].length > 60, `sanity: the sample must exceed 60, got ${[...line].length}`)
   const split = splitEntry(`${line}\n\n正文第一段`)
-  assert.equal(split.title, `${[...line].slice(0, 30).join('')}…`)
+  assert.equal(split.title, `${[...line].slice(0, 60).join('')}…`)
   assert.equal(split.body, `${line}\n\n正文第一段`)
   assert.ok(split.body.includes(line), 'the complete original line survives')
+
+  // Something that fits now comes back to being a plain heading: 30-60 code
+  // points used to be clipped under the old limit and must not be any more.
+  const fits = '中'.repeat(45)
+  assert.equal(splitEntry(`${fits}\n正文`).title, fits)
+  assert.equal(splitEntry(`${fits}\n正文`).body, '正文')
 
   // A short title is still removed from the body — no duplication.
   const short = splitEntry('短标题\n正文')
@@ -288,9 +293,9 @@ test('a clipped title keeps its full line in the body so nothing is lost', () =>
 })
 
 test('clipping counts the marker-stripped line, and the original keeps its markers', () => {
-  const item = `- ${'内容'.repeat(20)}`
+  const item = `- ${'内容'.repeat(35)}`
   const split = splitEntry(item)
-  assert.equal([...split.title].length, 31, '30 + ellipsis, markers not counted')
+  assert.equal([...split.title].length, 61, '60 + ellipsis, markers not counted')
   assert.ok(split.title.startsWith('内容'))
   // The kept line is the original source line, marker and all.
   assert.equal(split.body, item)
