@@ -398,6 +398,8 @@ window.__ModuleLoader__.load({
       readerNoteRecord: '记录笔记',
       readerNoteEdit: '修改笔记',
       readerNoteEditOpening: '正在打开…',
+      readerNoteOpenedInObsidian: '已交给 Obsidian 打开；若窗口没有切过去，请手动切换',
+      readerNoteOpenFailed: '无法打开 Obsidian，请检查是否已安装并登录 Obsidian',
       readerNoteCreated: '阅读笔记已建立',
       readerNoteCreateFailed: '建立阅读笔记失败，请在 Obsidian 设置里检查库路径',
       readerNoteLostConfirm: '原笔记文件已丢失（{path}），要重新建立吗？',
@@ -897,6 +899,8 @@ window.__ModuleLoader__.load({
       readerNoteRecord: 'Add entry',
       readerNoteEdit: 'Edit note',
       readerNoteEditOpening: 'Opening…',
+      readerNoteOpenedInObsidian: 'Handed to Obsidian; switch windows if it did not come to the front',
+      readerNoteOpenFailed: 'Could not open Obsidian — check that it is installed and signed in',
       readerNoteCreated: 'Reader note created',
       readerNoteCreateFailed: 'Could not create the reader note; check the vault path in the Obsidian settings',
       readerNoteLostConfirm: 'The note file is gone ({path}). Create it again?',
@@ -9101,6 +9105,9 @@ function findFigurePlaceholders(source) {
       )
       const [noteSubmitting, setNoteSubmitting] = useState(false)
       const [noteCreating, setNoteCreating] = useState(false)
+      // 「修改笔记」 briefly disables its button while the host hands the
+      // obsidian:// URI to the OS, so a slow or failing launch is visible.
+      const [noteOpening, setNoteOpening] = useState(false)
       const [noteOrganizing, setNoteOrganizing] = useState(false)
       const [noteOrganizeLabel, setNoteOrganizeLabel] = useState('')
       const [noteQuestions, setNoteQuestions] = useState(null)
@@ -10831,21 +10838,33 @@ function findFigurePlaceholders(source) {
 
       // 「修改笔记」 (spec §7.6): reuse the existing open-note route.
       async function openReaderNoteInObsidian() {
-        if (!paper) return
-        const current = await refreshReaderNote()
-        if (current?.fetchFailed) {
-          showToast(current.fetchError || t('readerNoteLoadFailed'), 'bad')
-          return
-        }
-        const rel = current?.relative || current?.path
-        if (!rel) {
-          setError(t('readerNoteCreateFailed'))
-          return
-        }
+        if (!paper || noteOpening) return
+        setNoteOpening(true)
         try {
+          const current = await refreshReaderNote()
+          if (current?.fetchFailed) {
+            showToast(current.fetchError || t('readerNoteLoadFailed'), 'bad')
+            return
+          }
+          // `relative` is vault-relative, which is what the open-note route
+          // wants; `path` is the absolute fallback when the note lives outside
+          // the vault (spec §1).
+          const rel = current?.relative || current?.path
+          if (!rel) {
+            setError(t('readerNoteCreateFailed'))
+            return
+          }
           await request('/vault/open-note', { method: 'POST', body: { rel } })
+          // The host hands the URI to the OS and cannot confirm that Obsidian
+          // actually focused the file, so say what really happened instead of
+          // leaving the click with no visible result.
+          showToast(t('readerNoteOpenedInObsidian'))
         } catch (openError) {
-          setError(safeError(openError))
+          const message = safeError(openError) || t('readerNoteOpenFailed')
+          setError(message)
+          showToast(message, 'bad')
+        } finally {
+          setNoteOpening(false)
         }
       }
 
@@ -11135,6 +11154,67 @@ function findFigurePlaceholders(source) {
         Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Number(zoom) || ZOOM_DEFAULT)) / 100
       const pagesInnerWidth = `calc(min(100%, 960px) * ${zoomScale.toFixed(4)})`
 
+      // 「建立笔记」/「记录笔记」+「修改笔记」(spec §7.1). Shared by the header and
+      // the PDF toolbar: page fullscreen hides `.lr-header`, so the feature has
+      // to stay reachable there too (spec §7.2b).
+      function renderReaderNoteActions(variant) {
+        if (!paper) return null
+        const inToolbar = variant === 'toolbar'
+        const button = inToolbar ? 'lr-tool' : 'lr-btn'
+        const iconButton = inToolbar ? 'lr-tool compact' : 'lr-btn icon'
+        const label = (text) => h('span', { className: inToolbar ? null : 'lr-label' }, text)
+        const buttons = hasReaderNote
+          ? [
+              h(
+                'button',
+                {
+                  type: 'button',
+                  className: `${button} primary lr-note-entry`,
+                  onClick: openNoteDock,
+                  // No accelerator: nothing is wired for a global shortcut and
+                  // Ctrl+Shift+N is reserved by the browser (new incognito window).
+                  title: t('readerNoteRecord'),
+                },
+                h(Icon, { name: 'note', size: inToolbar ? 14 : 14 }),
+                label(t('readerNoteRecord')),
+                readerNoteOpen > 0
+                  ? h('span', { className: 'lr-note-entry-badge' }, String(readerNoteOpen))
+                  : null,
+              ),
+              h(
+                'button',
+                {
+                  type: 'button',
+                  className: `${iconButton} lr-note-edit`,
+                  onClick: openReaderNoteInObsidian,
+                  disabled: noteOpening,
+                  title: noteOpening ? t('readerNoteEditOpening') : t('readerNoteEdit'),
+                  'aria-label': noteOpening ? t('readerNoteEditOpening') : t('readerNoteEdit'),
+                },
+                noteOpening ? h(Spinner, { size: 13 }) : h(Icon, { name: 'pen', size: inToolbar ? 14 : 15 }),
+              ),
+            ]
+          : [
+              h(
+                'button',
+                {
+                  type: 'button',
+                  className: `${button} lr-note-entry`,
+                  onClick: openNoteDock,
+                  disabled: noteCreating,
+                  title: t('readerNoteCreate'),
+                },
+                noteCreating ? h(Spinner, { size: 13 }) : h(Icon, { name: 'note', size: 14 }),
+                label(noteCreating ? t('readerNoteCreating') : t('readerNoteCreate')),
+              ),
+            ]
+        return h(
+          'div',
+          { className: inToolbar ? 'lr-tool-group lr-note-actions' : 'lr-note-actions', role: 'group' },
+          ...buttons,
+        )
+      }
+
       function renderViewer() {
         if (!paper) return null
         return h(
@@ -11330,6 +11410,7 @@ function findFigurePlaceholders(source) {
                 h('span', null, t('extract')),
               ),
             ),
+            renderReaderNoteActions('toolbar'),
             h(FullscreenButton, { active: fullscreen, onClick: toggleFullscreen }),
           ),
           h(
@@ -11943,52 +12024,9 @@ function findFigurePlaceholders(source) {
                   h(Icon, { name: 'note', size: 15 }),
                 )
               : null,
-            // 「建立笔记」/「记录笔记」+「修改笔记」(spec §7.1).
-            paper
-              ? hasReaderNote
-                ? h(
-                    'button',
-                    {
-                      type: 'button',
-                      className: 'lr-btn primary lr-note-entry',
-                      onClick: openNoteDock,
-                      // No accelerator here: nothing is wired for a global
-                      // shortcut, and Ctrl+Shift+N is reserved by the browser
-                      // (new incognito window) so a page cannot claim it.
-                      title: t('readerNoteRecord'),
-                    },
-                    h(Icon, { name: 'note', size: 14 }),
-                    h('span', { className: 'lr-label' }, t('readerNoteRecord')),
-                    readerNoteOpen > 0
-                      ? h('span', { className: 'lr-note-entry-badge' }, String(readerNoteOpen))
-                      : null,
-                  )
-                : h(
-                    'button',
-                    {
-                      type: 'button',
-                      className: 'lr-btn lr-note-entry',
-                      onClick: openNoteDock,
-                      disabled: noteCreating,
-                      title: t('readerNoteCreate'),
-                    },
-                    noteCreating ? h(Spinner, { size: 13 }) : h(Icon, { name: 'note', size: 14 }),
-                    h('span', { className: 'lr-label' }, noteCreating ? t('readerNoteCreating') : t('readerNoteCreate')),
-                  )
-              : null,
-            hasReaderNote
-              ? h(
-                  'button',
-                  {
-                    type: 'button',
-                    className: 'lr-btn icon',
-                    onClick: openReaderNoteInObsidian,
-                    title: t('readerNoteEdit'),
-                    'aria-label': t('readerNoteEdit'),
-                  },
-                  h(Icon, { name: 'pen', size: 15 }),
-                )
-              : null,
+            // 「建立笔记」/「记录笔记」+「修改笔记」(spec §7.1). The same group is
+            // also rendered in the PDF toolbar for full screen (spec §7.2b).
+            renderReaderNoteActions('header'),
             h(
               'button',
               {
@@ -13197,6 +13235,14 @@ html:fullscreen [data-shell-leading]{display:none!important}
 .lr-card-action:hover{background:var(--lr-tint);color:var(--lr-ink)}
 .lr-card-action.danger:hover{background:color-mix(in srgb,var(--dsw-alias-state-error-primary) 12%,transparent);color:var(--dsw-alias-state-error-primary)}
 .lr-note-actions{display:flex;align-items:center;gap:4px;flex:0 0 auto}
+/* The note entry also lives in the PDF toolbar, which fullscreen keeps
+   visible after the header row is hidden (spec 7.2b). It needs the tool
+   padding plus the accent used by the header primary button. */
+.lr-tool-group.lr-note-actions{flex:0 0 auto}
+.lr-tool.lr-note-entry{color:var(--lr-accent,var(--dsw-alias-label-primary));font-weight:600;border-color:color-mix(in srgb,var(--lr-accent,var(--dsw-alias-label-primary)) 32%,transparent);background:color-mix(in srgb,var(--lr-accent,var(--dsw-alias-label-primary)) 8%,transparent)}
+.lr-tool.lr-note-entry:hover:not(:disabled){background:color-mix(in srgb,var(--lr-accent,var(--dsw-alias-label-primary)) 16%,transparent)}
+.lr-tool.lr-note-entry:disabled{opacity:.55;cursor:default}
+.lr-tool.lr-note-entry .lr-note-entry-badge{margin-left:2px}
 .lr-btn.danger{background:color-mix(in srgb,var(--dsw-alias-state-error-primary) 12%,transparent);border-color:color-mix(in srgb,var(--dsw-alias-state-error-primary) 38%,transparent);color:var(--dsw-alias-state-error-primary);font-weight:600}
 .lr-btn.danger:hover:not(:disabled){background:color-mix(in srgb,var(--dsw-alias-state-error-primary) 20%,transparent);border-color:color-mix(in srgb,var(--dsw-alias-state-error-primary) 55%,transparent);color:var(--dsw-alias-state-error-primary)}
 .lr-delete-dialog{display:flex;flex-direction:column;gap:11px}

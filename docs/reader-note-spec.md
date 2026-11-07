@@ -410,6 +410,30 @@ async rewriteReaderNoteQuestion({ meta, markdown, question, history, signal })  
   只在 `length > 0` 时覆盖，避免清掉用户正在看的对话框。新建笔记路径要使用 `createReaderNote()` 的
   返回值（它同样带 `questions`），否则「新建当次」读不到。
 
+### 7.2b 全屏时笔记入口必须仍然可用
+
+页面全屏（`html:fullscreen`）会隐藏 `.lr-header`（`html:fullscreen .lr-header{display:none}`），
+如果笔记按钮只放在 header，**进入全屏后「建立笔记 / 记录笔记 / 修改笔记」会整个消失**。
+
+实现要求：同一个按钮组渲染两次——header 一次、**PDF 工具栏**一次（位置在「提炼」与「退出全屏」之间）。
+两处共用 `renderReaderNoteActions(variant)`：
+- `variant='header'` 用 `lr-btn` / `lr-btn icon` 与 `lr-label` 文本；
+- `variant='toolbar'` 用 `lr-tool` / `lr-tool compact`，不带 `lr-label` 类（工具栏已有全局小屏隐藏规则）。
+
+两处的 `onClick`、`disabled`、角标必须完全一致，不要各写一套。
+
+测试必须断言：有笔记时「记录笔记」按钮出现 **2 次**（header + toolbar），且工具栏那组带 `lr-tool-group`。
+
+### 7.2c 「修改笔记」必须给出可见反馈
+
+`openReaderNoteInObsidian()`：宿主只能把 `obsidian://` URI 交给 OS，**无法确认 Obsidian 是否真的切到了那个文件**。
+因此必须有可见结果，否则用户会以为按钮坏了（曾出现过「点了没反应」的反馈）：
+
+- 点击后立即置 `noteOpening`，按钮 `disabled` 并显示 `Spinner`（title 换成 `readerNoteEditOpening`）；
+- 成功 → toast `readerNoteOpenedInObsidian`（文案要说明「若窗口没切过去请手动切换」，不要谎称已打开）；
+- 失败 → `setError` + 红色 toast `readerNoteOpenFailed`；
+- `finally` 里复位 `noteOpening`。
+
 ### 7.5c 不得在 UI 里承诺未实现的快捷键
 
 按钮 tooltip、帮助面板等任何用户可见处，**只能写代码里真的处理了的快捷键**。

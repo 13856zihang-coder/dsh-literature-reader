@@ -780,9 +780,11 @@ describe('header entry buttons (spec §7.1, §14.6)', () => {
         readerNoteRelative: 'A/a 笔记.md',
         pageCount: 3,
       })
-      // The button is still 建立笔记, not 记录笔记.
+      // The button is still 建立笔记, not 记录笔记. It is rendered twice on
+      // purpose: once in the header and once in the PDF toolbar, because page
+      // fullscreen hides `.lr-header` (spec §7.2b).
       const create = buttonByText(tree, '建立笔记')
-      assert.equal(create.length, 1)
+      assert.equal(create.length, 2, 'header + toolbar')
       // Declining the confirmation must not create anything.
       await create[0].props.onClick()
       assert.equal(globalThis.__CONFIRMS__.length, 1, 'the confirmation must be asked exactly once')
@@ -1453,8 +1455,9 @@ describe('reader note history (spec §3.5)', () => {
     globalThis.__PAPER__ = { id: 'p1', title: '论文', hasReaderNote: true, pageCount: 3 }
     try {
       const tree = API.LiteratureReader({})
+      // Header + PDF toolbar (spec §7.2b); clicking either behaves the same.
       const header = buttonByText(tree, '记录笔记')
-      assert.equal(header.length, 1)
+      assert.equal(header.length, 2, 'header + toolbar')
 
       // First click: the host is broken. Nothing is created.
       await header[0].props.onClick()
@@ -1520,5 +1523,72 @@ describe('delete dialog choices (spec §12.3)', () => {
       assert.match(textOf(option), /备份|保留|删除/)
     }
     globalThis.__DELETE_TARGET__ = undefined
+  })
+})
+
+describe('note actions survive full screen (spec §7.2b)', () => {
+  // Page fullscreen hides `.lr-header` (`html:fullscreen .lr-header{display:none}`),
+  // so the entry/edit buttons must also live in the PDF toolbar, which stays
+  // visible. These assertions pin that duplication in place.
+  test('the toolbar offers the same entry button as the header', () => {
+    globalThis.__PAPER__ = { id: 'p1', title: '论文', hasReaderNote: true, pageCount: 3 }
+    try {
+      const tree = API.LiteratureReader({})
+      assert.equal(buttonByText(tree, '记录笔记').length, 2, 'header + PDF toolbar')
+      assert.equal(byClass(tree, 'lr-note-actions').length, 2, 'both groups exist')
+      // `byClass` matches one class token, so find the group by intersecting.
+      const toolbarGroup = byClass(tree, 'lr-note-actions').filter((node) =>
+        node.props.className.split(/\s+/).includes('lr-tool-group'),
+      )
+      assert.equal(toolbarGroup.length, 1, 'exactly one group sits in the toolbar')
+      // The toolbar variant must use the tool styling, not the header button one.
+      const toolbarButtons = byClass(toolbarGroup[0], 'lr-tool')
+      assert.ok(toolbarButtons.length >= 1, 'the toolbar group uses .lr-tool buttons')
+    } finally {
+      globalThis.__PAPER__ = undefined
+    }
+  })
+
+  test('the 修改笔记 button shows a spinner and a result toast', async () => {
+    const requests = []
+    let releaseOpen
+    const openGate = new Promise((resolve) => { releaseOpen = resolve })
+    globalThis.fetch = async (url, options) => {
+      const path = String(url)
+      requests.push({ path, method: (options && options.method) || 'GET' })
+      if (path.endsWith('/reader-note')) {
+        return { ok: true, json: async () => ({ exists: true, relative: 'A/a 笔记.md', hash: 'h1' }) }
+      }
+      if (path.endsWith('/vault/open-note')) {
+        await openGate
+        return { ok: true, json: async () => ({ ok: true, uri: 'obsidian://open' }) }
+      }
+      return { ok: true, json: async () => ({}) }
+    }
+    globalThis.__PAPER__ = { id: 'p1', title: '论文', hasReaderNote: true, pageCount: 3 }
+    try {
+      const tree = API.LiteratureReader({})
+      const edit = byClass(tree, 'lr-note-edit')
+      assert.equal(edit.length, 2, 'header + toolbar')
+      globalThis.__STATE_SETS__.length = 0
+      const pending = edit[0].props.onClick()
+      // The stub re-renders from the initial state, so assert what the handler
+      // *set* rather than what a second render would show.
+      const locked = globalThis.__STATE_SETS__.some((entry) => entry.value === true)
+      assert.ok(locked, 'the button locks while the host opens the note')
+      releaseOpen()
+      await pending
+      const open = requests.filter((item) => item.path.endsWith('/vault/open-note'))
+      assert.equal(open.length, 1, 'exactly one open-note call')
+      assert.equal(open[0].method, 'POST')
+      // A toast must appear so the click never looks dead.
+      const toasted = globalThis.__STATE_SETS__.some(
+        (entry) => entry.updater === undefined && entry.value && typeof entry.value === 'object' && 'message' in entry.value,
+      )
+      assert.ok(toasted, 'opening must report a result')
+    } finally {
+      globalThis.__PAPER__ = undefined
+      globalThis.fetch = async () => ({ ok: true, json: async () => ({}) })
+    }
   })
 })
