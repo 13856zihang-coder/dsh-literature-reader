@@ -446,7 +446,12 @@ async rewriteReaderNoteQuestion({ meta, markdown, question, history, signal })  
 - 仅 `win32`，其余平台直接返回 false（macOS `open` / Linux `xdg-open` 本来就会抬窗口）。
 - 通过 `powershell.exe -EncodedCommand`（base64/UTF-16LE，避免中文路径的编码损坏）执行一段
   内联 C#：枚举 `Obsidian.exe` 所有进程的顶层窗口，取 `Chrome_WidgetWin_1` 且**有非空标题**的窗口，
-  **全部**恢复并置前（实测同一时刻可能有多个带标题窗口，只抬第一个会选错）。
+  **全部**恢复并置前。
+- 每次调用都重新枚举、**不缓存窗口句柄**：实测同一次排查里先后读到过 `328750` 与 `4721384`，
+  隐藏/恢复过程中句柄并不稳定，缓存会指向已经不存在的窗口。
+- 必须按 **PID 过滤**（`GetWindowThreadProcessId` 结果属于 Obsidian 进程）。只按窗口类名
+  `Chrome_WidgetWin_1` 过滤会抓到 Edge、ChatGPT、墨笺等其它 Electron 应用的窗口——
+  排查时踩过这个坑，会误把别人的窗口抬到前台。
 - 轮询最多 ~3.2s（16 次 × 200ms）等 Obsidian 建窗，整体 8s 超时后 `kill` 并返回 false。
 - **尽力而为**：任何失败都不影响 open 请求本身；返回值多一个 `revealed` 字段，路由原样透传。
 - `LR_NO_WINDOW_REVEAL=1` 关闭该行为（测试套件依赖它，否则会真的弹窗）。
