@@ -424,6 +424,35 @@ async rewriteReaderNoteQuestion({ meta, markdown, question, history, signal })  
 
 测试必须断言：有笔记时「记录笔记」按钮出现 **2 次**（header + toolbar），且工具栏那组带 `lr-tool-group`。
 
+### 7.2b2 Windows 托盘态必须把窗口带到前台（实测血案）
+
+**症状**：用户点「修改笔记」，Obsidian 毫无反应，看起来像按钮坏了。
+
+**实测结论**（2026-11-07 复现）：
+
+1. `obsidian://open?...` **确实被 Obsidian 收到了**——窗口标题会跟着变成目标笔记
+   （实测 `端接基础 - note - Obsidian 1.15.0` → `Altera_EQ(1) 笔记 - note - Obsidian 1.15.0`）。
+   也就是说**笔记是打开了**。
+2. 但 Obsidian 关闭到托盘时，进程还活着（4 个 `Obsidian.exe`），主窗口是一个
+   **不带标题的隐藏窗口**（`Chrome_WidgetWin_1`，`IsWindowVisible == false`）。
+3. 这个状态下 `obsidian://` **只切换内部当前文件，不弹窗口**；`rundll32` 返回退出码 0，
+   所以宿主完全看不出失败。
+4. `WScript.Shell.AppActivate` 对隐藏窗口返回 `False`，**没用**。
+5. 直接启动 `Obsidian.exe "obsidian://..."` 同样不弹窗口，**也没用**。
+6. 唯一有效的手段：Win32 `ShowWindow(hwnd, SW_RESTORE)` + `ShowWindow(hwnd, SW_SHOW)` + `SetForegroundWindow`。
+
+**实现**：`lib/obsidian.js` 的 `openInObsidian()` 在交出 URI 后调用 `revealObsidianWindow()`：
+
+- 仅 `win32`，其余平台直接返回 false（macOS `open` / Linux `xdg-open` 本来就会抬窗口）。
+- 通过 `powershell.exe -EncodedCommand`（base64/UTF-16LE，避免中文路径的编码损坏）执行一段
+  内联 C#：枚举 `Obsidian.exe` 所有进程的顶层窗口，取 `Chrome_WidgetWin_1` 且**有非空标题**的窗口，
+  **全部**恢复并置前（实测同一时刻可能有多个带标题窗口，只抬第一个会选错）。
+- 轮询最多 ~3.2s（16 次 × 200ms）等 Obsidian 建窗，整体 8s 超时后 `kill` 并返回 false。
+- **尽力而为**：任何失败都不影响 open 请求本身；返回值多一个 `revealed` 字段，路由原样透传。
+- `LR_NO_WINDOW_REVEAL=1` 关闭该行为（测试套件依赖它，否则会真的弹窗）。
+
+测试必须断言：opt-out 时 `revealed === false` 且**不 spawn**；URI 仍然正常生成。
+
 ### 7.2c 「修改笔记」必须给出可见反馈
 
 `openReaderNoteInObsidian()`：宿主只能把 `obsidian://` URI 交给 OS，**无法确认 Obsidian 是否真的切到了那个文件**。
