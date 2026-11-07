@@ -18,7 +18,34 @@ import {
   updateSummaryNote,
   writeSummaryNote,
 } from './lib/obsidian.js'
-import { applyReplacements, findFigurePlaceholders } from './lib/markdown-core.js'
+import {
+  applyReplacements,
+  findFigurePlaceholders,
+  locateQuote,
+  parseMarkdown,
+  plainProjection,
+} from './lib/markdown-core.js'
+import {
+  READER_NOTE_HISTORY_DIR,
+  MAX_QUESTION_MESSAGES,
+  appendEntryToBody,
+  applyOrganizeResult,
+  attachmentRelPath,
+  checkOrganizeRewrite,
+  countEntries,
+  createReaderNote,
+  listReaderNoteHistory,
+  noteHash,
+  normalizeQuestions,
+  readerNoteFolder,
+  readQuestions,
+  readReaderNoteFile,
+  readReaderNoteHistoryVersion,
+  resolveReaderNotePath,
+  restoreReaderNoteHistory,
+  writeQuestions,
+  writeReaderNoteFile,
+} from './lib/reader-note.js'
 import {
   anchorAnnotations,
   figureDir,
@@ -257,6 +284,13 @@ function sanitizeCaption(value, max = 160) {
     .slice(0, max)
 }
 
+/** Parse the optional `at` of one reader-note entry; invalid values mean now. */
+function parseReaderNoteTime(value) {
+  if (value === undefined || value === null || value === '') return new Date()
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? new Date() : date
+}
+
 function countNoteFigures(markdown) {
   const matches = String(markdown || '').match(/!\[[^\]]*\]\(_附件\//g)
   return matches ? matches.length : 0
@@ -370,7 +404,10 @@ function insertBlockAt(text, offset, block) {
 
 function figureMarkdownFor(paperId, name, caption, page) {
   const label = sanitizeCaption(caption) || (page ? `第 ${page} 页的图` : '插图')
-  const lines = [`![${label}](_附件/${paperId}/${name})`]
+  // Spec §7.8b: the summary's figures live under `_附件/<id>/图/`, so the link
+  // must say the same — the in-app preview reads the local copy and would hide
+  // a mismatch until the note is opened in Obsidian.
+  const lines = [`![${label}](_附件/${paperId}/图/${name})`]
   if (page) {
     const note = sanitizeCaption(caption) || '图片'
     lines.push(`*${note} · p.${page}*`)
@@ -469,6 +506,10 @@ function makeSse(res, onAbort) {
 
 function publicPaper(meta) {
   const summaryExists = Boolean(meta.summaryPath) && existsSync(meta.summaryPath)
+  // The reader note lives in the vault, so its presence is a file check like the
+  // summary's (spec §3.10). A path recorded in meta that no longer exists must
+  // not claim `hasReaderNote: true`.
+  const readerNoteExists = Boolean(meta.readerNotePath) && existsSync(meta.readerNotePath)
   return {
     id: meta.id,
     title: meta.title || meta.fileName,
@@ -498,6 +539,9 @@ function publicPaper(meta) {
     error: meta.error || '',
     hasSummary: summaryExists,
     summaryPath: meta.summaryPath || '',
+    hasReaderNote: readerNoteExists,
+    readerNoteRelative: meta.readerNoteRelative || '',
+    readerNoteOpen: Number(meta.readerNoteOpen) || 0,
     summarizedAt: meta.summarizedAt || '',
     chatCount: meta.chatCount || 0,
     sha256: meta.sha256 || '',
@@ -788,22 +832,141 @@ export function apply(ctx, rawConfig = {}) {
   /**
    * Copy one local figure into the vault attachment folder. A missing vault is
    * not an error: the note keeps the relative link and the local copy.
+   *
+   * Spec §7.8b: the summary's images live in `_附件/<id>/图/` next to the PDF,
+   * and the link in the note says the same thing — otherwise the preview route
+   * (which reads the local copy) hides the breakage until Obsidian is opened.
    */
-  async function mirrorFigureToVault(id, name) {
+  async function mirrorFigureToVault(id, name, meta) {
     const vault = await getVaultInfo()
     if (!vault?.path) return { copied: false, reason: '未找到 Obsidian 库' }
     try {
+      const folder = readerNoteFolder({
+        meta: meta || { id },
+        notesFolder: config.notesFolder,
+      })
       await copyFigureToVault({
         vaultPath: vault.path,
-        notesFolder: config.notesFolder,
+        notesFolder: folder,
         paperId: id,
         localFile: path.join(figureDir(paperDirOf(id)), name),
         name,
+        sub: '图',
       })
       return { copied: true, reason: '' }
     } catch (error) {
       return { copied: false, reason: errorMessage(error) }
     }
+  }
+
+  // ---- reader note helpers (docs/reader-note-spec.md §1, §3, §14.6) -------
+
+  function readerNoteHistoryDir(id) {
+    return path.join(paperDirOf(id), READER_NOTE_HISTORY_DIR)
+  }
+
+  /**
+   * The note lives next to the PDF (spec §1). Without a usable vault there is
+   * nowhere to put it, so every write path answers 400 with the documented
+   * wording (spec §3.2, §10: unconfigured, missing or not a directory).
+   */
+  async function usableVaultPath() {
+    const vault = await getVaultInfo()
+    if (!vault?.path) return ''
+    const info = await stat(vault.path).catch(() => undefined)
+    return info?.isDirectory() ? vault.path : ''
+  }
+
+  async function readerNoteVaultPath() {
+    const vaultPath = await usableVaultPath()
+    if (!vaultPath) throw new HttpError(400, '未找到 Obsidian 库')
+    return vaultPath
+  }
+
+  /** Resolve the note path for a paper inside the current vault. */
+  async function resolveNoteFor(meta) {
+    const vaultPath = await readerNoteVaultPath()
+    const resolved = await resolveReaderNotePath({
+      vaultPath,
+      notesFolder: config.notesFolder,
+      meta,
+    })
+    return { vaultPath, ...resolved }
+  }
+
+  /** Persist `meta.readerNotePath` / `meta.readerNoteRelative` (spec §12.5). */
+  async function rememberReaderNote(meta, resolved) {
+    let changed = false
+    if (resolved?.path && meta.readerNotePath !== resolved.path) {
+      meta.readerNotePath = resolved.path
+      changed = true
+    }
+    if (resolved?.relative !== undefined && meta.readerNoteRelative !== resolved.relative) {
+      meta.readerNoteRelative = resolved.relative
+      changed = true
+    }
+    if (changed) await saveMeta(meta).catch(() => {})
+  }
+
+  /** Keep `meta.readerNoteOpen` in step with the stored question list. */
+  async function setReaderNoteOpen(meta, questions) {
+    const open = (Array.isArray(questions) ? questions : []).filter(
+      (item) => item && item.status === 'open',
+    ).length
+    if (meta.readerNoteOpen !== open) {
+      meta.readerNoteOpen = open
+      await saveMeta(meta).catch(() => {})
+    }
+  }
+
+  function openQuestionCount(questions) {
+    return (Array.isArray(questions) ? questions : []).filter((item) => item && item.status === 'open')
+      .length
+  }
+
+  /**
+   * Re-anchor `open` questions against the body and persist any status change
+   * (§3.9). A quote that no longer exists turns into `orphan` while keeping the
+   * text, so the reader can still repair it by hand.
+   */
+  async function anchorNoteQuestions(id, body, stored) {
+    const base = Array.isArray(stored) ? stored : await readQuestions(paperDirOf(id))
+    if (!base.length || !body) return base
+    const anchored = normalizeQuestions(base, body, base)
+    if (JSON.stringify(anchored) !== JSON.stringify(base)) {
+      await writeQuestions(paperDirOf(id), anchored).catch(() => {})
+    }
+    return anchored
+  }
+
+  /** Shape shared by GET/POST /reader-note; `exists:false` per spec §3.1. */
+  function readerNotePayload(meta, questions) {
+    return {
+      exists: false,
+      path: '',
+      relative: '',
+      markdown: '',
+      hash: '',
+      updatedAt: '',
+      entryCount: 0,
+      questions,
+      historyStamp: '',
+      // §14.6: a recorded path that no longer exists means the file was deleted
+      // outside the plugin; the client asks once before re-creating it.
+      ...(meta.readerNotePath && !existsSync(meta.readerNotePath)
+        ? { lostPath: meta.readerNotePath }
+        : {}),
+    }
+  }
+
+  /**
+   * Read + re-anchor the note for one paper. Returns `null` when the file does
+   * not exist (which is not an error: the client shows 「建立笔记」).
+   */
+  async function loadReaderNote(meta) {
+    const resolved = await resolveNoteFor(meta)
+    const file = await readReaderNoteFile({ path: resolved.path })
+    return { resolved, file }
   }
 
   /**
@@ -851,7 +1014,7 @@ export function apply(ctx, rawConfig = {}) {
         dpi: FIGURE_DPI,
         config,
       })
-      const mirrored = await mirrorFigureToVault(meta.id, name)
+      const mirrored = await mirrorFigureToVault(meta.id, name, meta)
       return {
         ok: true,
         name,
@@ -1261,6 +1424,13 @@ export function apply(ctx, rawConfig = {}) {
   async function buildVaultLibrary(refresh = false) {
     const vault = await getVaultInfo()
     if (!vault) throw new HttpError(400, '未找到 Obsidian 库')
+    /** Absolute path → POSIX path relative to the vault ('' when outside). */
+    const vaultRelOf = (abs) => {
+      if (!abs) return ''
+      const rel = path.relative(vault.path, abs)
+      if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) return ''
+      return rel.split(path.sep).join('/')
+    }
     const scan = await scanVault(vault.path, { refresh })
     const records = await listMetaRecords()
     const byVault = new Map(records.filter((meta) => meta.vaultPath).map((meta) => [meta.vaultPath, meta]))
@@ -1295,6 +1465,16 @@ export function apply(ctx, rawConfig = {}) {
         record?.title ||
         (record?.fileName ? record.fileName.replace(/\.pdf$/i, '') : pdf.title)
       const tags = uniqueTags(pdf.tags, record?.tags)
+      // §12.4: report the two companions explicitly so the client can group the
+      // tripod without guessing from note titles. Empty string = not present.
+      const summaryRel =
+        record?.summaryPath && existsSync(record.summaryPath)
+          ? vaultRelOf(record.summaryPath)
+          : ''
+      const readerNoteRel =
+        record?.readerNotePath && existsSync(record.readerNotePath)
+          ? vaultRelOf(record.readerNotePath)
+          : ''
       pdfs.push({
         ...pdf,
         title,
@@ -1305,6 +1485,8 @@ export function apply(ctx, rawConfig = {}) {
         analysisReady: Boolean(record?.analysisReady),
         hasSummary: Boolean(record?.summaryPath && existsSync(record.summaryPath)),
         summaryPath: record?.summaryPath || '',
+        summaryRel,
+        readerNoteRel,
         progress: record?.progress || null,
         scanned: Boolean(record?.scanned),
         chars: record?.chars || 0,
@@ -2297,7 +2479,7 @@ export function apply(ctx, rawConfig = {}) {
     const image = decodeImageUpload(body.dataUrl ?? body.data, body.mediaType)
     const name = uploadedImageName(new Date(), image.mediaType)
     await saveFigure(dir, name, image.buffer)
-    const mirrored = await mirrorFigureToVault(id, name)
+    const mirrored = await mirrorFigureToVault(id, name, meta)
     const imageId = name
     const previewUrl = imagePreviewUrl(id, name)
     const instruction = String(body.instruction || '').trim().slice(0, 2000)
@@ -2567,6 +2749,612 @@ export function apply(ctx, rawConfig = {}) {
     createReadStream(file).pipe(res)
   }
 
+  // ---- reader note routes (docs/reader-note-spec.md §3) ------------------
+
+  /** GET /papers/:id/reader-note — never 404 for "no note" (spec §3.1, §7.9). */
+  async function handleReaderNoteGet(req, res, id) {
+    const meta = await loadMeta(id)
+    const stored = await readQuestions(paperDirOf(id))
+    const vaultPath = await usableVaultPath()
+    if (!vaultPath) {
+      json(res, 200, readerNotePayload(meta, stored))
+      return
+    }
+    const { resolved, file } = await loadReaderNote(meta)
+    if (!file) {
+      json(res, 200, readerNotePayload(meta, stored))
+      return
+    }
+    const questions = await anchorNoteQuestions(id, file.markdown, stored)
+    await rememberReaderNote(meta, resolved)
+    await setReaderNoteOpen(meta, questions)
+    json(res, 200, {
+      exists: true,
+      path: resolved.path,
+      relative: resolved.relative,
+      markdown: file.markdown,
+      hash: file.hash,
+      updatedAt: file.updatedAt,
+      entryCount: file.entryCount,
+      questions,
+      historyStamp: '',
+    })
+  }
+
+  /** POST /papers/:id/reader-note — idempotent create (spec §3.2). */
+  async function handleReaderNoteCreate(req, res, id) {
+    await readJsonBody(req, 256 * 1024)
+    const meta = await loadMeta(id)
+    const vaultPath = await readerNoteVaultPath()
+    const tags = mergeTags(meta.tags, ['文献阅读', '阅读笔记'])
+    let created
+    try {
+      created = await createReaderNote({
+        vaultPath,
+        notesFolder: config.notesFolder,
+        meta,
+        tags,
+        now: new Date(),
+      })
+    } catch (error) {
+      // A vault that exists but rejects the write must not crash the route: the
+      // client needs the real reason (§10).
+      if (error instanceof HttpError) throw error
+      throw new HttpError(500, `写笔记失败：${errorMessage(error)}`)
+    }
+    await rememberReaderNote(meta, created)
+    const questions = await anchorNoteQuestions(id, created.markdown, await readQuestions(paperDirOf(id)))
+    await setReaderNoteOpen(meta, questions)
+    const info = await stat(created.path).catch(() => undefined)
+    json(res, 200, {
+      ok: true,
+      created: created.created,
+      exists: true,
+      path: created.path,
+      relative: created.relative,
+      markdown: created.markdown,
+      hash: created.hash,
+      updatedAt: info?.mtime ? info.mtime.toISOString() : '',
+      entryCount: countEntries(created.markdown),
+      links: created.links,
+      questions,
+      historyStamp: '',
+    })
+  }
+
+  /** POST /papers/:id/reader-note/entries — append one entry (spec §3.3). */
+  async function handleReaderNoteEntry(req, res, id) {
+    const body = await readJsonBody(req, 1024 * 1024)
+    const markdown = String(body.markdown ?? '')
+      .replace(/\r\n?/g, '\n')
+      .trim()
+    if (!markdown) throw new HttpError(400, '记录内容不能为空')
+    if (markdown.length > 20_000) throw new HttpError(400, '记录内容不能超过 20000 字')
+    const meta = await loadMeta(id)
+    const { resolved, file } = await loadReaderNote(meta)
+    if (!file) throw new HttpError(404, '还没有建立阅读笔记')
+    const at = parseReaderNoteTime(body.at)
+    const appended = appendEntryToBody({ body: file.markdown, markdown, at })
+    let written
+    try {
+      written = await writeReaderNoteFile({
+        path: resolved.path,
+        body: appended.body,
+        meta,
+        reason: 'append',
+        historyDir: readerNoteHistoryDir(id),
+        now: at,
+      })
+    } catch (error) {
+      if (error instanceof HttpError) throw error
+      throw new HttpError(500, `写笔记失败：${errorMessage(error)}`)
+    }
+    await rememberReaderNote(meta, resolved)
+    json(res, 200, {
+      ok: true,
+      markdown: written.body,
+      hash: written.hash,
+      entryCount: countEntries(written.body),
+      entry: appended.entry,
+      anchor: appended.anchor,
+      historyStamp: written.historyStamp,
+    })
+  }
+
+  /** POST /papers/:id/reader-note/images — upload one note image (spec §3.4). */
+  async function handleReaderNoteImage(req, res, id) {
+    const body = await readJsonBody(req, IMAGE_MAX_BYTES * 2)
+    const meta = await loadMeta(id)
+    const image = decodeImageUpload(body.dataUrl ?? body.data, body.mediaType)
+    const name = uploadedImageName(new Date(), image.mediaType)
+    // The name must stay inside the `/figure/:name` whitelist so the preview
+    // route can replay it (spec §3.4).
+    if (!isFigureName(name)) throw new HttpError(500, '图片文件名不符合规范')
+    const dir = paperDirOf(id)
+    await saveFigure(dir, name, image.buffer)
+    const rel = attachmentRelPath(id, name, '笔记')
+    // §7.8b: the bytes and the link must both live under the *note's* folder,
+    // so `_附件/<id>/笔记/<name>` resolves from the note itself in Obsidian.
+    const folder = readerNoteFolder({ meta, notesFolder: config.notesFolder })
+    let vaultError = ''
+    try {
+      const vaultPath = await usableVaultPath()
+      if (!vaultPath) throw new Error('未找到 Obsidian 库')
+      await copyFigureToVault({
+        vaultPath,
+        notesFolder: folder,
+        paperId: id,
+        localFile: path.join(figureDir(dir), name),
+        name,
+        sub: '笔记',
+      })
+    } catch (error) {
+      // A missing/unwritable vault never loses the local copy (§10).
+      vaultError = errorMessage(error)
+    }
+    json(res, 200, { ok: true, name, url: imagePreviewUrl(id, name), rel, vaultError })
+  }
+
+  /** GET /papers/:id/reader-note/history — newest first (spec §3.5). */
+  async function handleReaderNoteHistory(req, res, id) {
+    await loadMeta(id)
+    const versions = await listReaderNoteHistory(readerNoteHistoryDir(id))
+    json(res, 200, { versions })
+  }
+
+  /** GET /papers/:id/reader-note/history/:stamp — read-only preview. */
+  async function handleReaderNoteHistoryItem(req, res, id, stamp) {
+    await loadMeta(id)
+    const version = await readReaderNoteHistoryVersion({
+      historyDir: readerNoteHistoryDir(id),
+      stamp,
+    })
+    json(res, 200, {
+      stamp: version.stamp,
+      markdown: version.markdown,
+      chars: version.chars,
+      updatedAt: version.updatedAt,
+      reason: version.reason,
+    })
+  }
+
+  /** POST /papers/:id/reader-note/history/:stamp/restore (spec §3.5). */
+  async function handleReaderNoteRestore(req, res, id, stamp) {
+    await readJsonBody(req, 256 * 1024)
+    const meta = await loadMeta(id)
+    const resolved = await resolveNoteFor(meta)
+    let restored
+    try {
+      restored = await restoreReaderNoteHistory({
+        path: resolved.path,
+        historyDir: readerNoteHistoryDir(id),
+        stamp,
+        now: new Date(),
+      })
+    } catch (error) {
+      if (error instanceof HttpError) throw error
+      throw new HttpError(500, `恢复笔记失败：${errorMessage(error)}`)
+    }
+    await rememberReaderNote(meta, resolved)
+    const questions = await anchorNoteQuestions(id, restored.markdown)
+    await setReaderNoteOpen(meta, questions)
+    json(res, 200, {
+      ok: true,
+      markdown: restored.markdown,
+      hash: restored.hash,
+      entryCount: countEntries(restored.markdown),
+      historyStamp: restored.historyStamp,
+      questions,
+    })
+  }
+
+  /** POST /papers/:id/reader-note/organize — AI polish (spec §3.6, SSE). */
+  async function handleReaderNoteOrganize(req, res, id) {
+    const body = await readJsonBody(req, 256 * 1024)
+    if (busy.has(id)) throw new HttpError(409, '当前模型任务正在进行，请稍候')
+    const meta = await loadMeta(id)
+    const { resolved, file } = await loadReaderNote(meta)
+    if (!file) throw new HttpError(404, '还没有建立阅读笔记')
+    if (file.markdown.trim().length < 10) throw new HttpError(400, '笔记正文太短，无法整理')
+    const baseHash = String(body.baseHash || '').trim()
+    // The conflict has to be answered *before* the SSE handshake, otherwise the
+    // client only sees an error event where it expects a 409 (spec §3.6).
+    if (baseHash && baseHash !== file.hash) {
+      json(res, 409, {
+        error: '笔记已在别处更新',
+        conflict: true,
+        markdown: file.markdown,
+        hash: file.hash,
+      })
+      return
+    }
+    const controller = new AbortController()
+    let finished = false
+    const sse = makeSse(res, () => {
+      if (!finished) controller.abort()
+    })
+    busy.add(id)
+    try {
+      sse.send({ type: 'status', label: '正在整理笔记…' })
+      let answer
+      try {
+        answer = await ai.organizeReaderNote({
+          meta,
+          markdown: file.markdown,
+          signal: controller.signal,
+        })
+      } catch (error) {
+        if (controller.signal.aborted) {
+          finished = true
+          sse.end()
+          return
+        }
+        sse.send({ type: 'error', message: errorMessage(error) })
+        finished = true
+        sse.end()
+        return
+      }
+      if (controller.signal.aborted) {
+        finished = true
+        sse.end()
+        return
+      }
+      // Safety gate (§3.6, §5): a rewrite that breaks structure is refused as a
+      // whole — no write, no questions, so the note is exactly as it was.
+      const gate = checkOrganizeRewrite({ before: file.markdown, after: answer.markdown })
+      if (!gate.ok) {
+        const reason = (gate.problems || []).filter(Boolean).join('；') || '结构校验未通过'
+        sse.send({
+          type: 'error',
+          message: `AI 改写破坏了笔记结构（${reason}），已放弃本次整理`,
+        })
+        finished = true
+        sse.end()
+        return
+      }
+      const existing = await anchorNoteQuestions(id, file.markdown)
+      const written = await writeReaderNoteFile({
+        path: resolved.path,
+        body: answer.markdown,
+        meta,
+        reason: 'organize',
+        historyDir: readerNoteHistoryDir(id),
+        now: new Date(),
+      })
+      // Old questions keep their id, status and discussion; the new suspects
+      // arrive as `open` (spec §3.6).
+      const mapped = applyOrganizeResult({ body: written.body, questions: existing })
+      const fresh = (Array.isArray(answer.questions) ? answer.questions : []).map((item) => ({
+        quote: item?.quote || '',
+        problem: item?.problem || '',
+        suggestion: item?.suggestion || '',
+        ask: item?.ask || '',
+        status: 'open',
+      }))
+      const merged = normalizeQuestions([...mapped.questions, ...fresh], written.body, existing)
+      await writeQuestions(paperDirOf(id), merged)
+      await rememberReaderNote(meta, resolved)
+      await setReaderNoteOpen(meta, merged)
+      const report = answer.report && typeof answer.report === 'object' ? answer.report : {}
+      sse.send({
+        type: 'done',
+        markdown: written.body,
+        hash: written.hash,
+        historyStamp: written.historyStamp,
+        report: {
+          typos: Number(report.typos) || 0,
+          merges: Number(report.merges) || 0,
+          formatting: Number(report.formatting) || 0,
+          summary: String(report.summary || ''),
+        },
+        questions: merged,
+        entryCount: countEntries(written.body),
+      })
+      finished = true
+      sse.end()
+    } catch (error) {
+      if (controller.signal.aborted) {
+        finished = true
+        sse.end()
+        return
+      }
+      sse.send({ type: 'error', message: errorMessage(error) })
+      finished = true
+      sse.end()
+    } finally {
+      busy.delete(id)
+    }
+  }
+
+  /** POST /papers/:id/reader-note/questions/:qid/discuss (spec §3.7, SSE). */
+  async function handleReaderNoteDiscuss(req, res, id, qid) {
+    const body = await readJsonBody(req, 256 * 1024)
+    if (busy.has(id)) throw new HttpError(409, '当前模型任务正在进行，请稍候')
+    const meta = await loadMeta(id)
+    const { file } = await loadReaderNote(meta)
+    if (!file) throw new HttpError(404, '还没有建立阅读笔记')
+    const questions = await anchorNoteQuestions(id, file.markdown)
+    const question = questions.find((item) => item && item.id === qid)
+    if (!question) throw new HttpError(404, '问题不存在')
+    const message = String(body.message ?? '').trim().slice(0, 4000)
+    const controller = new AbortController()
+    let finished = false
+    const sse = makeSse(res, () => {
+      if (!finished) controller.abort()
+    })
+    busy.add(id)
+    try {
+      let reply = ''
+      try {
+        reply = await ai.discussReaderNoteQuestion({
+          meta,
+          markdown: file.markdown,
+          question,
+          history: question.messages || [],
+          userMessage: message,
+          signal: controller.signal,
+          onDelta: (text) => sse.send({ type: 'delta', text: String(text || '') }),
+        })
+      } catch (error) {
+        if (controller.signal.aborted) {
+          finished = true
+          sse.end()
+          return
+        }
+        sse.send({ type: 'error', message: errorMessage(error) })
+        finished = true
+        sse.end()
+        return
+      }
+      if (controller.signal.aborted) {
+        finished = true
+        sse.end()
+        return
+      }
+      const at = nowIso()
+      const messages = Array.isArray(question.messages) ? question.messages.slice() : []
+      if (message) messages.push({ role: 'user', content: message, at })
+      const text = String(reply || '').trim()
+      if (text) messages.push({ role: 'assistant', content: text, at })
+      question.messages = messages.slice(-MAX_QUESTION_MESSAGES)
+      const nextQuestions = questions.map((item) => (item.id === question.id ? question : item))
+      await writeQuestions(paperDirOf(id), nextQuestions)
+      await setReaderNoteOpen(meta, nextQuestions)
+      // `done` must carry the *complete* question: the client replaces its copy
+      // and the thread has to survive a reload (§7.9).
+      sse.send({ type: 'done', question, reply: text })
+      finished = true
+      sse.end()
+    } catch (error) {
+      if (controller.signal.aborted) {
+        finished = true
+        sse.end()
+        return
+      }
+      sse.send({ type: 'error', message: errorMessage(error) })
+      finished = true
+      sse.end()
+    } finally {
+      busy.delete(id)
+    }
+  }
+
+  /** POST /papers/:id/reader-note/questions/:qid/resolve (spec §3.8). */
+  async function handleReaderNoteResolve(req, res, id, qid) {
+    const body = await readJsonBody(req, 256 * 1024)
+    const mode = String(body.mode || '').trim()
+    if (mode !== 'apply' && mode !== 'dismiss') throw new HttpError(400, '不支持的修正方式')
+    if (mode === 'apply' && busy.has(id)) throw new HttpError(409, '当前模型任务正在进行，请稍候')
+    const meta = await loadMeta(id)
+    const { resolved, file } = await loadReaderNote(meta)
+    if (!file) throw new HttpError(404, '还没有建立阅读笔记')
+    const questions = await anchorNoteQuestions(id, file.markdown)
+    const question = questions.find((item) => item && item.id === qid)
+    if (!question) throw new HttpError(404, '问题不存在')
+    if (mode === 'dismiss') {
+      question.status = 'dismissed'
+      question.resolvedAt = nowIso()
+      await writeQuestions(paperDirOf(id), questions)
+      await setReaderNoteOpen(meta, questions)
+      json(res, 200, { ok: true, unchanged: true, question })
+      return
+    }
+    // §3.9: re-anchoring already turned a quote the body no longer contains
+    // into `orphan`; there is nothing left to replace.
+    if (question.status === 'orphan') {
+      json(res, 409, { error: '原文已改动，无法定位这处问题', orphan: true, question })
+      return
+    }
+    let answer
+    busy.add(id)
+    try {
+      answer = await ai.rewriteReaderNoteQuestion({
+        meta,
+        markdown: file.markdown,
+        question,
+        history: question.messages || [],
+      })
+    } finally {
+      busy.delete(id)
+    }
+    if (answer.verdict !== 'fix') {
+      // Discussing it settled the doubt: resolve without touching the body.
+      question.status = 'resolved'
+      question.verdict = 'ok'
+      question.resolvedAt = nowIso()
+      await writeQuestions(paperDirOf(id), questions)
+      await setReaderNoteOpen(meta, questions)
+      json(res, 200, {
+        ok: true,
+        unchanged: true,
+        question,
+        markdown: file.markdown,
+        hash: file.hash,
+      })
+      return
+    }
+    // Locate the quoted span in the *source* so `replacement` only touches that
+    // fragment (spec §3.8). The question's stored prefix/suffix disambiguate a
+    // quote that occurs more than once; a plain indexOf is the last resort and
+    // only ever hits text the AI layer already proved is present verbatim.
+    const source = file.markdown
+    const projection = source.trim()
+      ? plainProjection(parseMarkdown(source).blocks)
+      : { text: '', map: [] }
+    const located = projection.text
+      ? locateQuote(projection, {
+          quote: answer.quote,
+          prefix: question.prefix,
+          suffix: question.suffix,
+          start: answer.quote === question.quote ? question.start : undefined,
+        })
+      : null
+    const start = located ? located.start : source.indexOf(answer.quote)
+    const end = located ? located.end : start + answer.quote.length
+    if (!answer.quote || start < 0 || end <= start) {
+      question.status = 'orphan'
+      await writeQuestions(paperDirOf(id), questions)
+      await setReaderNoteOpen(meta, questions)
+      json(res, 409, { error: '原文已改动，无法定位这处问题', orphan: true, question })
+      return
+    }
+    const applied = applyReplacements(source, [
+      { start, end, replacement: answer.replacement },
+    ])
+    if (applied.applied.length === 0) {
+      question.status = 'orphan'
+      await writeQuestions(paperDirOf(id), questions)
+      await setReaderNoteOpen(meta, questions)
+      json(res, 409, { error: '原文已改动，无法定位这处问题', orphan: true, question })
+      return
+    }
+    const written = await writeReaderNoteFile({
+      path: resolved.path,
+      body: applied.text,
+      meta,
+      reason: 'resolve',
+      historyDir: readerNoteHistoryDir(id),
+      now: new Date(),
+    })
+    question.status = 'resolved'
+    question.verdict = 'fix'
+    question.resolvedAt = nowIso()
+    const nextQuestions = await anchorNoteQuestions(
+      id,
+      written.body,
+      questions.map((item) => (item.id === question.id ? question : item)),
+    )
+    await rememberReaderNote(meta, resolved)
+    await setReaderNoteOpen(meta, nextQuestions)
+    const settled = {
+      ...(nextQuestions.find((item) => item.id === question.id) || question),
+      status: 'resolved',
+      verdict: 'fix',
+    }
+    json(res, 200, {
+      ok: true,
+      markdown: written.body,
+      hash: written.hash,
+      entryCount: countEntries(written.body),
+      historyStamp: written.historyStamp,
+      question: settled,
+      replacement: answer.replacement,
+      why: answer.why || '',
+    })
+  }
+
+  /**
+   * DELETE /papers/:id with the three-way vault choice (spec §12.3).
+   *
+   * `keep` (the default) leaves the tripod alone; `summary` also removes the
+   * summary note; `all` removes the note, the framework files and the whole
+   * `_附件/<paperId>/` folder. The legacy `deleteNotes: true` means `all`.
+   * Every vault removal goes through `deleteVaultEntry`, so it lands in
+   * `backups/delete-*` and can be restored; failures are reported in
+   * `warnings[]` rather than aborting a half-done deletion.
+   */
+  async function deletePaperWithVaultFiles(req, res, id, meta, body) {
+    const requested = (() => {
+      let value = String(body?.vaultFiles ?? '').trim().toLowerCase()
+      if (!value) {
+        try {
+          value = String(new URL(req.url, 'http://127.0.0.1').searchParams.get('vaultFiles') || '')
+            .trim()
+            .toLowerCase()
+        } catch {
+          value = ''
+        }
+      }
+      if (!value && body?.deleteNotes === true) return 'all'
+      if (!value) return 'keep'
+      if (!['keep', 'summary', 'all'].includes(value)) {
+        throw new HttpError(400, 'vaultFiles 只能是 keep、summary 或 all')
+      }
+      return value
+    })()
+    const vaultPreserved = requested === 'keep'
+    const deleted = []
+    const warnings = []
+    const vault = await getVaultInfo()
+    /** Absolute paths (meta) → the vault-relative form `deleteVaultEntry` takes. */
+    const vaultRelFor = (abs) => {
+      if (!abs) return ''
+      if (!vault?.path) return ''
+      const rel = path.relative(vault.path, path.resolve(abs))
+      if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) return ''
+      return rel.split(path.sep).join('/')
+    }
+    const removeVaultEntry = async (rel, kind) => {
+      if (!rel) return
+      if (!vault?.path) {
+        warnings.push(`${rel}: 未找到 Obsidian 库`)
+        return
+      }
+      try {
+        const result = await deleteVaultEntry({
+          vault: vault.path,
+          dataDir: dirs.dataDir,
+          rel,
+          kind,
+        })
+        deleted.push(result)
+      } catch (error) {
+        // Already gone is not a failure worth reporting; anything else is.
+        if (error instanceof HttpError && error.status === 404) return
+        warnings.push(`${rel}: ${errorMessage(error)}`)
+      }
+    }
+    if (requested !== 'keep' && meta.summaryPath) {
+      await removeVaultEntry(vaultRelFor(meta.summaryPath), 'note')
+    }
+    if (requested === 'all') {
+      // `meta.readerNotePath` is absolute; fall back to the recorded relative
+      // path when the absolute one points outside the current vault.
+      const noteRel =
+        vaultRelFor(meta.readerNotePath) || normalizeRel(meta.readerNoteRelative || '')
+      await removeVaultEntry(noteRel, 'note')
+      if (vault?.path) {
+        const folder = readerNoteFolder({ meta, notesFolder: config.notesFolder })
+        const assetsRel = relJoin(folder, '_附件', id)
+        const assetsAbs = safeVaultPath(vault.path, assetsRel)
+        const info = await stat(assetsAbs).catch(() => undefined)
+        if (info?.isDirectory()) await removeVaultEntry(assetsRel, 'folder')
+      }
+    }
+    // The plugin-side copies always go: history snapshots and the question list
+    // live inside the paper directory, which is removed wholesale (spec §9).
+    await rm(paperDirOf(id), { recursive: true, force: true }).catch(() => {})
+    metaCache.delete(id)
+    invalidateVaultCache()
+    json(res, 200, {
+      ok: true,
+      vaultPreserved,
+      vaultFiles: requested,
+      deleted,
+      warnings,
+    })
+  }
+
   async function handlePaperRoute(req, res, id, rest) {
     const method = req.method || 'GET'
     // The confirmation gate runs before anything else so an unconfirmed DELETE
@@ -2595,10 +3383,8 @@ export function apply(ctx, rawConfig = {}) {
         if (meta.status === 'processing' || jobs.has(id)) {
           throw new HttpError(409, '文献正在处理中，完成后才能删除')
         }
-        const vaultPreserved = Boolean(meta.vaultPath)
-        await rm(dir, { recursive: true, force: true })
-        metaCache.delete(id)
-        json(res, 200, { ok: true, vaultPreserved })
+        const body = await readJsonBody(req, 64 * 1024)
+        await deletePaperWithVaultFiles(req, res, id, meta, body)
         return
       }
       throw new HttpError(405, '不支持的请求方法')
@@ -2711,6 +3497,58 @@ export function apply(ctx, rawConfig = {}) {
     }
     if (resource === 'summary' && a === 'figures' && method === 'POST') {
       await handleSummaryFigures(req, res, id)
+      return
+    }
+    if (resource === 'reader-note' && !a && method === 'GET') {
+      await handleReaderNoteGet(req, res, id)
+      return
+    }
+    if (resource === 'reader-note' && !a && method === 'POST') {
+      await handleReaderNoteCreate(req, res, id)
+      return
+    }
+    if (resource === 'reader-note' && a === 'entries' && !b && method === 'POST') {
+      await handleReaderNoteEntry(req, res, id)
+      return
+    }
+    if (resource === 'reader-note' && a === 'images' && !b && method === 'POST') {
+      await handleReaderNoteImage(req, res, id)
+      return
+    }
+    if (resource === 'reader-note' && a === 'history' && !b && method === 'GET') {
+      await handleReaderNoteHistory(req, res, id)
+      return
+    }
+    if (resource === 'reader-note' && a === 'history' && b && !rest[3] && method === 'GET') {
+      await handleReaderNoteHistoryItem(req, res, id, b)
+      return
+    }
+    if (resource === 'reader-note' && a === 'history' && b && rest[3] === 'restore' && method === 'POST') {
+      await handleReaderNoteRestore(req, res, id, b)
+      return
+    }
+    if (resource === 'reader-note' && a === 'organize' && !b && method === 'POST') {
+      await handleReaderNoteOrganize(req, res, id)
+      return
+    }
+    if (
+      resource === 'reader-note' &&
+      a === 'questions' &&
+      b &&
+      rest[3] === 'discuss' &&
+      method === 'POST'
+    ) {
+      await handleReaderNoteDiscuss(req, res, id, b)
+      return
+    }
+    if (
+      resource === 'reader-note' &&
+      a === 'questions' &&
+      b &&
+      rest[3] === 'resolve' &&
+      method === 'POST'
+    ) {
+      await handleReaderNoteResolve(req, res, id, b)
       return
     }
     if (resource === 'figure' && method === 'GET') {
@@ -3008,6 +3846,27 @@ export function apply(ctx, rawConfig = {}) {
       record.sourceAsset = ''
       const info = await stat(safeVaultPath(vault.path, result.rel)).catch(() => undefined)
       if (info) record.fileSize = info.size
+      // Spec §12.2: a canonical summary renamed alongside the PDF moved on disk,
+      // so the absolute `meta.summaryPath` has to follow or every later read
+      // (GET /summary, open-note) targets a path that no longer exists.
+      if (result.summaryRenamedPath && existsSync(result.summaryRenamedPath)) {
+        record.summaryPath = result.summaryRenamedPath
+      }
+      // The reader note rename follows the same tripod rule. `editVaultItem`
+      // does not return its new path, so drop a stale absolute path and let
+      // `resolveReaderNotePath` re-derive it from `meta.vaultPath` (it adopts by
+      // paper_id), then record the fresh one.
+      if (record.readerNotePath && !existsSync(record.readerNotePath)) {
+        const resolvedNote = await resolveReaderNotePath({
+          vaultPath: vault.path,
+          notesFolder: config.notesFolder,
+          meta: record,
+        }).catch(() => undefined)
+        if (resolvedNote) {
+          record.readerNotePath = resolvedNote.path
+          record.readerNoteRelative = resolvedNote.relative
+        }
+      }
       await saveMeta(record)
       if (record.summaryPath && existsSync(record.summaryPath)) {
         try {
@@ -3101,28 +3960,44 @@ export function apply(ctx, rawConfig = {}) {
     const body = await readJsonBody(req, 1024 * 1024)
     const vault = await getVaultInfo()
     if (!vault) throw new HttpError(400, '未找到 Obsidian 库')
+    const oldRel = normalizeRel(body.rel)
+    // Look the record up *before* the move: `moveVaultEntry` needs `paperId` to
+    // find `_附件/<id>/`, and afterwards the old `vaultPath` is already gone.
+    const records = await listMetaRecords()
+    const record = records.find((meta) => meta.vaultPath === oldRel)
     const result = await moveVaultEntry({
       vault: vault.path,
       dataDir: dirs.dataDir,
       rel: body.rel,
       folder: body.folder,
       kind: body.kind,
+      paperId: record?.id || '',
     })
     let recordId = ''
-    if (result.changed) {
-      const records = await listMetaRecords()
-      const record = records.find((meta) => meta.vaultPath === result.oldRel)
-      if (record) {
-        record.vaultPath = result.rel
-        record.vaultExists = true
-        const info = await stat(safeVaultPath(vault.path, result.rel)).catch(() => undefined)
-        if (info) record.fileSize = info.size
-        await saveMeta(record)
-        recordId = record.id
-        await touchSummaryPaths(record.summaryPath, (content) =>
-          content.split(result.oldRel).join(result.rel),
-        )
+    if (result.changed && record) {
+      record.vaultPath = result.rel
+      record.vaultExists = true
+      const info = await stat(safeVaultPath(vault.path, result.rel)).catch(() => undefined)
+      if (info) record.fileSize = info.size
+      // Spec §12.2/§12.4: the tripod moved with the PDF, so the absolute paths
+      // the client opens must follow. `moved[]` reports what actually moved, so
+      // this never invents a path for a file that stayed behind.
+      const movedTo = (kind) => (result.moved || []).find((item) => item.kind === kind)?.to || ''
+      const summaryTo = movedTo('summary')
+      const noteTo = movedTo('note')
+      if (summaryTo) record.summaryPath = safeVaultPath(vault.path, summaryTo)
+      if (noteTo) {
+        record.readerNotePath = safeVaultPath(vault.path, noteTo)
+        record.readerNoteRelative = noteTo
       }
+      await saveMeta(record)
+      recordId = record.id
+      await touchSummaryPaths(record.summaryPath, (content) =>
+        content.split(result.oldRel).join(result.rel),
+      )
+    } else if (!result.changed) {
+      // Nothing moved: still answer with the record so the client can refresh.
+      recordId = record?.id || ''
     }
     invalidateVaultCache()
     json(res, 200, { ok: true, ...result, paperId: recordId })

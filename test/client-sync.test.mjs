@@ -279,7 +279,7 @@ test('every locale key used by the client exists in both zh and en (spec §9)', 
 test('client.js loads through window.__ModuleLoader__ and apply() runs on a fake ctx', async () => {
   const { exported, registrations, localeDicts, required } = await loadAndApply()
   // The module object comes from the vm realm, so compare plain copies.
-  assert.deepEqual(Array.from(exported.inject), ['slots', 'locale'])
+  assert.deepEqual(Array.from(exported.inject), ['slots', 'locale', 'layout'])
   assert.deepEqual(required, ['react'])
 
   // Both slots are registered and the locale dictionary is handed to the host.

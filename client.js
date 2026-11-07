@@ -122,7 +122,9 @@ window.__ModuleLoader__.load({
       penTool: '画笔',
       eraserTool: '橡皮',
       panTool: '拖动',
-      panHint: '按住左键拖动文献',
+      fullscreen: '全屏',
+      exitFullscreen: '退出全屏',
+      fullscreenFailed: '当前环境无法进入全屏',
       width: '粗细',
       eraserSize: '橡皮大小',
       undo: '撤销',
@@ -140,7 +142,6 @@ window.__ModuleLoader__.load({
       critique: '质疑',
       quickAsk: '快捷提问',
       selectionExists: '已框选',
-      selectionHint: '在页面上拖动框选内容',
       selectionAsk: '提问',
       questionPlaceholder: '针对这篇文献提问，或框选一段内容…',
       chatDisabled: 'AI 正在解析这篇文献，稍后即可提问',
@@ -391,6 +392,126 @@ window.__ModuleLoader__.load({
       noteHistorySourceUnknown: '其他',
       noteRestoreDone: '已恢复历史版本',
       noteRestoreFailed: '恢复失败，请稍后重试',
+      // ── Reader note (docs/reader-note-spec.md §7) ──────────────────────────
+      readerNoteCreate: '建立笔记',
+      readerNoteCreating: '正在建立…',
+      readerNoteRecord: '记录笔记',
+      readerNoteEdit: '修改笔记',
+      readerNoteEditOpening: '正在打开…',
+      readerNoteCreated: '阅读笔记已建立',
+      readerNoteCreateFailed: '建立阅读笔记失败，请在 Obsidian 设置里检查库路径',
+      readerNoteLostConfirm: '原笔记文件已丢失（{path}），要重新建立吗？',
+      readerNoteDockTitle: '阅读笔记',
+      readerNoteDockHint: '记录会追加到 Obsidian 笔记的末尾',
+      readerNoteDockResize: '拖动这里调整面板高度',
+      readerNotePlaceholder: '在这里记 Markdown 笔记，Ctrl+Enter 记录…',
+      readerNoteWrite: '编辑',
+      readerNotePreview: '预览',
+      readerNotePreviewEmpty: '还没有内容，切回编辑开始记录',
+      readerNoteWords: '{count} 字',
+      readerNoteSubmit: '记录',
+      readerNoteSubmitting: '记录中…',
+      readerNoteRecorded: '已记录到笔记',
+      readerNoteRecordFailed: '记录失败，请稍后重试',
+      readerNoteEmpty: '先写点什么再记录',
+      readerNoteCancelConfirm: '这条记录还没提交，放弃吗？',
+      readerNoteShortcuts: '快捷键',
+      readerNoteShortcutsTitle: '快捷键（macOS 上 Cmd 等价 Ctrl）',
+      readerNoteShortcutRecord: '记录',
+      readerNoteShortcutClose: '关闭面板',
+      readerNoteShortcutFontUp: '放大字号',
+      readerNoteShortcutFontDown: '缩小字号',
+      readerNoteShortcutFontReset: '复位字号',
+      readerNoteFontSize: '字号',
+      readerNoteResetFont: '复位字号',
+      readerNoteClose: '关闭记录面板',
+      readerNoteImage: '插入图片',
+      readerNoteBold: '加粗',
+      readerNoteItalic: '斜体',
+      readerNoteLink: '链接',
+      readerNoteH1: '一级标题',
+      readerNoteH2: '二级标题',
+      readerNoteH3: '三级标题',
+      readerNoteBullet: '无序列表',
+      readerNoteOrdered: '有序列表',
+      readerNoteQuote: '引用',
+      readerNoteCode: '行内代码',
+      readerNoteMath: '行内公式',
+      readerNoteMathBlock: '块公式',
+      readerNoteShortcutBold: '加粗',
+      readerNoteShortcutItalic: '斜体',
+      readerNoteShortcutLink: '链接',
+      readerNoteShortcutHeading: '一 / 二 / 三级标题',
+      readerNoteShortcutBody: '恢复正文',
+      readerNoteShortcutBullet: '无序列表',
+      readerNoteShortcutOrdered: '有序列表',
+      readerNoteShortcutQuote: '引用',
+      readerNoteShortcutCode: '行内代码',
+      readerNoteShortcutMath: '行内公式',
+      readerNoteShortcutMathBlock: '块公式',
+      readerNoteShortcutImage: '插入图片',
+      readerNoteImageUploading: '正在上传图片…',
+      readerNoteImageFailed: '图片上传失败，请稍后重试',
+      readerNoteImageTooLarge: '图片不能超过 8 MB',
+      readerNoteImageType: '只支持 PNG 或 JPEG 图片',
+      readerNoteDraftRestored: '已恢复上次未提交的草稿',
+      readerNoteOrganize: '整理笔记',
+      readerNoteOrganizing: '正在整理笔记…',
+      readerNoteOrganizeDone: '已修正 {typos} 处错别字、合并 {merges} 处重复、整理 {formatting} 处格式',
+      readerNoteOrganizeNoChange: '笔记已经足够整洁，本次没有改动',
+      readerNoteOrganizeFailed: '整理失败，请稍后重试',
+      readerNoteOrganizeConflict: '笔记已在别处更新，请重新打开面板后再整理',
+      readerNoteOrganizeTooLong: '笔记过长（{chars} 字），超出模型单次整理范围，本次整理已放弃',
+      readerNoteOrganizeMissing: '还没有建立阅读笔记',
+      readerNoteQuestionsTitle: '疑似错误',
+      readerNoteQuestionsSubtitle: '逐条确认后再决定是否修正',
+      readerNoteQuestionQuote: '原文',
+      readerNoteQuestionProblem: '问题',
+      readerNoteQuestionAsk: '请确认',
+      readerNoteQuestionPlaceholder: '补充说明或回答…',
+      readerNoteQuestionDiscuss: '与 AI 讨论',
+      readerNoteQuestionDiscussing: '正在讨论…',
+      readerNoteQuestionAskInChat: '在 AI 对话中继续讨论',
+      readerNoteQuestionApply: '按讨论结果修正',
+      readerNoteQuestionDismiss: '保留原文',
+      readerNoteQuestionResolved: '已修正',
+      readerNoteQuestionDismissed: '已保留原文',
+      readerNoteQuestionFailed: '处理失败，请稍后重试',
+      readerNoteQuestionsOpen: '{count} 条待确认',
+      readerNoteQuestionsAllDone: '所有疑似错误都已处理',
+      readerNoteQuestionsEmpty: '本次整理没有发现疑似错误',
+      readerNoteBadgeCount: '{count} 条待确认',
+      readerNoteShowAllNotes: '显示全部笔记',
+      readerNoteOnlyStandalone: '只看独立笔记',
+      readerNoteStandalone: '独立笔记',
+      readerNoteBadgeSummary: '总结',
+      readerNoteBadgeNote: '笔记',
+      readerNoteOpenSummary: '打开速览总结',
+      readerNoteOpenReaderNote: '打开阅读笔记',
+      readerNoteMissingSummary: '尚未生成总结',
+      readerNoteMissingNote: '尚未生成笔记',
+      readerNoteExpandRow: '展开这篇文献的总结与笔记',
+      readerNoteCollapseRow: '收起',
+      readerNoteDeleteKeep: '只删记录',
+      readerNoteDeleteKeepDesc: '插件里的页面缓存、批注与问答会删除；Obsidian 里的 PDF、速览总结与阅读笔记全部保留。',
+      readerNoteDeleteSummary: '连同速览总结',
+      readerNoteDeleteSummaryDesc: '额外删除「{name} 总结.md」，先移入插件备份目录，可以还原。',
+      readerNoteDeleteAll: '连同总结与笔记',
+      readerNoteDeleteAllDesc: '额外删除「{name} 总结.md」「{name} 笔记.md」与 _附件 图片，都先移入插件备份目录，可以还原。',
+      readerNoteDeleteChoiceTitle: 'Obsidian 里的文件怎么处理',
+      readerNoteDeleteBackup: '删除的内容会先移入插件备份目录，可以还原。',
+      readerNoteHistory: '历史',
+      readerNoteHistoryTitle: '笔记历史版本',
+      readerNoteHistoryEmpty: '暂无历史版本',
+      readerNoteHistoryFailed: '历史版本加载失败',
+      readerNoteHistoryPreview: '预览此版本',
+      readerNoteHistorySourceAppend: '记录',
+      readerNoteHistorySourceOrganize: '整理',
+      readerNoteHistorySourceResolve: '修正',
+      readerNoteHistorySourceRestore: '恢复',
+      readerNoteHistorySourceManual: '手动保存',
+      readerNoteLoadFailed: '读取笔记失败，请稍后重试',
+      readerNoteUnreachable: '无法连接后端服务，请检查后重试',
     }
     const en = {
       panel: 'Literature Reader',
@@ -500,7 +621,9 @@ window.__ModuleLoader__.load({
       penTool: 'Pen',
       eraserTool: 'Eraser',
       panTool: 'Pan',
-      panHint: 'Hold the left button and drag to pan the paper',
+      fullscreen: 'Full screen',
+      exitFullscreen: 'Exit full screen',
+      fullscreenFailed: 'Full screen is unavailable in this environment',
       width: 'Width',
       eraserSize: 'Eraser size',
       undo: 'Undo',
@@ -518,7 +641,6 @@ window.__ModuleLoader__.load({
       critique: 'Critique',
       quickAsk: 'Quick ask',
       selectionExists: 'Selection',
-      selectionHint: 'Drag on the page to select',
       selectionAsk: 'Ask',
       questionPlaceholder: 'Ask about this paper, or select a passage…',
       chatDisabled: 'The AI is still reading this paper',
@@ -769,8 +891,131 @@ window.__ModuleLoader__.load({
       noteHistorySourceUnknown: 'Other',
       noteRestoreDone: 'Version restored',
       noteRestoreFailed: 'Could not restore that version, please try again',
+      // ── Reader note (docs/reader-note-spec.md §7) ──────────────────────────
+      readerNoteCreate: 'Create note',
+      readerNoteCreating: 'Creating…',
+      readerNoteRecord: 'Add entry',
+      readerNoteEdit: 'Edit note',
+      readerNoteEditOpening: 'Opening…',
+      readerNoteCreated: 'Reader note created',
+      readerNoteCreateFailed: 'Could not create the reader note; check the vault path in the Obsidian settings',
+      readerNoteLostConfirm: 'The note file is gone ({path}). Create it again?',
+      readerNoteDockTitle: 'Reader note',
+      readerNoteDockHint: 'Entries are appended to the end of the Obsidian note',
+      readerNoteDockResize: 'Drag to resize the panel',
+      readerNotePlaceholder: 'Write Markdown here; Ctrl+Enter to record…',
+      readerNoteWrite: 'Write',
+      readerNotePreview: 'Preview',
+      readerNotePreviewEmpty: 'Nothing yet — switch back to Write to start',
+      readerNoteWords: '{count} chars',
+      readerNoteSubmit: 'Record',
+      readerNoteSubmitting: 'Recording…',
+      readerNoteRecorded: 'Added to the note',
+      readerNoteRecordFailed: 'Could not record that entry, please try again',
+      readerNoteEmpty: 'Write something first',
+      readerNoteCancelConfirm: 'This entry is not recorded yet. Discard it?',
+      readerNoteShortcuts: 'Shortcuts',
+      readerNoteShortcutsTitle: 'Shortcuts (Cmd equals Ctrl on macOS)',
+      readerNoteShortcutRecord: 'Record',
+      readerNoteShortcutClose: 'Close panel',
+      readerNoteShortcutFontUp: 'Larger text',
+      readerNoteShortcutFontDown: 'Smaller text',
+      readerNoteShortcutFontReset: 'Reset text size',
+      readerNoteFontSize: 'Text size',
+      readerNoteResetFont: 'Reset text size',
+      readerNoteClose: 'Close the note panel',
+      readerNoteImage: 'Insert image',
+      readerNoteBold: 'Bold',
+      readerNoteItalic: 'Italic',
+      readerNoteLink: 'Link',
+      readerNoteH1: 'Heading 1',
+      readerNoteH2: 'Heading 2',
+      readerNoteH3: 'Heading 3',
+      readerNoteBullet: 'Bulleted list',
+      readerNoteOrdered: 'Numbered list',
+      readerNoteQuote: 'Quote',
+      readerNoteCode: 'Inline code',
+      readerNoteMath: 'Inline math',
+      readerNoteMathBlock: 'Display math',
+      readerNoteShortcutBold: 'Bold',
+      readerNoteShortcutItalic: 'Italic',
+      readerNoteShortcutLink: 'Link',
+      readerNoteShortcutHeading: 'Heading 1 / 2 / 3',
+      readerNoteShortcutBody: 'Body text',
+      readerNoteShortcutBullet: 'Bulleted list',
+      readerNoteShortcutOrdered: 'Numbered list',
+      readerNoteShortcutQuote: 'Quote',
+      readerNoteShortcutCode: 'Inline code',
+      readerNoteShortcutMath: 'Inline math',
+      readerNoteShortcutMathBlock: 'Display math',
+      readerNoteShortcutImage: 'Insert image',
+      readerNoteImageUploading: 'Uploading the image…',
+      readerNoteImageFailed: 'Could not upload the image, please try again',
+      readerNoteImageTooLarge: 'The image must be under 8 MB',
+      readerNoteImageType: 'Only PNG or JPEG images are supported',
+      readerNoteDraftRestored: 'Restored the unsubmitted draft',
+      readerNoteOrganize: 'Tidy note',
+      readerNoteOrganizing: 'Tidying the note…',
+      readerNoteOrganizeDone: 'Fixed {typos} typos, merged {merges} duplicates, cleaned up {formatting} formatting issues',
+      readerNoteOrganizeNoChange: 'The note was already tidy; nothing changed',
+      readerNoteOrganizeFailed: 'Could not tidy the note, please try again',
+      readerNoteOrganizeConflict: 'The note changed elsewhere; reopen the panel and tidy again',
+      readerNoteOrganizeTooLong: 'The note is too long ({chars} chars) for one tidy pass; this run was skipped',
+      readerNoteOrganizeMissing: 'There is no reader note yet',
+      readerNoteQuestionsTitle: 'Possible mistakes',
+      readerNoteQuestionsSubtitle: 'Confirm each item before it changes the note',
+      readerNoteQuestionQuote: 'Source',
+      readerNoteQuestionProblem: 'Problem',
+      readerNoteQuestionAsk: 'Please confirm',
+      readerNoteQuestionPlaceholder: 'Add a note or answer…',
+      readerNoteQuestionDiscuss: 'Discuss with AI',
+      readerNoteQuestionDiscussing: 'Discussing…',
+      readerNoteQuestionAskInChat: 'Continue in the AI chat',
+      readerNoteQuestionApply: 'Apply the fix',
+      readerNoteQuestionDismiss: 'Keep the original',
+      readerNoteQuestionResolved: 'Fixed',
+      readerNoteQuestionDismissed: 'Original kept',
+      readerNoteQuestionFailed: 'Could not handle that item, please try again',
+      readerNoteQuestionsOpen: '{count} to confirm',
+      readerNoteQuestionsAllDone: 'Every possible mistake was handled',
+      readerNoteQuestionsEmpty: 'This pass found no possible mistakes',
+      readerNoteBadgeCount: '{count} to confirm',
+      readerNoteShowAllNotes: 'Show all notes',
+      readerNoteOnlyStandalone: 'Standalone notes only',
+      readerNoteStandalone: 'Standalone',
+      readerNoteBadgeSummary: 'Summary',
+      readerNoteBadgeNote: 'Note',
+      readerNoteOpenSummary: 'Open the summary',
+      readerNoteOpenReaderNote: 'Open the reader note',
+      readerNoteMissingSummary: 'No summary yet',
+      readerNoteMissingNote: 'No note yet',
+      readerNoteExpandRow: 'Show this paper’s summary and note',
+      readerNoteCollapseRow: 'Collapse',
+      readerNoteDeleteKeep: 'Record only',
+      readerNoteDeleteKeepDesc: 'The plugin’s page cache, annotations and Q&A are removed; the PDF, summary and reader note stay in Obsidian.',
+      readerNoteDeleteSummary: 'Also the summary',
+      readerNoteDeleteSummaryDesc: 'Also removes “{name} 总结.md” into the plugin backup folder, where it can be restored.',
+      readerNoteDeleteAll: 'Also the summary and note',
+      readerNoteDeleteAllDesc: 'Also removes “{name} 总结.md”, “{name} 笔记.md” and the _附件 images into the plugin backup folder, where they can be restored.',
+      readerNoteDeleteChoiceTitle: 'What should happen to the Obsidian files',
+      readerNoteDeleteBackup: 'Everything removed goes to the plugin backup folder first and can be restored.',
+      readerNoteHistory: 'History',
+      readerNoteHistoryTitle: 'Note version history',
+      readerNoteHistoryEmpty: 'No earlier versions yet',
+      readerNoteHistoryFailed: 'Could not load the version history',
+      readerNoteHistoryPreview: 'Preview this version',
+      readerNoteHistorySourceAppend: 'Entry',
+      readerNoteHistorySourceOrganize: 'Organize',
+      readerNoteHistorySourceResolve: 'Correction',
+      readerNoteHistorySourceRestore: 'Restore',
+      readerNoteHistorySourceManual: 'Manual save',
+      readerNoteLoadFailed: 'Could not read the note, please try again',
+      readerNoteUnreachable: 'Cannot reach the host service, please check and retry',
     }
     let t = (key) => zh[key] || key
+    // Cross-plugin layout service, bound in apply(). Fullscreen uses it to
+    // collapse the host sidebar for the duration of the mode.
+    let layoutService = null
 
 // #region markdown-core
 const MD_FENCE_RE = /^ {0,3}(`{3,}|~{3,})[ \t]*([^`]*)$/
@@ -1560,6 +1805,7 @@ function findFigurePlaceholders(source) {
       arrowUp: 'M12 19V5 M5 12l7-7 7 7',
       quote: 'M6 17h3l2-4V7H5v6h3z M16 17h3l2-4V7h-5v6h3z',
       expand: 'M8 3H5a2 2 0 0 0-2 2v3 M21 8V5a2 2 0 0 0-2-2h-3 M3 16v3a2 2 0 0 0 2 2h3 M16 21h3a2 2 0 0 0 2-2v-3',
+      collapse: 'M8 3v3a2 2 0 0 1-2 2H3 M21 8h-3a2 2 0 0 1-2-2V3 M3 16h3a2 2 0 0 1 2 2v3 M16 21v-3a2 2 0 0 1 2-2h3',
       check: 'M20 6L9 17l-5-5',
       refresh: 'M23 4v6h-6 M1 20v-6h6 M3.5 9a9 9 0 0 1 14.9-3.4L23 10 M1 14l4.6 4.4A9 9 0 0 0 20.5 15',
       list: 'M4 6h2 M4 12h2 M4 18h2 M9 6h11 M9 12h11 M9 18h11',
@@ -1605,6 +1851,79 @@ function findFigurePlaceholders(source) {
           strokeLinejoin: 'round',
         }),
         h('path', { d: 'M32 20v28', stroke: 'currentColor', strokeWidth: 3.2, opacity: 0.5 }),
+      )
+    }
+
+    // ── fullscreen ────────────────────────────────────────────────────────
+    // The reader lives inside the Harness main column. Fullscreening the page
+    // root (instead of this subtree) keeps the host's wallpaper and overlay
+    // widgets, notably the weather pill, on screen; the reader still gets the
+    // whole width because the sidebar is collapsed for the mode and CSS zeroes
+    // the reserved Windows caption strip. These helpers stay at module scope so
+    // they can be tested without a DOM and so the same fallback serves
+    // Safari/Electron spellings.
+    function fullscreenElement() {
+      if (typeof document === 'undefined') return null
+      return document.fullscreenElement || document.webkitFullscreenElement || null
+    }
+
+    // The layout frame carries data-sidebar-collapsed while the host sidebar is
+    // closed. Reading that marker lets the mode collapse the sidebar only when
+    // it is actually open, and restore only what it changed. null means this is
+    // not the Harness shell (or the shell is not mounted), so leave it alone.
+    function hostLayoutFrame() {
+      if (typeof document === 'undefined') return null
+      const overlay = document.querySelector('[data-shell-overlay]')
+      return overlay ? overlay.parentElement : null
+    }
+
+    function hostSidebarCollapsed() {
+      const frame = hostLayoutFrame()
+      return frame ? frame.hasAttribute('data-sidebar-collapsed') : null
+    }
+
+    function enterFullscreen(node) {
+      if (!node) return Promise.resolve(false)
+      const request = node.requestFullscreen || node.webkitRequestFullscreen
+      if (typeof request !== 'function') return Promise.resolve(false)
+      try {
+        return Promise.resolve(request.call(node)).then(
+          () => true,
+          () => false,
+        )
+      } catch {
+        return Promise.resolve(false)
+      }
+    }
+
+    function exitFullscreen() {
+      if (typeof document === 'undefined') return Promise.resolve(false)
+      const exit = document.exitFullscreen || document.webkitExitFullscreen
+      if (typeof exit !== 'function') return Promise.resolve(false)
+      try {
+        return Promise.resolve(exit.call(document)).then(
+          () => true,
+          () => false,
+        )
+      } catch {
+        return Promise.resolve(false)
+      }
+    }
+
+    function FullscreenButton({ active, onClick }) {
+      const label = active ? t('exitFullscreen') : t('fullscreen')
+      return h(
+        'button',
+        {
+          type: 'button',
+          className: `lr-tool lr-fullscreen-tool${active ? ' active' : ''}`,
+          onClick,
+          title: label,
+          'aria-label': label,
+          'aria-pressed': active ? 'true' : 'false',
+        },
+        h(Icon, { name: active ? 'collapse' : 'expand', size: 14 }),
+        h('span', null, label),
       )
     }
 
@@ -1938,7 +2257,7 @@ function findFigurePlaceholders(source) {
       return h('span', { className: 'lr-spinner', style: { width: size, height: size }, 'aria-hidden': true })
     }
 
-    function Modal({ title, subtitle, onClose, children, wide = false }) {
+    function Modal({ title, subtitle, onClose, children, wide = false, elevated = false }) {
       const closeRef = useRef(null)
       useEffect(() => {
         const onKey = (event) => {
@@ -1957,7 +2276,7 @@ function findFigurePlaceholders(source) {
       return h(
         'div',
         {
-          className: 'lr-modal-backdrop',
+          className: `lr-modal-backdrop${elevated ? ' elevated' : ''}`,
           onMouseDown: (event) => {
             if (event.target === event.currentTarget) onClose?.()
           },
@@ -2745,8 +3064,13 @@ function findFigurePlaceholders(source) {
       const [renaming, setRenaming] = useState(false)
       const [deleteTarget, setDeleteTarget] = useState(null)
       const [deleteNotesToo, setDeleteNotesToo] = useState(false)
+      // 三选一 delete (spec §12.3): keep the vault trio, summary only, or all.
+      const [deleteVaultFiles, setDeleteVaultFiles] = useState('keep')
       const [deleteError, setDeleteError] = useState('')
       const [deleting, setDeleting] = useState(false)
+      // PDF rows collapse by default; the expanded set holds the open ones.
+      const [expandedPdf, setExpandedPdf] = useState(null)
+      const [showAllNotes, setShowAllNotes] = useState(false)
 
       useEffect(() => {
         if (!data) return
@@ -2777,6 +3101,10 @@ function findFigurePlaceholders(source) {
       }
       const visiblePdfs = pdfs.filter(matches)
       const visibleNotes = notes.filter(matches)
+      // 「笔记」tab: standalone notes only by default; the toggle restores the
+      // flat list of everything (spec §14.8).
+      const standaloneNotes = visibleNotes.filter(isStandaloneNote)
+      const listedNotes = showAllNotes ? visibleNotes : standaloneNotes
       const folderLabel = activeFolder || t('allItems')
 
       function statusText(item) {
@@ -2879,6 +3207,38 @@ function findFigurePlaceholders(source) {
         return []
       }
 
+      // 三件套 (spec §12.4): the server reports the two companions explicitly.
+      // Older payloads only carry `noteRel`, so keep that as a hint rather than
+      // guessing from note titles.
+      function summaryOf(item) {
+        if (!item) return ''
+        if (item.summaryRel) return item.summaryRel
+        const notes = relatedNotesOf(item)
+        const match = notes.find((note) => note.isSummary)
+        return match ? match.rel : ''
+      }
+
+      function readerNoteOf(item) {
+        if (!item) return ''
+        if (item.readerNoteRel) return item.readerNoteRel
+        const notes = relatedNotesOf(item)
+        const match = notes.find(
+          (note) => note.noteRole === 'reader-note' || (typeof note.title === 'string' && /阅读笔记$/.test(note.title)),
+        )
+        return match ? match.rel : ''
+      }
+
+      // 「笔记」tab default view: only notes that belong to no paper (spec §14.8).
+      function isStandaloneNote(note) {
+        if (!note) return false
+        if (note.paperRel || note.paperId) return false
+        if (note.isSummary) return false
+        if (note.noteRole === 'reader-note') return false
+        const title = String(note.title || '')
+        if (/(?:总结|笔记)$/.test(title)) return false
+        return true
+      }
+
       function openRename(folder) {
         setRenameTarget(folder)
         setRenameValue(folder.name || '')
@@ -2910,6 +3270,7 @@ function findFigurePlaceholders(source) {
       function requestDelete(target) {
         setDeleteTarget(target)
         setDeleteNotesToo(false)
+        setDeleteVaultFiles('keep')
         setDeleteError('')
       }
 
@@ -2929,7 +3290,12 @@ function findFigurePlaceholders(source) {
           if (deleteTarget.kind === 'cache') {
             await onDeleteCache(deleteTarget.item)
           } else {
-            await onDeleteEntry(deleteTarget, { deleteNotes: deleteNotesToo })
+            // `vaultFiles` is the spec §12.3三选一; `deleteNotes` stays for the
+            // older host that only understands the boolean.
+            await onDeleteEntry(deleteTarget, {
+              vaultFiles: deleteTarget.kind === 'pdf' ? deleteVaultFiles : 'keep',
+              deleteNotes: deleteTarget.kind === 'pdf' ? deleteVaultFiles === 'all' : deleteNotesToo,
+            })
           }
           if (
             deleteTarget.kind === 'folder' &&
@@ -3352,7 +3718,10 @@ function findFigurePlaceholders(source) {
                             statusText(item),
                           ),
                           item.hasSummary
-                            ? h('span', { className: 'lr-summary-pill' }, t('summary'))
+                            ? h('span', { className: 'lr-summary-pill' }, t('readerNoteBadgeSummary'))
+                            : null,
+                          readerNoteOf(item)
+                            ? h('span', { className: 'lr-reader-note-pill' }, t('readerNoteBadgeNote'))
                             : null,
                           h(
                             'div',
@@ -3407,6 +3776,49 @@ function findFigurePlaceholders(source) {
                               h('span', null, relBase(item.noteRel).replace(/\.md$/i, '')),
                             )
                           : null,
+                        // Expand/collapse reveals the 三件套 actions (spec §12.4).
+                        h(
+                          'button',
+                          {
+                            type: 'button',
+                            className: `lr-pdf-expand${expandedPdf === item.rel ? ' open' : ''}`,
+                            'aria-expanded': expandedPdf === item.rel,
+                            title: expandedPdf === item.rel ? t('readerNoteCollapseRow') : t('readerNoteExpandRow'),
+                            onClick: () => setExpandedPdf(expandedPdf === item.rel ? null : item.rel),
+                          },
+                          h(Icon, { name: expandedPdf === item.rel ? 'collapse' : 'expand', size: 12 }),
+                          expandedPdf === item.rel ? t('readerNoteCollapseRow') : t('readerNoteExpandRow'),
+                        ),
+                        expandedPdf === item.rel
+                          ? h(
+                              'div',
+                              { className: 'lr-pdf-trio' },
+                              h(
+                                'button',
+                                {
+                                  type: 'button',
+                                  className: 'lr-btn small',
+                                  disabled: !summaryOf(item),
+                                  title: summaryOf(item) || t('readerNoteMissingSummary'),
+                                  onClick: () => summaryOf(item) && onOpenNote(summaryOf(item)),
+                                },
+                                h(Icon, { name: 'sparkle', size: 12 }),
+                                summaryOf(item) ? t('readerNoteOpenSummary') : t('readerNoteMissingSummary'),
+                              ),
+                              h(
+                                'button',
+                                {
+                                  type: 'button',
+                                  className: 'lr-btn small',
+                                  disabled: !readerNoteOf(item),
+                                  title: readerNoteOf(item) || t('readerNoteMissingNote'),
+                                  onClick: () => readerNoteOf(item) && onOpenNote(readerNoteOf(item)),
+                                },
+                                h(Icon, { name: 'note', size: 12 }),
+                                readerNoteOf(item) ? t('readerNoteOpenReaderNote') : t('readerNoteMissingNote'),
+                              ),
+                            )
+                          : null,
                         h(
                           'div',
                           { className: 'lr-pdf-footer' },
@@ -3447,7 +3859,19 @@ function findFigurePlaceholders(source) {
                 : h(
                     'div',
                     { className: 'lr-note-list' },
-                    visibleNotes.map((item) =>
+                    // 「显示全部笔记」(spec §14.8): the default view hides the
+                    // notes already reachable from a PDF row.
+                    h(
+                      'label',
+                      { className: 'lr-note-scope' },
+                      h('input', {
+                        type: 'checkbox',
+                        checked: showAllNotes,
+                        onChange: (event) => setShowAllNotes(event.target.checked),
+                      }),
+                      h('span', null, showAllNotes ? t('readerNoteOnlyStandalone') : t('readerNoteShowAllNotes')),
+                    ),
+                    listedNotes.map((item) =>
                       h(
                         'article',
                         {
@@ -3463,7 +3887,15 @@ function findFigurePlaceholders(source) {
                           h('div', { className: 'lr-note-title-row' },
                             h(Icon, { name: 'note', size: 15 }),
                             h('div', { className: 'lr-note-title' }, item.title),
-                            item.isSummary ? h('span', { className: 'lr-summary-pill' }, t('summary')) : null,
+                            item.isSummary
+                              ? h('span', { className: 'lr-summary-pill' }, t('readerNoteBadgeSummary'))
+                              : null,
+                            !item.isSummary && !isStandaloneNote(item)
+                              ? h('span', { className: 'lr-reader-note-pill' }, t('readerNoteBadgeNote'))
+                              : null,
+                            showAllNotes && isStandaloneNote(item)
+                              ? h('span', { className: 'lr-standalone-pill' }, t('readerNoteStandalone'))
+                              : null,
                           ),
                           h('div', { className: 'lr-note-path' }, item.rel),
                           item.tags?.length
@@ -3508,7 +3940,7 @@ function findFigurePlaceholders(source) {
                         ),
                       ),
                     ),
-                    visibleNotes.length === 0
+                    listedNotes.length === 0
                       ? h(
                           'div',
                           { className: 'lr-library-empty' },
@@ -3859,22 +4291,50 @@ function findFigurePlaceholders(source) {
                             ),
                           )
                         : h('div', { className: 'lr-delete-hint' }, t('noRelatedNotes')),
-                      deleteRelatedNotes.length > 0
-                        ? h(
-                            'label',
-                            { className: 'lr-check lr-related-toggle' },
-                            h('input', {
-                              type: 'checkbox',
-                              checked: deleteNotesToo,
-                              onChange: (event) => setDeleteNotesToo(event.target.checked),
-                            }),
-                            h('span', null, t('deleteNotesToggle')),
-                          )
-                        : null,
-                      deleteRelatedNotes.length > 0
-                        ? h('div', { className: 'lr-delete-hint' }, t('relatedNotesHint'))
-                        : null,
                     )
+                  : null,
+                // 三选一 (spec §12.3): every option says whether the files stay.
+                deleteTarget.kind === 'pdf'
+                  ? h(
+                      'div',
+                      { className: 'lr-delete-choice' },
+                      h('div', { className: 'lr-delete-choice-title' }, t('readerNoteDeleteChoiceTitle')),
+                      ...[
+                        ['keep', 'readerNoteDeleteKeep', 'readerNoteDeleteKeepDesc'],
+                        ['summary', 'readerNoteDeleteSummary', 'readerNoteDeleteSummaryDesc'],
+                        ['all', 'readerNoteDeleteAll', 'readerNoteDeleteAllDesc'],
+                      ].map(([value, label, description]) =>
+                        h(
+                          'label',
+                          {
+                            className: `lr-delete-option${deleteVaultFiles === value ? ' checked' : ''}`,
+                            key: value,
+                          },
+                          h('input', {
+                            type: 'radio',
+                            name: 'lr-delete-vault-files',
+                            value,
+                            checked: deleteVaultFiles === value,
+                            onChange: () => setDeleteVaultFiles(value),
+                          }),
+                          h(
+                            'span',
+                            { className: 'lr-delete-option-body' },
+                            h('span', { className: 'lr-delete-option-label' }, t(label)),
+                            h(
+                              'span',
+                              { className: 'lr-delete-option-desc' },
+                              fillTemplate(t(description), {
+                                name: deleteItem?.stem || deleteItem?.fileName || '',
+                              }),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  : null,
+                deleteTarget.kind === 'pdf'
+                  ? h('div', { className: 'lr-delete-hint' }, t('readerNoteDeleteBackup'))
                   : null,
                 deleteTarget.kind === 'cache'
                   ? null
@@ -4550,6 +5010,655 @@ function findFigurePlaceholders(source) {
       } catch {
         // ignore storage failures
       }
+    }
+
+
+
+    // ── Reader note editing helpers (docs/reader-note-spec.md §7.3–§7.4) ────
+    // Everything here is pure: no DOM, no fetch, no React state. The dock and
+    // its tests both drive the same functions, so a shortcut cannot behave
+    // differently from the toolbar button that shares its command.
+
+    const READER_NOTE_DOCK_KEY = 'dsh.literature.noteDock.v1'
+    const READER_NOTE_DOCK_MIN = 160
+    const READER_NOTE_DOCK_DEFAULT = 260
+    const READER_NOTE_FONT_MIN = 85
+    const READER_NOTE_FONT_MAX = 180
+    const READER_NOTE_DRAFT_LIMIT = 200 * 1024
+    const READER_NOTE_DRAFT_DEBOUNCE = 400
+    // One source of truth for the responsive switch: `@media(max-width:860px)`
+    // in CSS must stay equal to this number (spec §14.1).
+    const READER_NOTE_NARROW = 860
+
+    function readerNoteDockHeight() {
+      return storedNumber(READER_NOTE_DOCK_KEY, READER_NOTE_DOCK_DEFAULT, READER_NOTE_DOCK_MIN, 100000)
+    }
+
+    function storeReaderNoteDockHeight(value) {
+      const number = Number(value)
+      if (!Number.isFinite(number)) return
+      const clamped = Math.max(READER_NOTE_DOCK_MIN, Math.round(number))
+      try {
+        localStorage.setItem(READER_NOTE_DOCK_KEY, String(clamped))
+      } catch {
+        // a full quota must not break the drag
+      }
+    }
+
+    // Text size (spec §7.2): 85%–180%, steps of 5, so every stop is reachable
+    // from both the keyboard and the ± buttons.
+    function clampReaderNoteFont(value) {
+      const number = Number(value)
+      if (!Number.isFinite(number)) return 100
+      return Math.max(READER_NOTE_FONT_MIN, Math.min(READER_NOTE_FONT_MAX, Math.round(number)))
+    }
+
+    function stepReaderNoteFont(value, direction) {
+      return clampReaderNoteFont(clampReaderNoteFont(value) + (direction < 0 ? -5 : 5))
+    }
+
+    /** `t(key)` with `{placeholder}` substitution (`{count}`, `{path}`, …). */
+    function readerNoteText(key, values) {
+      let output = t(key)
+      if (!values) return output
+      for (const [name, value] of Object.entries(values)) {
+        output = output.split(`{${name}}`).join(String(value))
+      }
+      return output
+    }
+
+    /**
+     * Draft per paper, kept apart from the summary editor's draft so a note
+     * draft can never leak into the summary editor (and vice versa).
+     */
+    function readerNoteDraftKey(paperId) {
+      return `dsh.literature.noteDraft.${paperId}.v1`
+    }
+
+    function readReaderNoteDraft(paperId) {
+      if (!paperId) return ''
+      try {
+        const raw = localStorage.getItem(readerNoteDraftKey(paperId))
+        return typeof raw === 'string' ? raw : ''
+      } catch {
+        return ''
+      }
+    }
+
+    function writeReaderNoteDraft(paperId, markdown) {
+      if (!paperId) return
+      const text = typeof markdown === 'string' ? markdown : ''
+      try {
+        if (!text.trim()) {
+          localStorage.removeItem(readerNoteDraftKey(paperId))
+          return
+        }
+        // Keep the last editable slice rather than throwing the draft away.
+        const slice = text.length > READER_NOTE_DRAFT_LIMIT ? text.slice(0, READER_NOTE_DRAFT_LIMIT) : text
+        localStorage.setItem(readerNoteDraftKey(paperId), slice)
+      } catch {
+        // quota failures are harmless: the in-memory edit still works
+      }
+    }
+
+    function clearReaderNoteDraft(paperId) {
+      if (!paperId) return
+      try {
+        localStorage.removeItem(readerNoteDraftKey(paperId))
+      } catch {
+        // ignore storage failures
+      }
+    }
+
+    // Wrap a selection in `marker` on both sides, or unwrap it when the
+    // selection (or the text just outside it) already carries that marker.
+    function readerNoteWrap(text, start, end, marker) {
+      const value = String(text || '')
+      const from = Math.max(0, Math.min(value.length, Number(start) || 0))
+      const to = Math.max(from, Math.min(value.length, Number(end) || 0))
+      const inner = value.slice(from, to)
+      const size = marker.length
+      const openAt = from - size
+      // Selection includes the markers: drop them.
+      if (inner.length >= size * 2 && inner.startsWith(marker) && inner.endsWith(marker)) {
+        const stripped = inner.slice(size, inner.length - size)
+        return {
+          text: value.slice(0, from) + stripped + value.slice(to),
+          start: from,
+          end: from + stripped.length,
+        }
+      }
+      // Markers sit just outside the selection: drop them too.
+      if (openAt >= 0 && value.slice(openAt, from) === marker && value.slice(to, to + size) === marker) {
+        return {
+          text: value.slice(0, openAt) + inner + value.slice(to + size),
+          start: openAt,
+          end: openAt + inner.length,
+        }
+      }
+      return {
+        text: value.slice(0, from) + marker + inner + marker + value.slice(to),
+        start: from + size,
+        end: from + size + inner.length,
+      }
+    }
+
+    // Line-prefix commands (headings, lists, quotes) toggle: applying the same
+    // prefix twice removes it, and 恢复正文 strips every recognised prefix.
+    const READER_NOTE_LINE_PREFIXES = [
+      { command: 'h1', prefix: '# ' },
+      { command: 'h2', prefix: '## ' },
+      { command: 'h3', prefix: '### ' },
+      { command: 'ul', prefix: '- ' },
+      { command: 'ol', prefix: '1. ' },
+      { command: 'quote', prefix: '> ' },
+    ]
+    const READER_NOTE_ANY_PREFIX_RE = /^(?:#{1,6} |> |- |\d{1,9}[.)] )/
+
+    function readerNoteLinePrefix(text, start, end, command) {
+      const value = String(text || '')
+      const from = Math.max(0, Math.min(value.length, Number(start) || 0))
+      const to = Math.max(from, Math.min(value.length, Number(end) || 0))
+      const lineStart = value.lastIndexOf('\n', from - 1) + 1
+      // `end` may sit exactly on a newline; stay on the previous line then.
+      const scanFrom = to > from && value[to - 1] === '\n' ? to - 1 : to
+      const nextBreak = value.indexOf('\n', scanFrom)
+      const lineEnd = nextBreak === -1 ? value.length : nextBreak
+      const block = value.slice(lineStart, lineEnd)
+      const lines = block.split('\n')
+      const target = READER_NOTE_LINE_PREFIXES.find((item) => item.command === command)
+      const stripAny = command === 'body'
+      let delta = 0
+      let firstStart = 0
+      let firstEnd = 0
+      let seen = 0
+      const next = lines.map((line) => {
+        const prefix = stripAny
+          ? (READER_NOTE_ANY_PREFIX_RE.exec(line) || [''])[0]
+          : target && line.startsWith(target.prefix) ? target.prefix : ''
+        const content = prefix ? line.slice(prefix.length) : line
+        const applied = stripAny || !target ? '' : prefix ? '' : target.prefix
+        const body = prefix ? content : line
+        const out = `${applied}${body}`
+        if (seen === 0) {
+          firstStart = delta
+          firstEnd = delta + out.length
+        }
+        seen += 1
+        delta += out.length + 1
+        return out
+      })
+      const replaced = next.join('\n')
+      return {
+        text: value.slice(0, lineStart) + replaced + value.slice(lineEnd),
+        start: lineStart + firstStart,
+        end: lineStart + firstEnd,
+      }
+    }
+
+    function readerNoteInsertLink(text, start, end) {
+      const value = String(text || '')
+      const from = Math.max(0, Math.min(value.length, Number(start) || 0))
+      const to = Math.max(from, Math.min(value.length, Number(end) || 0))
+      const inner = value.slice(from, to)
+      // A selection that is already a link unwraps back to its label.
+      const existing = /^\[([^\]]*)\]\([^)]*\)$/.exec(inner)
+      if (existing) {
+        return { text: value.slice(0, from) + existing[1] + value.slice(to), start: from, end: from + existing[1].length }
+      }
+      const snippet = `[${inner}]()`
+      // With a selection the label is done, so the caret belongs in the URL
+      // slot; with none it belongs between the brackets, ready for the label.
+      const caret = inner ? from + 1 + inner.length + 2 : from + 1
+      return { text: value.slice(0, from) + snippet + value.slice(to), start: caret, end: caret }
+    }
+
+    /**
+     * Apply one editing command to `text` and return the new value plus the
+     * selection the textarea should carry afterwards.
+     * @param {{text:string,start:number,end:number,command:string}} input
+     * @returns {{text:string,start:number,end:number}}
+     */
+    function applyMarkdownCommand(input) {
+      const value = typeof input?.text === 'string' ? input.text : ''
+      const start = Number.isFinite(input?.start) ? input.start : 0
+      const end = Number.isFinite(input?.end) ? input.end : start
+      const command = typeof input?.command === 'string' ? input.command : ''
+      switch (command) {
+        case 'bold':
+          return readerNoteWrap(value, start, end, '**')
+        case 'italic':
+          return readerNoteWrap(value, start, end, '*')
+        case 'code':
+          return readerNoteWrap(value, start, end, '`')
+        case 'math':
+          return readerNoteWrap(value, start, end, '$')
+        case 'mathBlock':
+          return readerNoteWrap(value, start, end, '$$')
+        case 'link':
+          return readerNoteInsertLink(value, start, end)
+        case 'h1':
+        case 'h2':
+        case 'h3':
+        case 'ul':
+        case 'ol':
+        case 'quote':
+        case 'body':
+          return readerNoteLinePrefix(value, start, end, command)
+        default:
+          return { text: value, start, end }
+      }
+    }
+
+    /**
+     * One keydown -> one command. Returns null when the event is not ours, so
+     * the textarea keeps its native behaviour (typing, plain Enter, …).
+     * macOS reports `metaKey`; the spec makes Cmd equivalent to Ctrl.
+     * @returns {{command:string}|{action:string}|null}
+     */
+    function readerNoteCommandForKey(event) {
+      if (!event || event.altKey) return null
+      const mod = event.ctrlKey || event.metaKey
+      const key = typeof event.key === 'string' ? event.key : ''
+      if (!mod) return event.key === 'Escape' ? { action: 'close' } : null
+      if (event.key === 'Enter') return { action: 'submit' }
+      const lower = key.toLowerCase()
+      if (event.shiftKey) {
+        if (lower === '8') return { command: 'ul' }
+        if (lower === '7') return { command: 'ol' }
+        if (lower === 'q') return { command: 'quote' }
+        // Ctrl+Shift+` — the backtick key reports different codes per layout.
+        if (key === '`' || key === '~' || event.code === 'Backquote') return { command: 'code' }
+        if (lower === 'm') return { command: 'mathBlock' }
+        if (lower === 'i') return { command: 'image' }
+        if (key === '0') return { action: 'fontReset' }
+        if (key === '=' || key === '+' || event.code === 'Equal') return { action: 'fontUp' }
+        if (key === '-' || key === '_' || event.code === 'Minus') return { action: 'fontDown' }
+        return null
+      }
+      if (lower === 'b') return { command: 'bold' }
+      if (lower === 'i') return { command: 'italic' }
+      if (lower === 'k') return { command: 'link' }
+      if (lower === 'm') return { command: 'math' }
+      if (key === '1') return { command: 'h1' }
+      if (key === '2') return { command: 'h2' }
+      if (key === '3') return { command: 'h3' }
+      if (key === '0') return { command: 'body' }
+      // Ctrl+= / Ctrl+- zoom the text size, not the browser (spec §7.3).
+      if (key === '=' || key === '+' || event.code === 'Equal') return { action: 'fontUp' }
+      if (key === '-' || key === '_' || event.code === 'Minus') return { action: 'fontDown' }
+      return null
+    }
+
+    // ── Math rendering (spec §7.4): offline, no library ─────────────────────
+    const MATH_GREEK = {
+      alpha: 'α', beta: 'β', gamma: 'γ', delta: 'δ', epsilon: 'ε', zeta: 'ζ', eta: 'η', theta: 'θ',
+      iota: 'ι', kappa: 'κ', lambda: 'λ', mu: 'μ', nu: 'ν', xi: 'ξ', omicron: 'ο', pi: 'π', rho: 'ρ',
+      sigma: 'σ', tau: 'τ', upsilon: 'υ', phi: 'φ', chi: 'χ', psi: 'ψ', omega: 'ω',
+      Gamma: 'Γ', Delta: 'Δ', Theta: 'Θ', Lambda: 'Λ', Xi: 'Ξ', Pi: 'Π', Sigma: 'Σ', Upsilon: 'Υ',
+      Phi: 'Φ', Psi: 'Ψ', Omega: 'Ω', Epsilon: 'Ε', Zeta: 'Ζ', Eta: 'Η', Iota: 'Ι', Kappa: 'Κ',
+      Mu: 'Μ', Nu: 'Ν', Omicron: 'Ο', Rho: 'Ρ', Tau: 'Τ', Chi: 'Χ', Beta: 'Β',
+    }
+    const MATH_SYMBOLS = {
+      sum: '∑', prod: '∏', int: '∫', oint: '∮', infin: '∞', infty: '∞', partial: '∂', nabla: '∇',
+      times: '×', div: '÷', pm: '±', mp: '∓', cdot: '·', le: '≤', leq: '≤', ge: '≥', geq: '≥',
+      ne: '≠', neq: '≠', approx: '≈', equiv: '≡', sim: '∼', propto: '∝', to: '→', rightarrow: '→',
+      Rightarrow: '⇒', leftarrow: '←', Leftarrow: '⇐', leftrightarrow: '↔', Leftrightarrow: '⇔',
+      mapsto: '↦', in: '∈', notin: '∉', subset: '⊂', supset: '⊃', cup: '∪', cap: '∩',
+      forall: '∀', exists: '∃', emptyset: '∅', angle: '∠', degree: '°', prime: '′',
+      ldots: '…', cdots: '⋯', dots: '…', therefore: '∴', because: '∵',
+      ' ': ' ', ',': '\u2009', ';': '\u2005', ':': '\u2005', '!': '',
+      quad: '\u2003', qquad: '\u2003\u2003',
+    }
+    const MATH_FUNCTIONS = new Set([
+      'sin', 'cos', 'tan', 'cot', 'sec', 'csc', 'arcsin', 'arccos', 'arctan', 'sinh', 'cosh', 'tanh',
+      'log', 'ln', 'lg', 'exp', 'lim', 'max', 'min', 'sup', 'inf', 'det', 'dim', 'ker', 'deg', 'gcd',
+      'arg', 'mod', 'bmod',
+    ])
+
+    /**
+     * Split `source` into tokens (`\cmd`, `{`, `}`, `_`, `^`, `&`, chars).
+     * Unknown commands stay as a `cmd` token; the renderer prints them
+     * verbatim in monospace instead of swallowing them.
+     */
+    function mathTokens(source) {
+      const text = typeof source === 'string' ? source : ''
+      const tokens = []
+      let index = 0
+      while (index < text.length) {
+        const char = text[index]
+        if (char === '\\') {
+          let end = index + 1
+          if (end < text.length && /[A-Za-z]/.test(text[end])) {
+            while (end < text.length && /[A-Za-z]/.test(text[end])) end += 1
+            tokens.push({ type: 'cmd', value: text.slice(index + 1, end) })
+            // TeX swallows the whitespace that terminates a control word, so
+            // `\quad x` is one space and `\alpha \beta` is two letters.
+            while (end < text.length && /\s/.test(text[end])) end += 1
+            index = end
+            continue
+          }
+          // Control symbol such as `\,`, `\;`, `\{`, `\\`.
+          tokens.push({ type: 'cmd', value: text.slice(index + 1, index + 2) })
+          index += 2
+          continue
+        }
+        if (char === '{' || char === '}' || char === '_' || char === '^' || char === '&') {
+          tokens.push({ type: char })
+          index += 1
+          continue
+        }
+        if (/\s/.test(char)) {
+          // Whitespace is significant only as a word break in text mode.
+          let end = index
+          while (end < text.length && /\s/.test(text[end])) end += 1
+          tokens.push({ type: 'space', value: text.slice(index, end) })
+          index = end
+          continue
+        }
+        tokens.push({ type: 'char', value: char })
+        index += 1
+      }
+      return tokens
+    }
+
+    /**
+     * Turn a math fragment into a flat list of render nodes. The parser is a
+     * deliberately small recursive reader: scripts bind to the previous atom,
+     * `\frac`/`\sqrt`/`\text`/`\left` take braced groups, and everything else
+     * degrades to the raw command text.
+     */
+    function mathParse(source) {
+      const tokens = mathTokens(source)
+      let position = 0
+
+      const peek = () => tokens[position]
+      const next = () => tokens[position++]
+
+      function parseGroup() {
+        const token = peek()
+        if (!token) return []
+        if (token.type === '{') {
+          next()
+          const nodes = parseNodes(() => peek()?.type === '}')
+          if (peek()?.type === '}') next()
+          return nodes
+        }
+        if (token.type === 'cmd') {
+          next()
+          return [mathCommandNode(token.value, null)]
+        }
+        next()
+        return [mathAtomNode(token)]
+      }
+
+      function mathAtomNode(token) {
+        if (!token) return null
+        if (token.type === 'char') return { type: 'text', value: token.value }
+        if (token.type === 'space') return { type: 'text', value: ' ' }
+        if (token.type === '&') return { type: 'text', value: '\u2003' }
+        if (token.type === 'cmd') return mathCommandNode(token.value, null)
+        return null
+      }
+
+      function mathCommandNode(name, argument) {
+        const greek = MATH_GREEK[name]
+        if (greek !== undefined) return { type: 'text', value: greek }
+        if (Object.prototype.hasOwnProperty.call(MATH_SYMBOLS, name)) {
+          return { type: 'text', value: MATH_SYMBOLS[name] }
+        }
+        if (MATH_FUNCTIONS.has(name)) return { type: 'func', value: name }
+        if (name === 'frac' || name === 'dfrac' || name === 'tfrac') {
+          const numerator = parseGroup()
+          const denominator = parseGroup()
+          return { type: 'frac', numerator, denominator }
+        }
+        if (name === 'sqrt') {
+          // Optional index: \sqrt[3]{x}
+          let index = null
+          if (peek()?.type === 'char' && peek().value === '[') {
+            next()
+            const inner = []
+            while (peek() && !(peek().type === 'char' && peek().value === ']')) {
+              const token = next()
+              if (token.type === 'char') inner.push({ type: 'text', value: token.value })
+              else if (token.type === 'space') inner.push({ type: 'text', value: ' ' })
+              else inner.push(mathAtomNode(token))
+            }
+            if (peek()) next()
+            index = inner
+          }
+          return { type: 'sqrt', index, body: parseGroup() }
+        }
+        if (name === 'text' || name === 'mathrm' || name === 'operatorname' || name === 'textbf' || name === 'mbox') {
+          const body = parseGroup()
+          return { type: 'text-run', body }
+        }
+        if (name === 'left' || name === 'right') {
+          const token = next()
+          if (!token) return { type: 'text', value: '' }
+          if (token.type === 'cmd') {
+            const symbol = MATH_SYMBOLS[token.value] ?? MATH_SYMBOLS[token.value === 'vert' ? '|' : token.value]
+            return { type: 'text', value: symbol !== undefined ? symbol : `\\${token.value}` }
+          }
+          if (token.type === 'char') {
+            if (token.value === '.') return { type: 'text', value: '' }
+            return { type: 'text', value: token.value }
+          }
+          return { type: 'text', value: '' }
+        }
+        if (name === 'begin' || name === 'end') {
+          const body = parseGroup()
+          const groupName = body.map((node) => node.value || '').join('')
+          return { type: name === 'begin' ? 'env-begin' : 'env-end', name: groupName }
+        }
+        if (name === '\\') return { type: 'break' }
+        return { type: 'unknown', value: `\\${name}` }
+      }
+
+      function parseNodes(isEnd) {
+        const nodes = []
+        while (position < tokens.length) {
+          if (isEnd && isEnd()) break
+          const token = peek()
+          if (token.type === '_' || token.type === '^') {
+            next()
+            const script = parseGroup()
+            const base = nodes.length > 0 ? nodes.pop() : { type: 'text', value: '' }
+            const existing = base.type === 'script' ? base : null
+            const merged = existing || { type: 'script', base, sub: null, sup: null }
+            if (token.type === '_') merged.sub = script
+            else merged.sup = script
+            nodes.push(merged)
+            continue
+          }
+          if (token.type === '}') {
+            next()
+            continue
+          }
+          if (token.type === 'cmd') {
+            next()
+            nodes.push(mathCommandNode(token.value, null))
+            continue
+          }
+          next()
+          nodes.push(mathAtomNode(token))
+        }
+        return nodes
+      }
+
+      const nodes = parseNodes(null)
+      return nodes
+    }
+
+    // A math node tree -> React children. `key` prefixes every node so React
+    // never complains about a bare list.
+    function renderMathNodes(nodes, prefix) {
+      const out = []
+      const list = Array.isArray(nodes) ? nodes : []
+      list.forEach((node, index) => {
+        const key = `${prefix}-${index}`
+        if (!node) return
+        switch (node.type) {
+          case 'text':
+            out.push(node.value)
+            return
+          case 'func':
+            out.push(h('span', { key, className: 'lr-math-func' }, node.value))
+            return
+          case 'unknown':
+            // Never throw, never swallow: show the command as it was written.
+            out.push(h('code', { key, className: 'lr-math-unknown' }, node.value))
+            return
+          case 'break':
+            out.push(h('br', { key }))
+            return
+          case 'frac':
+            out.push(
+              h(
+                'span',
+                { key, className: 'lr-math-frac' },
+                h('span', { className: 'lr-math-num' }, ...renderMathNodes(node.numerator, `${key}-n`)),
+                h('span', { className: 'lr-math-den' }, ...renderMathNodes(node.denominator, `${key}-d`)),
+              ),
+            )
+            return
+          case 'sqrt':
+            out.push(
+              h(
+                'span',
+                { key, className: 'lr-math-sqrt' },
+                node.index
+                  ? h('span', { className: 'lr-math-sqrt-index' }, ...renderMathNodes(node.index, `${key}-i`))
+                  : null,
+                h('span', { className: 'lr-math-radical' }, '√'),
+                h('span', { className: 'lr-math-sqrt-body' }, ...renderMathNodes(node.body, `${key}-b`)),
+              ),
+            )
+            return
+          case 'script':
+            out.push(
+              h(
+                'span',
+                { key, className: 'lr-math-script' },
+                ...renderMathNodes([node.base], `${key}-b`),
+                node.sub ? h('sub', { className: 'lr-math-sub' }, ...renderMathNodes(node.sub, `${key}-s`)) : null,
+                node.sup ? h('sup', { className: 'lr-math-sup' }, ...renderMathNodes(node.sup, `${key}-p`)) : null,
+              ),
+            )
+            return
+          case 'text-run':
+            out.push(h('span', { key, className: 'lr-math-text' }, ...renderMathNodes(node.body, `${key}-t`)))
+            return
+          case 'env-begin':
+          case 'env-end':
+            // `\begin{aligned}` and friends only contribute structure; the
+            // display container already stacks the `\\` breaks.
+            return
+          default:
+            out.push(h('code', { key, className: 'lr-math-unknown' }, String(node.value || '')))
+        }
+      })
+      return out
+    }
+
+    /**
+     * Render `$…$`/`$$…$$` content as React nodes (spec §7.4).
+     * @param {string} source
+     * @param {{display?:boolean}} [options]
+     */
+    function renderMath(source, options) {
+      const display = Boolean(options?.display)
+      const text = typeof source === 'string' ? source : ''
+      // `\begin{aligned} … \\ … \end{aligned}` becomes stacked rows.
+      const rows = []
+      let parsed
+      try {
+        parsed = mathParse(text)
+      } catch {
+        parsed = [{ type: 'unknown', value: text }]
+      }
+      let current = []
+      for (const node of parsed) {
+        if (node && node.type === 'break') {
+          rows.push(current)
+          current = []
+        } else {
+          current.push(node)
+        }
+      }
+      rows.push(current)
+      const body = []
+      rows.forEach((row, index) => {
+        if (index > 0) body.push(h('br', { key: `math-br-${index}` }))
+        body.push(...renderMathNodes(row, `math-${index}`))
+      })
+      return h(
+        display ? 'div' : 'span',
+        { className: `lr-math ${display ? 'lr-math-display' : 'lr-math-inline'}` },
+        ...body,
+      )
+    }
+
+    /**
+     * Split one text run into plain text and `$…$` math segments. `$$…$$` is
+     * display maths and must stand on its own line. Returns `null` when the
+     * run has no maths at all, so callers can keep the plain string.
+     */
+    function splitMathSegments(text) {
+      const value = typeof text === 'string' ? text : ''
+      if (value.indexOf('$') === -1) return null
+      const out = []
+      let last = 0
+      let index = 0
+      while (index < value.length) {
+        const char = value[index]
+        if (char === '\\') {
+          index += 2
+          continue
+        }
+        if (char !== '$') {
+          index += 1
+          continue
+        }
+        const display = value[index + 1] === '$'
+        const marker = display ? '$$' : '$'
+        const open = index
+        let cursor = index + marker.length
+        let close = -1
+        while (cursor < value.length) {
+          const inner = value[cursor]
+          if (inner === '\\') {
+            cursor += 2
+            continue
+          }
+          if (inner === '$') {
+            if (display) {
+              if (value[cursor + 1] === '$') {
+                close = cursor
+                break
+              }
+              cursor += 1
+              continue
+            }
+            close = cursor
+            break
+          }
+          cursor += 1
+        }
+        if (close === -1) {
+          // Unbalanced: leave the rest as plain text.
+          break
+        }
+        const source = value.slice(open + marker.length, close)
+        if (open > last) out.push({ type: 'text', value: value.slice(last, open) })
+        out.push({ type: 'math', source, display })
+        index = close + marker.length
+        last = index
+      }
+      if (last < value.length) out.push({ type: 'text', value: value.slice(last) })
+      const hasMath = out.some((item) => item.type === 'math')
+      return hasMath ? out : null
     }
 
     // Plain range covered by a DOM selection inside the note document. The two
@@ -5655,8 +6764,24 @@ function findFigurePlaceholders(source) {
       )
     }
 
-    function NoteHistoryDrawer({ open, loading, versions, error, onClose, onPreview, onRestore, busy }) {
+    // Version list for a note file. Shared by the summary editor and the reader
+    // note panel: only the reason vocabulary and the empty text differ, so both
+    // pass their own `labelOf`/`emptyText` instead of duplicating the shell.
+    function NoteHistoryDrawer({ open, loading, versions, error, onClose, onPreview, onRestore, busy, labelOf, emptyText }) {
       if (!open) return null
+      const reasonOf =
+        typeof labelOf === 'function'
+          ? labelOf
+          : (item) =>
+              item.source === 'manual'
+                ? t('noteHistorySourceManual')
+                : item.source === 'revision'
+                  ? t('noteHistorySourceRevision')
+                  : item.source === 'restore'
+                    ? t('noteHistorySourceRestore')
+                    : item.source === 'summary' || item.source === 'auto'
+                      ? t('noteHistorySourceAuto')
+                      : t('noteHistorySourceUnknown')
       return h(
         'div',
         { className: 'lr-note-history-mask', onMouseDown: (event) => { if (event.target === event.currentTarget) onClose?.() } },
@@ -5682,19 +6807,10 @@ function findFigurePlaceholders(source) {
               : error
                 ? h('div', { className: 'lr-note-history-empty' }, error)
                 : versions.length === 0
-                  ? h('div', { className: 'lr-note-history-empty' }, t('noteHistoryEmpty'))
+                  ? h('div', { className: 'lr-note-history-empty' }, emptyText || t('noteHistoryEmpty'))
                   : versions.map((item) => {
                       const stamp = item.stamp || item.id || ''
-                      const label =
-                        item.source === 'manual'
-                          ? t('noteHistorySourceManual')
-                          : item.source === 'revision'
-                            ? t('noteHistorySourceRevision')
-                            : item.source === 'restore'
-                              ? t('noteHistorySourceRestore')
-                              : item.source === 'summary' || item.source === 'auto'
-                                ? t('noteHistorySourceAuto')
-                                : t('noteHistorySourceUnknown')
+                      const label = reasonOf(item)
                       return h(
                         'div',
                         { key: stamp, className: 'lr-note-history-row' },
@@ -6960,6 +8076,958 @@ function findFigurePlaceholders(source) {
       )
     }
 
+
+    // ── Reader note preview: Markdown + `$…$` / `$$…$$` (spec §7.4) ──────────
+
+    function readerNotePreviewInline(inline, prefix) {
+      const out = []
+      const runs = Array.isArray(inline) ? inline : []
+      runs.forEach((run, index) => {
+        if (!run) return
+        const key = `${prefix}-${index}`
+        const text = typeof run.text === 'string' ? run.text : ''
+        if (run.type === 'strong') {
+          out.push(h('strong', { key }, ...renderMathSegmentsInline(text, `${key}-s`)))
+          return
+        }
+        if (run.type === 'em') {
+          out.push(h('em', { key }, ...renderMathSegmentsInline(text, `${key}-e`)))
+          return
+        }
+        if (run.type === 'code') {
+          out.push(h('code', { key, className: 'lr-note-code' }, text))
+          return
+        }
+        if (run.type === 'link') {
+          out.push(
+            h(
+              'a',
+              {
+                key,
+                className: 'lr-note-link-inline',
+                href: run.href || '#',
+                target: '_blank',
+                rel: 'noreferrer',
+                onClick: (event) => event.preventDefault(),
+              },
+              ...renderMathSegmentsInline(text, `${key}-l`),
+            ),
+          )
+          return
+        }
+        out.push(...renderMathSegmentsInline(text, key))
+      })
+      return out
+    }
+
+    // `$…$` becomes an inline math node; `$$…$$` inside a text run still renders
+    // (it usually arrives as its own paragraph, handled below).
+    function renderMathSegmentsInline(text, prefix) {
+      const segments = splitMathSegments(text)
+      if (!segments) return [String(text || '')]
+      return segments.map((segment, index) => {
+        const key = `${prefix}-${index}`
+        if (segment.type === 'text') return segment.value
+        return h(
+          'span',
+          { key, className: `lr-math-holder${segment.display ? ' is-display' : ''}` },
+          renderMath(segment.source, { display: segment.display }),
+        )
+      })
+    }
+
+    // A paragraph that is nothing but `$$…$$` renders as centred display maths.
+    function readerNoteDisplayMath(block) {
+      const runs = Array.isArray(block.inline) ? block.inline : []
+      if (runs.length !== 1 || runs[0]?.type !== 'text') return null
+      const raw = String(runs[0].text || '').trim()
+      const match = /^\$\$([\s\S]+)\$\$$/.exec(raw)
+      return match ? match[1] : null
+    }
+
+    /**
+     * Render the reader-note preview. Deliberately separate from `MarkdownDoc`:
+     * the note preview needs maths, the summary document never does (spec §15.9).
+     */
+    function renderReaderNotePreview(markdown, paperId) {
+      const parsed = parseMarkdown(markdown || '')
+      const out = []
+      const blocks = Array.isArray(parsed.blocks) ? parsed.blocks : []
+      blocks.forEach((block, index) => {
+        if (!block) return
+        const key = `np-${index}`
+        if (block.type === 'heading') {
+          const level = Math.max(1, Math.min(4, Number(block.level) || 1))
+          out.push(
+            h(
+              `h${level}`,
+              { key, className: `lr-note-h lr-note-h${level}` },
+              ...readerNotePreviewInline(block.inline, key),
+            ),
+          )
+          return
+        }
+        if (block.type === 'paragraph') {
+          const math = readerNoteDisplayMath(block)
+          if (math !== null) {
+            out.push(h('div', { key, className: 'lr-note-math-block' }, renderMath(math, { display: true })))
+            return
+          }
+          out.push(h('p', { key, className: 'lr-note-p' }, ...readerNotePreviewInline(block.inline, key)))
+          return
+        }
+        if (block.type === 'list') {
+          const items = Array.isArray(block.items) ? block.items : []
+          out.push(
+            h(
+              block.ordered ? 'ol' : 'ul',
+              { key, className: 'lr-note-doc-list' },
+              items.map((item, itemIndex) =>
+                h(
+                  'li',
+                  { key: `${key}-${itemIndex}` },
+                  ...readerNotePreviewInline(item.inline, `${key}-${itemIndex}`),
+                ),
+              ),
+            ),
+          )
+          return
+        }
+        if (block.type === 'quote') {
+          out.push(h('blockquote', { key, className: 'lr-note-quote' }, ...renderReaderNoteQuote(block.blocks, key)))
+          return
+        }
+        if (block.type === 'code') {
+          out.push(h('pre', { key, className: 'lr-note-pre' }, h('code', null, String(block.text || ''))))
+          return
+        }
+        if (block.type === 'image') {
+          const src = resolveNoteFigureSrc(block.src, paperId)
+          out.push(
+            h(
+              'figure',
+              { key, className: 'lr-note-figure' },
+              src ? h('img', { src, alt: block.alt || '', loading: 'lazy' }) : null,
+              block.alt ? h('figcaption', null, block.alt) : null,
+            ),
+          )
+          return
+        }
+        if (block.type === 'table') {
+          const header = Array.isArray(block.header) ? block.header : []
+          const rows = Array.isArray(block.rows) ? block.rows : []
+          out.push(
+            h(
+              'div',
+              { key, className: 'lr-note-table-wrap' },
+              h(
+                'table',
+                { className: 'lr-note-table' },
+                h(
+                  'thead',
+                  null,
+                  h(
+                    'tr',
+                    null,
+                    header.map((cell, cellIndex) =>
+                      h(
+                        'th',
+                        { key: `${key}-h-${cellIndex}` },
+                        ...readerNotePreviewInline(cell, `${key}-h${cellIndex}`),
+                      ),
+                    ),
+                  ),
+                ),
+                h(
+                  'tbody',
+                  null,
+                  rows.map((row, rowIndex) =>
+                    h(
+                      'tr',
+                      { key: `${key}-r-${rowIndex}` },
+                      (row || []).map((cell, cellIndex) =>
+                        h(
+                          'td',
+                          { key: `${key}-r${rowIndex}-c${cellIndex}` },
+                          ...readerNotePreviewInline(cell, `${key}-r${rowIndex}c${cellIndex}`),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          )
+          return
+        }
+        if (block.type === 'hr') out.push(h('hr', { key, className: 'lr-note-hr' }))
+      })
+      return out
+    }
+
+    function renderReaderNoteQuote(blocks, prefix) {
+      const out = []
+      const list = Array.isArray(blocks) ? blocks : []
+      list.forEach((block, index) => {
+        if (!block || block.type !== 'paragraph') return
+        const key = `${prefix}-q${index}`
+        out.push(h('p', { key, className: 'lr-note-p' }, ...readerNotePreviewInline(block.inline, key)))
+      })
+      return out
+    }
+
+    // ── Record panel (spec §7.2) ────────────────────────────────────────────
+
+    // Snapshot reasons written by the host (spec §3.5): append / organize /
+    // resolve / restore. Anything unrecognised reads as a manual save rather
+    // than showing a raw English token to the reader.
+    const READER_NOTE_HISTORY_REASONS = {
+      append: 'readerNoteHistorySourceAppend',
+      organize: 'readerNoteHistorySourceOrganize',
+      resolve: 'readerNoteHistorySourceResolve',
+      restore: 'readerNoteHistorySourceRestore',
+    }
+
+    function readerNoteHistoryLabel(reason) {
+      const key = READER_NOTE_HISTORY_REASONS[String(reason || '').toLowerCase()]
+      return t(key || 'readerNoteHistorySourceManual')
+    }
+
+    // The drawer works off a plain, always-shaped list so a partial payload
+    // cannot crash the render.
+    function readerNoteHistoryList(versions) {
+      return (Array.isArray(versions) ? versions : []).map((item) => ({
+        stamp: String(item?.stamp || ''),
+        updatedAt: String(item?.updatedAt || ''),
+        chars: Number(item?.chars) || 0,
+        reason: String(item?.reason || ''),
+      }))
+    }
+
+    // Shared by the toolbar and the shortcut help so a hint can never drift
+    // from the key it documents.
+    const READER_NOTE_TOOLS = [
+      { command: 'bold', glyph: 'B', label: 'readerNoteBold', keys: 'Ctrl+B', strong: true },
+      { command: 'italic', glyph: 'I', label: 'readerNoteItalic', keys: 'Ctrl+I', italic: true },
+      { command: 'link', glyph: '链接', label: 'readerNoteLink', keys: 'Ctrl+K' },
+      { command: 'h1', glyph: 'H1', label: 'readerNoteH1', keys: 'Ctrl+1' },
+      { command: 'h2', glyph: 'H2', label: 'readerNoteH2', keys: 'Ctrl+2' },
+      { command: 'h3', glyph: 'H3', label: 'readerNoteH3', keys: 'Ctrl+3' },
+      { command: 'ul', glyph: '•', label: 'readerNoteBullet', keys: 'Ctrl+Shift+8' },
+      { command: 'ol', glyph: '1.', label: 'readerNoteOrdered', keys: 'Ctrl+Shift+7' },
+      { command: 'quote', glyph: '❝', label: 'readerNoteQuote', keys: 'Ctrl+Shift+Q' },
+      { command: 'code', glyph: '<>', label: 'readerNoteCode', keys: 'Ctrl+Shift+`' },
+      { command: 'math', glyph: '∑', label: 'readerNoteMath', keys: 'Ctrl+M' },
+      { command: 'mathBlock', glyph: '∫', label: 'readerNoteMathBlock', keys: 'Ctrl+Shift+M' },
+    ]
+
+    const READER_NOTE_SHORTCUTS = [
+      ['readerNoteShortcutBold', 'Ctrl+B'],
+      ['readerNoteShortcutItalic', 'Ctrl+I'],
+      ['readerNoteShortcutLink', 'Ctrl+K'],
+      ['readerNoteShortcutHeading', 'Ctrl+1 / 2 / 3'],
+      ['readerNoteShortcutBody', 'Ctrl+0'],
+      ['readerNoteShortcutBullet', 'Ctrl+Shift+8'],
+      ['readerNoteShortcutOrdered', 'Ctrl+Shift+7'],
+      ['readerNoteShortcutQuote', 'Ctrl+Shift+Q'],
+      ['readerNoteShortcutCode', 'Ctrl+Shift+`'],
+      ['readerNoteShortcutMath', 'Ctrl+M'],
+      ['readerNoteShortcutMathBlock', 'Ctrl+Shift+M'],
+      ['readerNoteShortcutImage', 'Ctrl+Shift+I'],
+      ['readerNoteShortcutFontUp', 'Ctrl+='],
+      ['readerNoteShortcutFontDown', 'Ctrl+-'],
+      ['readerNoteShortcutFontReset', 'Ctrl+Shift+0'],
+      ['readerNoteShortcutRecord', 'Ctrl+Enter'],
+      ['readerNoteShortcutClose', 'Esc'],
+    ]
+
+    /**
+     * Narrow screens get a full-page editor (spec §14.1); the CSS media query
+     * and this flag therefore share one breakpoint constant.
+     */
+    function useReaderNoteNarrow() {
+      const [narrow, setNarrow] = useState(() => {
+        try {
+          if (typeof window === 'undefined') return false
+          if (typeof window.matchMedia === 'function') {
+            return Boolean(window.matchMedia(`(max-width: ${READER_NOTE_NARROW}px)`).matches)
+          }
+          return Number(window.innerWidth) <= READER_NOTE_NARROW
+        } catch {
+          return false
+        }
+      })
+      useEffect(() => {
+        if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return undefined
+        const query = window.matchMedia(`(max-width: ${READER_NOTE_NARROW}px)`)
+        const onChange = (event) => setNarrow(Boolean(event?.matches ?? query.matches))
+        if (typeof query.addEventListener === 'function') {
+          query.addEventListener('change', onChange)
+          return () => query.removeEventListener('change', onChange)
+        }
+        // Safari < 14 only ships the legacy listener API.
+        if (typeof query.addListener === 'function') {
+          query.addListener(onChange)
+          return () => query.removeListener(onChange)
+        }
+        return undefined
+      }, [])
+      return narrow
+    }
+
+    /**
+     * Apply one keydown inside the record textarea. Returns `{handled:false}`
+     * for keys the textarea should keep handling itself.
+     */
+    function applyReaderNoteKey({ event, text, start, end, font }) {
+      const action = readerNoteCommandForKey(event)
+      if (!action) return { handled: false }
+      if (action.action === 'submit') return { handled: true, action: 'submit' }
+      if (action.action === 'close') return { handled: true, action: 'close' }
+      if (action.action === 'fontUp') return { handled: true, action: 'fontUp', font: stepReaderNoteFont(font, 1) }
+      if (action.action === 'fontDown') return { handled: true, action: 'fontDown', font: stepReaderNoteFont(font, -1) }
+      if (action.action === 'fontReset') return { handled: true, action: 'fontReset', font: 100 }
+      if (action.command === 'image') return { handled: true, action: 'image' }
+      const result = applyMarkdownCommand({ text, start, end, command: action.command })
+      return { handled: true, command: action.command, text: result.text, start: result.start, end: result.end }
+    }
+
+    function readImageFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(String(reader.result || ''))
+        reader.onerror = () => reject(new Error('read failed'))
+        reader.readAsDataURL(file)
+      })
+    }
+
+    /**
+     * The record panel. It never talks to the vault itself: the host owns every
+     * HTTP call, the panel owns the editing surface.
+     */
+    function ReaderNoteDock({
+      open,
+      narrow,
+      paperId,
+      height = READER_NOTE_DOCK_DEFAULT,
+      font = 100,
+      submitting = false,
+      onFontChange,
+      onHeightChange,
+      onSubmit,
+      onClose,
+      onUploadImage,
+      onToast,
+      onHistory,
+    }) {
+      const [text, setText] = useState(() => readReaderNoteDraft(paperId))
+      const [mode, setMode] = useState('write')
+      const [help, setHelp] = useState(false)
+      const [uploading, setUploading] = useState(false)
+      const [dragHeight, setDragHeight] = useState(0)
+      const areaRef = useRef(null)
+      const selectionRef = useRef({ start: 0, end: 0 })
+
+      // New paper while the panel is open: swap in that paper's own draft.
+      useEffect(() => {
+        if (!open) return
+        setText(readReaderNoteDraft(paperId))
+        selectionRef.current = { start: 0, end: 0 }
+      }, [open, paperId])
+
+      // Debounced draft write (spec §7.2): 400 ms after the last keystroke.
+      useEffect(() => {
+        if (!open || !paperId) return undefined
+        const timer = setTimeout(() => writeReaderNoteDraft(paperId, text), READER_NOTE_DRAFT_DEBOUNCE)
+        return () => clearTimeout(timer)
+      }, [open, paperId, text])
+
+      const applyResult = (result) => {
+        setText(result.text)
+        selectionRef.current = { start: result.start, end: result.end }
+        if (typeof requestAnimationFrame !== 'function') return
+        requestAnimationFrame(() => {
+          const area = areaRef.current
+          if (!area) return
+          try {
+            area.focus()
+            area.setSelectionRange(result.start, result.end)
+          } catch {
+            // selection is cosmetic; never let it break editing
+          }
+        })
+      }
+
+      const insertText = (snippet) => {
+        const { start, end } = selectionRef.current
+        const next = `${text.slice(0, start)}${snippet}${text.slice(end)}`
+        applyResult({ text: next, start: start + snippet.length, end: start + snippet.length })
+      }
+
+      async function uploadImageFile(file) {
+        if (!file || uploading) return
+        if (!/^image\/(png|jpeg)$/i.test(file.type || '')) {
+          onToast?.(t('readerNoteImageType'), 'bad')
+          return
+        }
+        if (file.size > 8 * 1024 * 1024) {
+          onToast?.(t('readerNoteImageTooLarge'), 'bad')
+          return
+        }
+        setUploading(true)
+        try {
+          const dataUrl = await readImageFileAsDataUrl(file)
+          const result = await onUploadImage?.({ dataUrl, name: file.name || '' })
+          const rel = result?.rel || ''
+          if (!rel) throw new Error(t('readerNoteImageFailed'))
+          insertText(`![](${rel})`)
+          if (result?.vaultError) onToast?.(String(result.vaultError), 'bad')
+        } catch (uploadError) {
+          onToast?.(safeError(uploadError) || t('readerNoteImageFailed'), 'bad')
+        } finally {
+          setUploading(false)
+        }
+      }
+
+      function startImageUpload() {
+        if (uploading || typeof onUploadImage !== 'function') return
+        if (typeof document === 'undefined' || typeof document.createElement !== 'function') return
+        const input = document.createElement('input')
+        input.type = 'file'
+        input.accept = 'image/png,image/jpeg'
+        input.onchange = () => {
+          const file = input.files && input.files[0]
+          if (file) uploadImageFile(file)
+        }
+        input.click()
+      }
+
+      const runCommand = (command) => {
+        if (command === 'image') {
+          startImageUpload()
+          return
+        }
+        const area = areaRef.current
+        // Read the live selection from the textarea: a click into the editor
+        // updates it, and the tracked value can lag behind a drag-select.
+        if (area && typeof area.selectionStart === 'number') {
+          selectionRef.current = {
+            start: area.selectionStart,
+            end: typeof area.selectionEnd === 'number' ? area.selectionEnd : area.selectionStart,
+          }
+        }
+        applyResult(
+          applyMarkdownCommand({
+            text,
+            start: selectionRef.current.start,
+            end: selectionRef.current.end,
+            command,
+          }),
+        )
+      }
+
+      function handlePaste(event) {
+        const items = event?.clipboardData?.items
+        if (!items) return
+        for (const item of items) {
+          if (item.kind !== 'file' || !/^image\//.test(item.type || '')) continue
+          const file = item.getAsFile?.()
+          if (!file) continue
+          event.preventDefault()
+          uploadImageFile(file)
+          return
+        }
+      }
+
+      function submit() {
+        if (submitting) return
+        if (!String(text || '').trim()) {
+          onToast?.(t('readerNoteEmpty'), 'bad')
+          return
+        }
+        onSubmit?.(text)
+      }
+
+      function cancel() {
+        if (String(text || '').trim() && typeof window !== 'undefined' && typeof window.confirm === 'function') {
+          if (!window.confirm(t('readerNoteCancelConfirm'))) return
+        }
+        clearReaderNoteDraft(paperId)
+        setText('')
+        selectionRef.current = { start: 0, end: 0 }
+        onClose?.()
+      }
+
+      function handleKeyDown(event) {
+        const result = applyReaderNoteKey({
+          event,
+          text,
+          start: event.currentTarget?.selectionStart ?? selectionRef.current.start,
+          end: event.currentTarget?.selectionEnd ?? selectionRef.current.end,
+          font,
+        })
+        if (!result.handled) {
+          if (event.key === 'Tab') {
+            event.preventDefault()
+            insertText('  ')
+          }
+          return
+        }
+        event.preventDefault()
+        if (result.action === 'submit') {
+          submit()
+          return
+        }
+        if (result.action === 'close') {
+          cancel()
+          return
+        }
+        if (result.action === 'image') {
+          startImageUpload()
+          return
+        }
+        if (result.action === 'fontUp' || result.action === 'fontDown' || result.action === 'fontReset') {
+          onFontChange?.(result.font)
+          return
+        }
+        if (result.command) applyResult(result)
+      }
+
+      // Drag the top edge (spec §7.2). The live value stays local so the drag
+      // follows the pointer; only the release writes localStorage.
+      const liveHeight = dragHeight || Number(height) || READER_NOTE_DOCK_DEFAULT
+      function beginResize(event) {
+        if (narrow || !event) return
+        const startY = event.clientY
+        const startHeight = liveHeight
+        const viewport = (typeof window !== 'undefined' && window.innerHeight) || 800
+        const maxHeight = Math.max(READER_NOTE_DOCK_MIN, Math.round(viewport * 0.6))
+        let final = startHeight
+        event.preventDefault?.()
+        const move = (moveEvent) => {
+          final = Math.max(
+            READER_NOTE_DOCK_MIN,
+            Math.min(maxHeight, startHeight - (moveEvent.clientY - startY)),
+          )
+          setDragHeight(Math.round(final))
+        }
+        const end = () => {
+          window.removeEventListener('pointermove', move)
+          window.removeEventListener('pointerup', end)
+          window.removeEventListener('pointercancel', end)
+          setDragHeight(0)
+          if (final !== startHeight) onHeightChange?.(Math.round(final), true)
+        }
+        window.addEventListener('pointermove', move)
+        window.addEventListener('pointerup', end)
+        window.addEventListener('pointercancel', end)
+      }
+
+      if (!open) return null
+
+      const words = noteWordCount(text)
+      const fontPercent = clampReaderNoteFont(font)
+
+      const toolbar = h(
+        'div',
+        { className: 'lr-note-dock-tools' },
+        ...READER_NOTE_TOOLS.map((tool) =>
+          h(
+            'button',
+            {
+              key: tool.command,
+              type: 'button',
+              className: `lr-note-dock-tool${tool.strong ? ' is-strong' : ''}${tool.italic ? ' is-italic' : ''}`,
+              title: `${t(tool.label)} (${tool.keys})`,
+              'aria-label': t(tool.label),
+              // Keep the textarea selection: a mousedown would collapse it.
+              onMouseDown: (event) => event.preventDefault(),
+              onClick: () => runCommand(tool.command),
+            },
+            tool.glyph,
+          ),
+        ),
+        h('span', { className: 'lr-note-dock-sep' }),
+        h(
+          'button',
+          {
+            type: 'button',
+            className: 'lr-note-dock-tool',
+            title: `${t('readerNoteImage')} (Ctrl+Shift+I)`,
+            'aria-label': t('readerNoteImage'),
+            disabled: uploading,
+            onMouseDown: (event) => event.preventDefault(),
+            onClick: startImageUpload,
+          },
+          uploading ? h(Spinner, { size: 12 }) : h(Icon, { name: 'upload', size: 13 }),
+        ),
+        h(
+          'div',
+          { className: 'lr-note-dock-font' },
+          h(
+            'button',
+            {
+              type: 'button',
+              className: 'lr-note-dock-tool',
+              title: `${t('readerNoteShortcutFontDown')} (Ctrl+-)`,
+              'aria-label': t('readerNoteShortcutFontDown'),
+              onClick: () => onFontChange?.(stepReaderNoteFont(fontPercent, -1)),
+            },
+            h(Icon, { name: 'minus', size: 12 }),
+          ),
+          h(
+            'button',
+            {
+              type: 'button',
+              className: 'lr-note-dock-font-value',
+              title: t('readerNoteResetFont'),
+              onClick: () => onFontChange?.(100),
+            },
+            `${fontPercent}%`,
+          ),
+          h(
+            'button',
+            {
+              type: 'button',
+              className: 'lr-note-dock-tool',
+              title: `${t('readerNoteShortcutFontUp')} (Ctrl+=)`,
+              'aria-label': t('readerNoteShortcutFontUp'),
+              onClick: () => onFontChange?.(stepReaderNoteFont(fontPercent, 1)),
+            },
+            h(Icon, { name: 'plus', size: 12 }),
+          ),
+        ),
+        h('span', { className: 'lr-note-dock-spacer' }),
+        h(
+          'div',
+          { className: 'lr-note-dock-modes' },
+          h(
+            'button',
+            {
+              type: 'button',
+              className: `lr-note-dock-mode${mode === 'write' ? ' active' : ''}`,
+              onClick: () => setMode('write'),
+            },
+            t('readerNoteWrite'),
+          ),
+          h(
+            'button',
+            {
+              type: 'button',
+              className: `lr-note-dock-mode${mode === 'preview' ? ' active' : ''}`,
+              onClick: () => setMode('preview'),
+            },
+            t('readerNotePreview'),
+          ),
+          h(
+            'button',
+            {
+              type: 'button',
+              className: 'lr-note-dock-tool',
+              title: t('readerNoteShortcuts'),
+              'aria-label': t('readerNoteShortcuts'),
+              onClick: () => setHelp((value) => !value),
+            },
+            '?',
+          ),
+        ),
+      )
+
+      const editor = h('textarea', {
+        ref: areaRef,
+        className: 'lr-note-dock-input',
+        value: text,
+        spellCheck: false,
+        style: { fontSize: `calc(12.5px * ${fontPercent / 100})` },
+        placeholder: t('readerNotePlaceholder'),
+        onChange: (event) => {
+          setText(event.target.value)
+          selectionRef.current = {
+            start: event.target.selectionStart ?? 0,
+            end: event.target.selectionEnd ?? 0,
+          }
+        },
+        onSelect: (event) => {
+          selectionRef.current = {
+            start: event.currentTarget.selectionStart ?? 0,
+            end: event.currentTarget.selectionEnd ?? 0,
+          }
+        },
+        onKeyDown: handleKeyDown,
+        onPaste: handlePaste,
+      })
+
+      const preview = h(
+        'div',
+        { className: 'lr-note-dock-preview', style: { fontSize: `calc(12.5px * ${fontPercent / 100})` } },
+        String(text || '').trim()
+          ? renderReaderNotePreview(text, paperId)
+          : h('div', { className: 'lr-note-dock-empty' }, t('readerNotePreviewEmpty')),
+      )
+
+      const helpPanel = help
+        ? h(
+            'div',
+            { className: 'lr-note-dock-help' },
+            h('div', { className: 'lr-note-dock-help-title' }, t('readerNoteShortcutsTitle')),
+            h(
+              'div',
+              { className: 'lr-note-dock-help-grid' },
+              ...READER_NOTE_SHORTCUTS.map(([key, accel]) =>
+                h('div', { className: 'lr-note-dock-help-row', key }, h('span', null, t(key)), h('kbd', null, accel)),
+              ),
+            ),
+          )
+        : null
+
+      const footer = h(
+        'div',
+        { className: 'lr-note-dock-foot' },
+        h('span', { className: 'lr-note-dock-words' }, readerNoteText('readerNoteWords', { count: words })),
+        h('span', { className: 'lr-note-dock-spacer' }),
+        h('button', { type: 'button', className: 'lr-btn small', onClick: cancel, disabled: submitting }, t('cancel')),
+        h(
+          'button',
+          { type: 'button', className: 'lr-btn small primary', onClick: submit, disabled: submitting },
+          submitting ? h(Spinner, { size: 12 }) : h(Icon, { name: 'check', size: 13 }),
+          submitting ? t('readerNoteSubmitting') : t('readerNoteSubmit'),
+          h('kbd', { className: 'lr-note-dock-kbd' }, 'Ctrl+↵'),
+        ),
+      )
+
+      // Narrow (≤860px): a full-page editor, not an overlay (spec §14.1).
+      // Both heads carry it: the dock is where the reader is when 整理笔记 has
+      // just rewritten the body (spec §7.6)。
+      const historyButton = h(
+        'button',
+        {
+          type: 'button',
+          className: 'lr-btn icon',
+          onClick: onHistory,
+          title: t('readerNoteHistory'),
+          'aria-label': t('readerNoteHistory'),
+        },
+        h(Icon, { name: 'refresh', size: 14 }),
+      )
+
+      if (narrow) {
+        return h(
+          'section',
+          {
+            className: 'lr-note-dock lr-note-dock-full',
+            role: 'dialog',
+            'aria-modal': 'true',
+            'aria-label': t('readerNoteDockTitle'),
+          },
+          h(
+            'div',
+            { className: 'lr-note-dock-head' },
+            h(Icon, { name: 'note', size: 14 }),
+            h('span', { className: 'lr-note-dock-title' }, t('readerNoteDockTitle')),
+            h('span', { className: 'lr-note-dock-hint' }, t('readerNoteDockHint')),
+            h('span', { className: 'lr-note-dock-spacer' }),
+            historyButton,
+            h(
+              'button',
+              { type: 'button', className: 'lr-btn small primary', onClick: submit, disabled: submitting },
+              submitting ? h(Spinner, { size: 12 }) : h(Icon, { name: 'check', size: 13 }),
+              submitting ? t('readerNoteSubmitting') : t('readerNoteSubmit'),
+            ),
+            h(
+              'button',
+              {
+                type: 'button',
+                className: 'lr-btn icon',
+                onClick: cancel,
+                title: t('readerNoteClose'),
+                'aria-label': t('readerNoteClose'),
+              },
+              h(Icon, { name: 'close', size: 14 }),
+            ),
+          ),
+          toolbar,
+          helpPanel,
+          h('div', { className: 'lr-note-dock-body full' }, mode === 'write' ? editor : preview),
+          footer,
+        )
+      }
+
+      // Wide: a flex sibling below `lr-split`, so the PDF and the chat both
+      // shrink instead of being covered (spec §7.2).
+      return h(
+        'section',
+        {
+          className: 'lr-note-dock',
+          style: { height: `${Math.max(READER_NOTE_DOCK_MIN, liveHeight)}px` },
+          'aria-label': t('readerNoteDockTitle'),
+        },
+        h(
+          'div',
+          {
+            className: 'lr-note-dock-resize',
+            role: 'separator',
+            'aria-orientation': 'horizontal',
+            title: t('readerNoteDockResize'),
+            onPointerDown: beginResize,
+            onDoubleClick: () => onHeightChange?.(READER_NOTE_DOCK_DEFAULT, true),
+          },
+          h('span', { className: 'lr-note-dock-grip' }),
+        ),
+        h(
+          'div',
+          { className: 'lr-note-dock-head' },
+          h(Icon, { name: 'note', size: 14 }),
+          h('span', { className: 'lr-note-dock-title' }, t('readerNoteDockTitle')),
+          h('span', { className: 'lr-note-dock-hint' }, t('readerNoteDockHint')),
+          h('span', { className: 'lr-note-dock-spacer' }),
+          historyButton,
+          h(
+            'button',
+            {
+              type: 'button',
+              className: 'lr-btn icon',
+              onClick: onClose,
+              title: t('readerNoteClose'),
+              'aria-label': t('readerNoteClose'),
+            },
+            h(Icon, { name: 'close', size: 14 }),
+          ),
+        ),
+        toolbar,
+        helpPanel,
+        h('div', { className: `lr-note-dock-body${mode === 'preview' ? ' preview-only' : ''}` }, editor, preview),
+        footer,
+      )
+    }
+
+    // ── 「整理笔记」question confirmation (spec §7.5) ────────────────────────
+
+    function ReaderNoteQuestionsDialog({ questions, busyId, replies, onClose, onDiscuss, onAskInChat, onResolve }) {
+      const [drafts, setDrafts] = useState({})
+      const list = Array.isArray(questions) ? questions : []
+      const pending = list.filter((item) => item && item.status === 'open')
+      return h(
+        Modal,
+        {
+          title: t('readerNoteQuestionsTitle'),
+          subtitle: t('readerNoteQuestionsSubtitle'),
+          onClose,
+          wide: true,
+        },
+        h(
+          'div',
+          { className: 'lr-note-questions' },
+          pending.length === 0
+            ? h(
+                'div',
+                { className: 'lr-note-questions-empty' },
+                h(Icon, { name: 'check', size: 15 }),
+                h('span', null, t('readerNoteQuestionsAllDone')),
+              )
+            : null,
+          ...pending.map((question, index) =>
+            h(
+              'article',
+              { className: 'lr-note-question', key: question.id || `q-${index}` },
+              h(
+                'div',
+                { className: 'lr-note-question-quote' },
+                h(Icon, { name: 'quote', size: 12 }),
+                h('q', null, question.quote || ''),
+              ),
+              question.problem ? h('div', { className: 'lr-note-question-problem' }, question.problem) : null,
+              question.ask
+                ? h(
+                    'div',
+                    { className: 'lr-note-question-ask' },
+                    h('span', { className: 'lr-note-question-label' }, t('readerNoteQuestionAsk')),
+                    question.ask,
+                  )
+                : null,
+              // Discussion history lives on the question (`messages`, spec §3.7),
+              // so it survives reopening the dialog; the local map only holds the
+              // turns added in this session while the stream is still running.
+              (() => {
+                const persisted = Array.isArray(question.messages) ? question.messages : []
+                const session = Array.isArray(replies?.[question.id]) ? replies[question.id] : []
+                const thread = persisted.length > 0 ? persisted : session
+                if (thread.length === 0) return null
+                return h(
+                  'div',
+                  { className: 'lr-note-question-thread' },
+                  ...thread.map((message, messageIndex) =>
+                    h(
+                      'div',
+                      {
+                        className: `lr-note-question-msg ${message.role === 'user' ? 'user' : 'ai'}`,
+                        key: messageIndex,
+                      },
+                      String(message.content || ''),
+                    ),
+                  ),
+                )
+              })(),
+              h('textarea', {
+                className: 'lr-note-question-input',
+                value: drafts[question.id] || '',
+                placeholder: t('readerNoteQuestionPlaceholder'),
+                spellCheck: false,
+                onChange: (event) => setDrafts((current) => ({ ...current, [question.id]: event.target.value })),
+              }),
+              h(
+                'div',
+                { className: 'lr-note-question-actions' },
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    className: 'lr-btn small',
+                    disabled: busyId === question.id,
+                    onClick: () => onDiscuss?.(question, drafts[question.id] || ''),
+                  },
+                  busyId === question.id ? h(Spinner, { size: 12 }) : h(Icon, { name: 'sparkle', size: 12 }),
+                  busyId === question.id ? t('readerNoteQuestionDiscussing') : t('readerNoteQuestionDiscuss'),
+                ),
+                h(
+                  'button',
+                  { type: 'button', className: 'lr-btn small', onClick: () => onAskInChat?.(question) },
+                  h(Icon, { name: 'arrowUp', size: 12 }),
+                  t('readerNoteQuestionAskInChat'),
+                ),
+                h('span', { className: 'lr-note-dock-spacer' }),
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    className: 'lr-btn small',
+                    disabled: busyId === question.id,
+                    onClick: () => onResolve?.(question, 'dismiss'),
+                  },
+                  t('readerNoteQuestionDismiss'),
+                ),
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    className: 'lr-btn small primary',
+                    disabled: busyId === question.id,
+                    onClick: () => onResolve?.(question, 'apply'),
+                  },
+                  t('readerNoteQuestionApply'),
+                ),
+              ),
+            ),
+          ),
+          h(
+            'div',
+            { className: 'lr-note-questions-foot' },
+            h('span', { className: 'lr-note-dock-spacer' }),
+            h('button', { type: 'button', className: 'lr-btn small', onClick: onClose }, t('close')),
+          ),
+        ),
+      )
+    }
+
     function LiteratureReader() {
       const [papers, setPapers] = useState([])
       const [paper, setPaper] = useState(null)
@@ -7018,7 +9086,40 @@ function findFigurePlaceholders(source) {
       const [textScale, setTextScale] = useState(() =>
         storedNumber('dsh.literature.textScale.v1', 100, 70, 220),
       )
+      // Page fullscreen: the whole document becomes the browser's fullscreen
+      // element so host overlays survive. The state only drives the toolbar
+      // icon; the browser owns the actual mode and its Esc exit.
+      const [fullscreen, setFullscreen] = useState(false)
+      // ── Reader note (docs/reader-note-spec.md §7) ──────────────────────────
+      // `readerNote` mirrors GET /papers/:id/reader-note: null means "not asked
+      // yet", `{ exists: false }` means the file is gone or never created.
+      const [readerNote, setReaderNote] = useState(null)
+      const [noteDock, setNoteDock] = useState(false)
+      const [noteDockHeight, setNoteDockHeight] = useState(() => readerNoteDockHeight())
+      const [noteFont, setNoteFont] = useState(() =>
+        clampReaderNoteFont(storedNumber('dsh.literature.noteFont.v1', 100, READER_NOTE_FONT_MIN, READER_NOTE_FONT_MAX)),
+      )
+      const [noteSubmitting, setNoteSubmitting] = useState(false)
+      const [noteCreating, setNoteCreating] = useState(false)
+      const [noteOrganizing, setNoteOrganizing] = useState(false)
+      const [noteOrganizeLabel, setNoteOrganizeLabel] = useState('')
+      const [noteQuestions, setNoteQuestions] = useState(null)
+      const [noteDiscussing, setNoteDiscussing] = useState('')
+      const [noteReplies, setNoteReplies] = useState({})
+      const [noteHistoryOpen, setNoteHistoryOpen] = useState(false)
+      const [noteHistoryLoading, setNoteHistoryLoading] = useState(false)
+      const [noteHistoryError, setNoteHistoryError] = useState('')
+      const [noteHistoryVersions, setNoteHistoryVersions] = useState(null)
+      const [noteHistoryPreview, setNoteHistoryPreview] = useState(null)
+      const [noteHistoryBusy, setNoteHistoryBusy] = useState(false)
+      const noteNarrow = useReaderNoteNarrow()
 
+      // The page is the fullscreen element, so unmounting this panel no longer
+      // exits the mode automatically. Track ownership to clean up on unmount.
+      const fullscreenOwner = useRef(false)
+      // True only when this mode collapsed a previously open host sidebar; the
+      // exit path then restores it instead of guessing.
+      const sidebarCollapsedByUs = useRef(false)
       const viewerRef = useRef(null)
       const zoomRef = useRef(ZOOM_DEFAULT)
       const zoomAnchorRef = useRef(null)
@@ -7118,6 +9219,43 @@ function findFigurePlaceholders(source) {
           // storage can be unavailable
         }
       }, [penWidth, eraserWidth, splitPercent, textScale])
+
+      function restoreSidebarAfterFullscreen() {
+        if (!sidebarCollapsedByUs.current) return
+        sidebarCollapsedByUs.current = false
+        // A manual sidebar toggle while the mode is active is respected: only
+        // re-open the sidebar when it is still in the state this mode implied.
+        if (hostSidebarCollapsed() === true && layoutService && typeof layoutService.toggleSidebar === 'function') {
+          layoutService.toggleSidebar()
+        }
+      }
+
+      // The browser exits fullscreen on Esc without going through our button,
+      // so mirror its state back into React and undo the host-side changes.
+      useEffect(() => {
+        const sync = () => {
+          const active = fullscreenElement() === document.documentElement
+          setFullscreen(active)
+          if (!active) {
+            fullscreenOwner.current = false
+            restoreSidebarAfterFullscreen()
+          }
+        }
+        document.addEventListener('fullscreenchange', sync)
+        document.addEventListener('webkitfullscreenchange', sync)
+        return () => {
+          document.removeEventListener('fullscreenchange', sync)
+          document.removeEventListener('webkitfullscreenchange', sync)
+          // Unmounting while page-fullscreen is active must not strand the
+          // application in a chrome-less page with no reader in it.
+          if (fullscreenOwner.current) {
+            fullscreenOwner.current = false
+            exitFullscreen()
+          }
+          restoreSidebarAfterFullscreen()
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [])
 
       // Switching away from the hand tool must end an in-flight drag, otherwise
       // the grabbing cursor and pointer capture would linger.
@@ -7673,6 +9811,30 @@ function findFigurePlaceholders(source) {
 
       function showToast(message, kind = 'ok') {
         setToast({ message, kind, id: Date.now() })
+      }
+
+      async function toggleFullscreen() {
+        if (fullscreenElement() === document.documentElement) {
+          await exitFullscreen()
+          return
+        }
+        fullscreenOwner.current = true
+        if (!(await enterFullscreen(document.documentElement))) {
+          fullscreenOwner.current = false
+          showToast(t('fullscreenFailed'), 'error')
+          return
+        }
+        // Collapse the host sidebar so the reader gets the full width. The page
+        // itself stays mounted, which is what keeps the wallpaper and the
+        // weather overlay (shell.overlay) alive in this mode.
+        if (
+          hostSidebarCollapsed() === false &&
+          layoutService &&
+          typeof layoutService.toggleSidebar === 'function'
+        ) {
+          sidebarCollapsedByUs.current = true
+          layoutService.toggleSidebar()
+        }
       }
 
       function scheduleAnnotationSave(next) {
@@ -8418,6 +10580,424 @@ function findFigurePlaceholders(source) {
         setView('note')
       }
 
+      // ── Reader note handlers (docs/reader-note-spec.md §7) ────────────────
+      // Every call degrades quietly while the host routes are absent: a 404 or a
+      // network error is treated as "no note yet" so the reader keeps working.
+
+      function noteResult(payload) {
+        const value = payload && typeof payload === 'object' ? payload : {}
+        return {
+          exists: Boolean(value.exists),
+          path: value.path || '',
+          relative: value.relative || '',
+          markdown: typeof value.markdown === 'string' ? value.markdown : '',
+          hash: value.hash || '',
+          updatedAt: value.updatedAt || '',
+          entryCount: Number(value.entryCount) || 0,
+          questions: Array.isArray(value.questions) ? value.questions : [],
+          lostPath: value.lostPath || '',
+        }
+      }
+
+      async function refreshReaderNote() {
+        if (!paper) {
+          setReaderNote(null)
+          return null
+        }
+        try {
+          const payload = await request(`/papers/${paper.id}/reader-note`)
+          const result = noteResult(payload)
+          setReaderNote(result)
+          return result
+        } catch (noteError) {
+          // Spec §7.7 distinguishes three outcomes: only a 404 means "no note
+          // yet". A transport error (no HTTP status) is "host unreachable" and
+          // is retryable; anything else (500, 401, a write fault) must surface
+          // its real cause. Neither may be treated as an empty note, because
+          // 「记录笔记」 would then fall through to POST /reader-note and rebuild
+          // a note that already exists.
+          const status = noteError?.status
+          const noNote = status === 404
+          const failed = !noNote
+          const missing = {
+            ...noteResult(null),
+            exists: noNote ? false : Boolean(paper.hasReaderNote),
+            fetchFailed: failed,
+            fetchError: !failed
+              ? ''
+              : status
+                ? safeError(noteError) || t('readerNoteLoadFailed')
+                : t('readerNoteUnreachable'),
+          }
+          if (paper.readerNoteRelative) missing.relative = paper.readerNoteRelative
+          setReaderNote(missing)
+          if (failed) setError(missing.fetchError)
+          return missing
+        }
+      }
+
+      function noteDraftState() {
+        return readerNote ? noteResult(readerNote) : noteResult(null)
+      }
+
+      // 「建立笔记」/「记录笔记」. The lost-file branch is spec §14.6: the file was
+      // deleted outside the plugin, so re-creating it deserves one confirmation.
+      // `current` is passed in when the caller has just fetched the note: React
+      // state would still be stale on the same tick.
+      async function createReaderNote(current) {
+        if (!paper || noteCreating) return null
+        const snapshot = current || noteDraftState()
+        if (snapshot.lostPath && typeof window !== 'undefined' && typeof window.confirm === 'function') {
+          const message = readerNoteText('readerNoteLostConfirm', { path: snapshot.lostPath })
+          if (!window.confirm(message)) return null
+        }
+        setNoteCreating(true)
+        try {
+          const payload = await request(`/papers/${paper.id}/reader-note`, { method: 'POST' })
+          const result = noteResult({ ...payload, exists: true })
+          setReaderNote(result)
+          showToast(t('readerNoteCreated'))
+          setPaper((previous) => (previous ? { ...previous, hasReaderNote: true, readerNoteRelative: result.relative } : previous))
+          try {
+            await refreshPaperList()
+          } catch {
+            // the list refresh is cosmetic
+          }
+          return result
+        } catch (createError) {
+          const message = safeError(createError) || t('readerNoteCreateFailed')
+          setError(message)
+          showToast(message, 'bad')
+          return null
+        } finally {
+          setNoteCreating(false)
+        }
+      }
+
+      async function openNoteDock() {
+        if (!paper || noteCreating) return
+        setError('')
+        // Re-ask the host each time: the file may have been created, edited or
+        // deleted in Obsidian since the panel last looked (spec §14.6).
+        let current = readerNote
+        // A failed load must be retried on the next click: otherwise its
+        // `fetchFailed` marker would keep short-circuiting the handler and the
+        // reader would have to reload the page after the host recovered.
+        if (!current || !current.exists || current.fetchFailed) current = await refreshReaderNote()
+        // A real load failure must not be reported as "no note yet": the reader
+        // would go looking for a file that exists while the host is broken.
+        if (current?.fetchFailed) {
+          showToast(current.fetchError || t('readerNoteLoadFailed'), 'bad')
+          return
+        }
+        // A note the reader already knows about does not need the create round
+        // trip; only a genuinely missing file gets created here.
+        if (!current?.exists) {
+          const created = await createReaderNote(current)
+          if (!created) return
+          current = created
+        }
+        // Spec §7.5: open questions stay visible when the panel opens. The GET
+        // above already carries them, so this costs no extra round trip and no
+        // model call — previously the badge was the only trace of them and the
+        // sole way to read them was to re-run 「整理笔记」, which rewrites the body.
+        const openQuestions = (current?.questions || []).filter((item) => item?.status === 'open')
+        // Never clear an already-open dialog: this only ever adds questions.
+        if (openQuestions.length > 0) setNoteQuestions(openQuestions)
+        setNoteDock(true)
+      }
+
+      async function closeNoteDock() {
+        setNoteDock(false)
+      }
+
+      // ── Version history (spec §3.5) ───────────────────────────────────────
+      // 「整理笔记」 rewrites the body, so the snapshots are the safety net the
+      // reader needs in order to undo it. Failures are surfaced, never folded
+      // into "no note yet" — a 500 here means the write really failed.
+      async function openNoteHistory() {
+        if (!paper) return
+        setNoteHistoryOpen(true)
+        setNoteHistoryLoading(true)
+        setNoteHistoryError('')
+        try {
+          const payload = await request(`/papers/${paper.id}/reader-note/history`)
+          setNoteHistoryVersions(readerNoteHistoryList(payload?.versions))
+        } catch (historyError) {
+          setNoteHistoryVersions([])
+          setNoteHistoryError(safeError(historyError) || t('readerNoteHistoryFailed'))
+        } finally {
+          setNoteHistoryLoading(false)
+        }
+      }
+
+      async function previewNoteHistory(item) {
+        if (!paper || !item?.stamp) return
+        // The list already carries everything the preview header needs; the
+        // body is fetched lazily so opening the drawer stays one request.
+        setNoteHistoryPreview({ loading: true, item, markdown: '' })
+        try {
+          const payload = await request(
+            `/papers/${paper.id}/reader-note/history/${encodeURIComponent(item.stamp)}`,
+          )
+          setNoteHistoryPreview({ loading: false, item, markdown: String(payload?.markdown || '') })
+        } catch (previewError) {
+          setNoteHistoryPreview(null)
+          showToast(safeError(previewError) || t('readerNoteHistoryFailed'), 'bad')
+        }
+      }
+
+      async function restoreNoteHistory(item) {
+        if (!paper || !item?.stamp || noteHistoryBusy) return
+        if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
+          if (!window.confirm(t('noteHistoryRestoreConfirm'))) return
+        }
+        setNoteHistoryBusy(true)
+        try {
+          const payload = await request(
+            `/papers/${paper.id}/reader-note/history/${encodeURIComponent(item.stamp)}/restore`,
+            { method: 'POST' },
+          )
+          const next = noteResult({
+            ...noteDraftState(),
+            ...payload,
+            exists: true,
+            markdown: String(payload?.markdown ?? ''),
+          })
+          setReaderNote(next)
+          setNoteHistoryOpen(false)
+          setNoteHistoryPreview(null)
+          showToast(t('noteRestoreDone'))
+          try {
+            await refreshPaperList()
+          } catch {
+            // cosmetic
+          }
+        } catch (restoreError) {
+          showToast(safeError(restoreError) || t('noteRestoreFailed'), 'bad')
+        } finally {
+          setNoteHistoryBusy(false)
+        }
+      }
+
+      async function submitReaderNote(markdown) {
+        if (!paper || noteSubmitting) return
+        setNoteSubmitting(true)
+        try {
+          const payload = await request(`/papers/${paper.id}/reader-note/entries`, {
+            method: 'POST',
+            body: { markdown, baseHash: noteDraftState().hash || undefined },
+          })
+          const result = noteResult({ ...noteDraftState(), ...payload, exists: true })
+          setReaderNote(result)
+          clearReaderNoteDraft(paper.id)
+          setNoteDock(false)
+          showToast(t('readerNoteRecorded'))
+          try {
+            await refreshPaperList()
+          } catch {
+            // cosmetic
+          }
+        } catch (submitError) {
+          showToast(safeError(submitError) || t('readerNoteRecordFailed'), 'bad')
+        } finally {
+          setNoteSubmitting(false)
+        }
+      }
+
+      function changeNoteHeight(value, persist) {
+        const next = Math.max(READER_NOTE_DOCK_MIN, Math.round(Number(value) || READER_NOTE_DOCK_DEFAULT))
+        setNoteDockHeight(next)
+        if (persist) storeReaderNoteDockHeight(next)
+      }
+
+      function changeNoteFont(value) {
+        const next = clampReaderNoteFont(value)
+        setNoteFont(next)
+        try {
+          localStorage.setItem('dsh.literature.noteFont.v1', String(next))
+        } catch {
+          // ignore storage failures
+        }
+      }
+
+      async function uploadNoteImage({ dataUrl }) {
+        if (!paper) throw new Error(t('readerNoteImageFailed'))
+        return request(`/papers/${paper.id}/reader-note/images`, {
+          method: 'POST',
+          body: { dataUrl },
+        })
+      }
+
+      // 「修改笔记」 (spec §7.6): reuse the existing open-note route.
+      async function openReaderNoteInObsidian() {
+        if (!paper) return
+        const current = await refreshReaderNote()
+        if (current?.fetchFailed) {
+          showToast(current.fetchError || t('readerNoteLoadFailed'), 'bad')
+          return
+        }
+        const rel = current?.relative || current?.path
+        if (!rel) {
+          setError(t('readerNoteCreateFailed'))
+          return
+        }
+        try {
+          await request('/vault/open-note', { method: 'POST', body: { rel } })
+        } catch (openError) {
+          setError(safeError(openError))
+        }
+      }
+
+      // ── 「整理笔记」 (spec §7.5) ───────────────────────────────────────────
+      async function organizeReaderNote() {
+        if (!paper || noteOrganizing) return
+        // Same retry rule as the dock: a remembered failure must not pin the
+        // button to "broken" until the page is reloaded.
+        const remembered = readerNote
+        const current =
+          remembered && !remembered.fetchFailed ? remembered : await refreshReaderNote()
+        if (current?.fetchFailed) {
+          showToast(current.fetchError || t('readerNoteLoadFailed'), 'bad')
+          return
+        }
+        if (!current?.exists) {
+          showToast(t('readerNoteOrganizeMissing'), 'bad')
+          return
+        }
+        setNoteOrganizing(true)
+        setNoteOrganizeLabel(t('readerNoteOrganizing'))
+        try {
+          let done = null
+          await streamSse(
+            `/papers/${paper.id}/reader-note/organize`,
+            { baseHash: current.hash || undefined },
+            (event) => {
+              if (!event) return
+              if (event.type === 'status') {
+                setNoteOrganizeLabel(event.label || t('readerNoteOrganizing'))
+                return
+              }
+              if (event.type === 'done') done = event
+            },
+          )
+          if (!done) {
+            showToast(t('readerNoteOrganizeFailed'), 'bad')
+            return
+          }
+          const result = noteResult({ ...current, markdown: done.markdown, hash: done.hash, exists: true })
+          setReaderNote(result)
+          // Spec §3.6 names this payload `stats` while §3.6's own summary table
+          // and the AI layer call it `report`. Accept either rather than showing
+          // 「没有改动」 whenever the host picks the other spelling.
+          const stats = done.stats || done.report || {}
+          const total = (Number(stats.typos) || 0) + (Number(stats.merges) || 0) + (Number(stats.formatting) || 0)
+          showToast(
+            total > 0
+              ? readerNoteText('readerNoteOrganizeDone', {
+                  typos: Number(stats.typos) || 0,
+                  merges: Number(stats.merges) || 0,
+                  formatting: Number(stats.formatting) || 0,
+                })
+              : t('readerNoteOrganizeNoChange'),
+          )
+          const questions = Array.isArray(done.questions) ? done.questions : []
+          setNoteQuestions(questions.length > 0 ? questions : null)
+          setNoteReplies({})
+          try {
+            await refreshPaperList()
+          } catch {
+            // cosmetic
+          }
+        } catch (organizeError) {
+          if (organizeError?.status === 409) {
+            showToast(t('readerNoteOrganizeConflict'), 'bad')
+            await refreshReaderNote()
+          } else if (organizeError?.status === 404) {
+            showToast(t('readerNoteOrganizeMissing'), 'bad')
+          } else {
+            showToast(safeError(organizeError) || t('readerNoteOrganizeFailed'), 'bad')
+          }
+        } finally {
+          setNoteOrganizing(false)
+          setNoteOrganizeLabel('')
+        }
+      }
+
+      async function discussNoteQuestion(question, message) {
+        if (!paper || !question?.id || noteDiscussing) return
+        setNoteDiscussing(question.id)
+        const asked = String(message || '').trim()
+        try {
+          const lines = []
+          await streamSse(
+            `/papers/${paper.id}/reader-note/questions/${question.id}/discuss`,
+            { message: asked },
+            (event) => {
+              if (!event) return
+              if (event.type === 'delta' && event.text) lines.push(String(event.text))
+              if (event.type === 'done' && event.question) {
+                updateNoteQuestion(event.question)
+              }
+            },
+          )
+          const reply = lines.join('')
+          if (reply || asked) {
+            setNoteReplies((current) => {
+              const thread = Array.isArray(current[question.id]) ? current[question.id].slice() : []
+              if (asked) thread.push({ role: 'user', content: asked })
+              if (reply) thread.push({ role: 'assistant', content: reply })
+              return { ...current, [question.id]: thread }
+            })
+          }
+        } catch (discussError) {
+          showToast(safeError(discussError) || t('readerNoteQuestionFailed'), 'bad')
+        } finally {
+          setNoteDiscussing('')
+        }
+      }
+
+      function updateNoteQuestion(updated) {
+        if (!updated || !updated.id) return
+        setNoteQuestions((current) => {
+          if (!Array.isArray(current)) return current
+          return current.map((item) => (item && item.id === updated.id ? { ...item, ...updated } : item))
+        })
+      }
+
+      async function resolveNoteQuestion(question, mode) {
+        if (!paper || !question?.id || noteDiscussing) return
+        setNoteDiscussing(question.id)
+        try {
+          const payload = await request(
+            `/papers/${paper.id}/reader-note/questions/${question.id}/resolve`,
+            { method: 'POST', body: { mode } },
+          )
+          if (payload?.question) updateNoteQuestion(payload.question)
+          if (typeof payload?.markdown === 'string' && payload.markdown) {
+            setReaderNote((current) => ({ ...noteResult(current), markdown: payload.markdown, hash: payload.hash || '' }))
+          }
+          showToast(mode === 'dismiss' ? t('readerNoteQuestionDismissed') : t('readerNoteQuestionResolved'))
+        } catch (resolveError) {
+          const message =
+            resolveError?.status === 409
+              ? t('readerNoteQuestionFailed')
+              : safeError(resolveError) || t('readerNoteQuestionFailed')
+          showToast(message, 'bad')
+        } finally {
+          setNoteDiscussing('')
+        }
+      }
+
+      // 「在 AI 对话中继续讨论」: hand the fragment to the existing ask flow.
+      function askNoteQuestionInChat(question) {
+        if (!question) return
+        const body = [question.quote, question.problem, question.ask].filter(Boolean).join('\n\n')
+        setNoteQuestions(null)
+        setView('reader')
+        sendQuestion(body, null, 'ask')
+      }
+
       async function handleFile(file) {
         if (!file) return
         if (!/\.pdf$/i.test(file.name)) {
@@ -8750,6 +11330,7 @@ function findFigurePlaceholders(source) {
                 h('span', null, t('extract')),
               ),
             ),
+            h(FullscreenButton, { active: fullscreen, onClick: toggleFullscreen }),
           ),
           h(
             'div',
@@ -8867,12 +11448,6 @@ function findFigurePlaceholders(source) {
               h(Icon, { name: 'plus', size: 14 }),
             ),
           ),
-          h(
-            'div',
-            { className: `lr-hint-pill${mode === 'pan' ? ' pan' : ''}` },
-            h(Icon, { name: mode === 'pan' ? 'hand' : 'select', size: 12 }),
-            mode === 'pan' ? t('panHint') : t('selectionHint'),
-          ),
         )
       }
 
@@ -8913,6 +11488,29 @@ function findFigurePlaceholders(source) {
               h(
                 'div',
                 { className: 'lr-model-box' },
+                // 「整理笔记」 (spec §7.1): only offered once a note exists. The
+                // badge counts the open suspicious findings it reported.
+                hasReaderNote
+                  ? h(
+                      'button',
+                      {
+                        type: 'button',
+                        className: 'lr-btn small lr-note-organize',
+                        onClick: organizeReaderNote,
+                        disabled: noteOrganizing,
+                        title: t('readerNoteOrganize'),
+                      },
+                      noteOrganizing ? h(Spinner, { size: 12 }) : h(Icon, { name: 'sparkle', size: 13 }),
+                      h('span', { className: 'lr-label' }, noteOrganizeLabel || t('readerNoteOrganize')),
+                      readerNoteOpen > 0 && !noteOrganizing
+                        ? h(
+                            'span',
+                            { className: 'lr-note-organize-badge', title: readerNoteText('readerNoteBadgeCount', { count: readerNoteOpen }) },
+                            String(readerNoteOpen),
+                          )
+                        : null,
+                    )
+                  : null,
                 h(
                   'button',
                   {
@@ -9266,6 +11864,13 @@ function findFigurePlaceholders(source) {
         )
       }
 
+      // A paper has a reader note when the route says so, and — because the
+      // route may not be deployed yet — when the paper payload claims one.
+      const hasReaderNote = Boolean(readerNote?.exists || paper?.hasReaderNote)
+      const readerNoteOpen = Number(
+        readerNote?.questions?.filter?.((item) => item && item.status === 'open').length ?? paper?.readerNoteOpen ?? 0,
+      )
+
       function renderHeader() {
         return h(
           'header',
@@ -9336,6 +11941,52 @@ function findFigurePlaceholders(source) {
                     title: t('openObsidian'),
                   },
                   h(Icon, { name: 'note', size: 15 }),
+                )
+              : null,
+            // 「建立笔记」/「记录笔记」+「修改笔记」(spec §7.1).
+            paper
+              ? hasReaderNote
+                ? h(
+                    'button',
+                    {
+                      type: 'button',
+                      className: 'lr-btn primary lr-note-entry',
+                      onClick: openNoteDock,
+                      // No accelerator here: nothing is wired for a global
+                      // shortcut, and Ctrl+Shift+N is reserved by the browser
+                      // (new incognito window) so a page cannot claim it.
+                      title: t('readerNoteRecord'),
+                    },
+                    h(Icon, { name: 'note', size: 14 }),
+                    h('span', { className: 'lr-label' }, t('readerNoteRecord')),
+                    readerNoteOpen > 0
+                      ? h('span', { className: 'lr-note-entry-badge' }, String(readerNoteOpen))
+                      : null,
+                  )
+                : h(
+                    'button',
+                    {
+                      type: 'button',
+                      className: 'lr-btn lr-note-entry',
+                      onClick: openNoteDock,
+                      disabled: noteCreating,
+                      title: t('readerNoteCreate'),
+                    },
+                    noteCreating ? h(Spinner, { size: 13 }) : h(Icon, { name: 'note', size: 14 }),
+                    h('span', { className: 'lr-label' }, noteCreating ? t('readerNoteCreating') : t('readerNoteCreate')),
+                  )
+              : null,
+            hasReaderNote
+              ? h(
+                  'button',
+                  {
+                    type: 'button',
+                    className: 'lr-btn icon',
+                    onClick: openReaderNoteInObsidian,
+                    title: t('readerNoteEdit'),
+                    'aria-label': t('readerNoteEdit'),
+                  },
+                  h(Icon, { name: 'pen', size: 15 }),
                 )
               : null,
             h(
@@ -9658,10 +12309,96 @@ function findFigurePlaceholders(source) {
                 ),
               ),
             ),
+        // The record panel is a flex sibling, never an overlay (spec §7.2):
+        // opening it shrinks the split instead of covering the PDF or the chat.
+        // On ≤860px it becomes a full-page editor (spec §14.1).
+        paper
+          ? h(ReaderNoteDock, {
+              open: noteDock,
+              narrow: noteNarrow,
+              paperId: paper.id,
+              height: noteDockHeight,
+              font: noteFont,
+              submitting: noteSubmitting,
+              onFontChange: changeNoteFont,
+              onHeightChange: changeNoteHeight,
+              onSubmit: submitReaderNote,
+              onClose: closeNoteDock,
+              onUploadImage: uploadNoteImage,
+              onToast: showToast,
+              onHistory: openNoteHistory,
+            })
+          : null,
         renderImportOverlay(),
-        // Phase 1 of summary generation: only shown when the host says some
-        // vocabulary terms are genuinely ambiguous. Closing it cancels the run
-        // without ever opening the SSE stream.
+        // Version history of the reader note (spec §3.5): the safety net behind
+        // 「整理笔记」. The list is fetched on open, one snapshot read lazily.
+        h(NoteHistoryDrawer, {
+          open: noteHistoryOpen,
+          loading: noteHistoryLoading,
+          versions: noteHistoryVersions,
+          error: noteHistoryError,
+          busy: noteHistoryBusy,
+          onClose: () => {
+            setNoteHistoryOpen(false)
+            setNoteHistoryPreview(null)
+          },
+          onPreview: previewNoteHistory,
+          onRestore: restoreNoteHistory,
+          labelOf: (item) => readerNoteHistoryLabel(item.reason),
+          emptyText: t('readerNoteHistoryEmpty'),
+        }),
+        noteHistoryPreview
+          ? h(
+              Modal,
+              {
+                title: t('readerNoteHistoryPreview'),
+                subtitle: noteHistoryPreview.item?.updatedAt
+                  ? noteFormatTime(noteHistoryPreview.item.updatedAt)
+                  : '',
+                onClose: () => setNoteHistoryPreview(null),
+                wide: true,
+                // Opened from the dock, which is a full-page layer on narrow
+                // screens: the preview has to sit above it (spec §14.1).
+                elevated: true,
+              },
+              noteHistoryPreview.loading
+                ? h('div', { className: 'lr-modal-loading' }, h(Spinner, { size: 18 }), t('noteHistoryLoading'))
+                : h(
+                    'div',
+                    { className: 'lr-note-preview' },
+                    renderReaderNotePreview(noteHistoryPreview.markdown, paper?.id || ''),
+                    h(
+                      'div',
+                      { className: 'lr-note-preview-actions' },
+                      h('span', { className: 'lr-note-preview-note' }, t('noteHistoryPreviewReadOnly')),
+                      h(
+                        'button',
+                        {
+                          type: 'button',
+                          className: 'lr-btn small primary',
+                          disabled: noteHistoryBusy,
+                          onClick: () => restoreNoteHistory(noteHistoryPreview.item),
+                        },
+                        noteHistoryBusy ? h(Spinner, { size: 12 }) : h(Icon, { name: 'refresh', size: 13 }),
+                        t('noteHistoryRestore'),
+                      ),
+                    ),
+                  ),
+            )
+          : null,
+        // 「整理笔记」 reports what it changed and then asks about anything it
+        // refused to touch (spec §7.5): suspicious facts stay user-confirmed.
+        noteQuestions
+          ? h(ReaderNoteQuestionsDialog, {
+              questions: noteQuestions,
+              busyId: noteDiscussing,
+              replies: noteReplies,
+              onClose: () => setNoteQuestions(null),
+              onDiscuss: discussNoteQuestion,
+              onAskInChat: askNoteQuestionInChat,
+              onResolve: resolveNoteQuestion,
+            })
+          : null,
         glossaryAsk
           ? h(GlossaryConfirmDialog, {
               questions: glossaryAsk.questions,
@@ -9791,6 +12528,18 @@ function findFigurePlaceholders(source) {
 
     const CSS = `
 .lr-root{position:relative;height:100%;min-height:0;display:flex;flex-direction:column;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-family:inherit;font-size:13px;overflow:hidden}
+/* Page fullscreen keeps the wallpaper and shell.overlay widgets mounted; the
+   Windows caption strip is reserved by a custom property, so zero it here. The
+   Desktop application menu is a fixed child of the page, so hide it too. */
+html:fullscreen{--dsh-windows-titlebar-height:0px!important}
+html:fullscreen .lr-header{display:none}
+html:fullscreen [data-windows-menu]{display:none!important}
+/* A collapsed Windows sidebar keeps its reopen/new-session buttons fixed in
+   the caption strip; they would float over the reader (and after the caption
+   is zeroed, sit half-clipped at the top edge). Hide the collapsed column and
+   the macOS leading seat for the duration of the mode. */
+html:fullscreen [data-sidebar-collapsed] > :first-child{display:none!important}
+html:fullscreen [data-shell-leading]{display:none!important}
 .lr-root *{box-sizing:border-box}
 .lr-icon{flex:0 0 auto;display:block}
 .lr-header{height:56px;flex:0 0 56px;display:flex;align-items:center;gap:12px;padding:0 14px;border-bottom:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-base);min-width:0}
@@ -9830,6 +12579,7 @@ function findFigurePlaceholders(source) {
 .lr-tool:disabled{opacity:.4;cursor:not-allowed}
 .lr-tool.chapter-extract{color:var(--dsw-alias-brand-primary);border:1px solid color-mix(in srgb,var(--dsw-alias-brand-primary) 34%,transparent);background:color-mix(in srgb,var(--dsw-alias-brand-primary) 7%,transparent);padding:0 9px;font-weight:500}
 .lr-tool.chapter-extract:hover:not(:disabled){background:color-mix(in srgb,var(--dsw-alias-brand-primary) 14%,transparent)}
+.lr-fullscreen-tool{margin-left:auto}
 .lr-width-control{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 6px;border:1px solid var(--dsw-alias-border-l1);border-radius:7px;background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-secondary);font-size:10.5px;white-space:nowrap}
 .lr-width-control input[type=range]{width:64px;height:16px;accent-color:var(--dsw-alias-brand-primary);cursor:pointer}
 .lr-width-value{min-width:16px;text-align:right;font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-primary)}
@@ -9879,7 +12629,6 @@ function findFigurePlaceholders(source) {
 .lr-zoom{min-width:46px;height:24px;padding:0 6px;border:0;border-radius:6px;background:transparent;text-align:center;font-family:inherit;font-size:10.5px;color:var(--dsw-alias-label-secondary);font-variant-numeric:tabular-nums;cursor:pointer;white-space:nowrap}
 .lr-zoom:hover{background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary)}
 .lr-zoom:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:1px}
-.lr-hint-pill{position:absolute;left:14px;top:60px;z-index:5;display:inline-flex;align-items:center;gap:5px;height:23px;padding:0 8px;border:1px solid var(--dsw-alias-border-l1);border-radius:999px;background:color-mix(in srgb,var(--dsw-alias-bg-overlay) 88%,transparent);color:var(--dsw-alias-label-secondary);font-size:10px;pointer-events:none;backdrop-filter:blur(6px)}
 .lr-chat{flex:1 1 0;min-width:220px;min-height:0;display:flex;flex-direction:column;background:var(--dsw-alias-bg-base)}
 .lr-chat-head{flex:0 0 auto;padding:12px 14px 10px;border-bottom:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-base)}
 .lr-chat-title-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -10288,8 +13037,6 @@ function findFigurePlaceholders(source) {
 .lr-page-paper{border-radius:4px;box-shadow:0 1px 2px rgba(12,10,8,.2),0 18px 46px rgba(12,10,8,.3)}
 .lr-page-paper img{border-radius:4px}
 .lr-viewer-bottom{border-color:var(--lr-line);box-shadow:var(--lr-shadow)}
-.lr-hint-pill{top:auto;bottom:58px;left:16px;border-color:var(--lr-line);background:color-mix(in srgb,var(--dsw-alias-bg-overlay) 92%,transparent);font-size:10px}
-.lr-hint-pill.pan{color:color-mix(in srgb,var(--lr-teal) 62%,var(--lr-muted))}
 .lr-chat{border-left:1px solid var(--lr-line);background:linear-gradient(180deg,color-mix(in srgb,var(--lr-accent) 8%,var(--dsw-alias-bg-base)),var(--dsw-alias-bg-base) 170px)}
 .lr-chat-head{padding:12px 14px 11px;border-bottom:1px solid var(--lr-line);background:linear-gradient(180deg,color-mix(in srgb,var(--lr-accent) 5%,var(--dsw-alias-bg-base)),transparent)}
 .lr-chat-title-row{gap:9px;align-items:center}
@@ -10496,7 +13243,7 @@ function findFigurePlaceholders(source) {
 @media(max-width:1100px){.lr-label{display:none}.lr-header-actions .lr-btn{padding:0 8px}.lr-title{max-width:38vw}.lr-model-pill{max-width:150px;padding:0 6px;gap:3px}.lr-model-pill-label{flex:0 1 auto}.lr-folder-pane{flex-basis:204px;width:204px}.lr-pdf-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}.lr-library-sync{display:none}.lr-library-main{padding:12px 14px 30px}}
 @media(max-width:860px){.lr-library-head{flex-wrap:wrap;gap:8px}.lr-library-actions{width:100%;justify-content:flex-end}.lr-library-body{flex-direction:column}.lr-folder-pane{flex:0 0 auto;width:100%;max-height:150px;border-right:0;border-bottom:1px solid var(--dsw-alias-border-l1)}.lr-pdf-grid{grid-template-columns:1fr}.lr-library-main{padding:12px 12px 30px}.lr-library-sync{display:none}}
 @media(max-width:980px){.lr-subtitle{max-width:32vw}.lr-tool span{display:none}.lr-tool{padding:0 7px}.lr-feature-grid{grid-template-columns:1fr}.lr-empty-title{font-size:20px}.lr-width-control span:first-child{display:none}}
-@media(max-width:860px){.lr-split{display:flex;flex-direction:column}.lr-viewer{flex:1 1 auto;width:100%;min-width:0;min-height:0}.lr-chat{flex:0 0 42%;min-width:0;border-top:1px solid var(--dsw-alias-border-l1)}.lr-divider{display:none}.lr-chat-scroll{max-height:none}.lr-hint-pill{display:none}.lr-title{max-width:46vw}}
+@media(max-width:860px){.lr-split{display:flex;flex-direction:column}.lr-viewer{flex:1 1 auto;width:100%;min-width:0;min-height:0}.lr-chat{flex:0 0 42%;min-width:0;border-top:1px solid var(--dsw-alias-border-l1)}.lr-divider{display:none}.lr-chat-scroll{max-height:none}.lr-title{max-width:46vw}}
 
 /* ── Summary view ───────────────────────────────────────────────────────── */
 .lr-note{position:relative;display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-size:calc(12px * var(--lr-fs,1))}
@@ -10720,7 +13467,11 @@ function findFigurePlaceholders(source) {
 .lr-note-progress{display:flex;align-items:center;gap:8px;padding:7px 14px;border-top:1px solid var(--lr-line);background:color-mix(in srgb,var(--lr-accent) 7%,var(--dsw-alias-bg-layer-1));font-size:11px;color:var(--dsw-alias-label-secondary);flex:0 0 auto}
 .lr-note-progress-count{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:600;color:var(--dsw-alias-label-primary)}
 /* History drawer */
-.lr-note-history-mask{position:fixed;inset:0;z-index:120;display:flex;justify-content:flex-end;background:color-mix(in srgb,#000 32%,transparent);animation:lr-fade .16s ease}
+/* Above the narrow full-page editor (120) so the sheet is layered by z-index
+   rather than by DOM order — reordering the siblings must not sink it. */
+.lr-note-history-mask{position:fixed;inset:0;z-index:130;display:flex;justify-content:flex-end;background:color-mix(in srgb,#000 32%,transparent);animation:lr-fade .16s ease}
+/* Modals opened from the narrow full-page editor (120) must sit above it. */
+.lr-modal-backdrop.elevated{z-index:130}
 .lr-note-history{display:flex;flex-direction:column;width:min(400px,92vw);height:100%;background:var(--dsw-alias-bg-layer-1);border-left:1px solid var(--dsw-alias-border-l1);box-shadow:-18px 0 44px color-mix(in srgb,#000 26%,transparent);animation:lr-slide-right .2s ease}
 .lr-note-history-head{display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid var(--lr-line);color:var(--dsw-alias-label-secondary)}
 .lr-note-history-title{flex:1 1 auto;font-size:12px;font-weight:600;color:var(--dsw-alias-label-primary)}
@@ -10770,11 +13521,141 @@ function findFigurePlaceholders(source) {
   .lr-note-applybar-count{font-size:10.5px}
 }
 
+
+/* ── Reader note (docs/reader-note-spec.md §7) ───────────────────────────────
+   The record panel is a flex sibling of the split pane, so opening it
+   shortens the split instead of covering the PDF or the chat. */
+.lr-note-entry{position:relative}
+.lr-note-entry-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:color-mix(in srgb,var(--dsw-alias-state-warn-primary) 26%,transparent);color:var(--dsw-alias-label-primary);font-size:10px;font-weight:600;line-height:1}
+.lr-note-dock{position:relative;flex:0 0 auto;display:flex;flex-direction:column;min-height:0;width:100%;border-top:1px solid var(--lr-line,var(--dsw-alias-border-l1));background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary)}
+.lr-note-dock-resize{position:absolute;top:-4px;left:0;right:0;height:9px;display:flex;align-items:center;justify-content:center;cursor:row-resize;touch-action:none;z-index:2}
+.lr-note-dock-grip{width:46px;height:3px;border-radius:2px;background:var(--dsw-alias-border-l2);transition:background .15s ease}
+.lr-note-dock-resize:hover .lr-note-dock-grip{background:var(--lr-accent,var(--dsw-alias-brand-primary))}
+.lr-note-dock-head{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:8px 12px 6px;min-height:36px}
+.lr-note-dock-title{font-size:12.5px;font-weight:650;line-height:1.3}
+.lr-note-dock-hint{font-size:10.5px;color:var(--dsw-alias-label-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr-note-dock-spacer{flex:1 1 auto}
+.lr-note-dock-tools{flex:0 0 auto;display:flex;align-items:center;gap:3px;flex-wrap:wrap;padding:0 12px 7px}
+.lr-note-dock-tool{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 6px;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--dsw-alias-label-secondary);font-family:inherit;font-size:11.5px;font-weight:600;line-height:1;cursor:pointer;transition:background .14s ease,color .14s ease,border-color .14s ease}
+.lr-note-dock-tool:hover:not(:disabled){background:color-mix(in srgb,var(--dsw-alias-label-primary) 7%,transparent);color:var(--dsw-alias-label-primary)}
+.lr-note-dock-tool.is-strong{font-weight:800}
+.lr-note-dock-tool.is-italic{font-style:italic;font-family:Georgia,serif}
+.lr-note-dock-tool:disabled{opacity:.45;cursor:default}
+.lr-note-dock-sep{width:1px;height:16px;margin:0 4px;background:var(--dsw-alias-border-l1)}
+.lr-note-dock-font{display:flex;align-items:center;gap:1px;margin-left:2px}
+.lr-note-dock-font-value{min-width:42px;height:26px;padding:0 4px;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--dsw-alias-label-secondary);font-family:inherit;font-size:11px;font-variant-numeric:tabular-nums;cursor:pointer}
+.lr-note-dock-font-value:hover{background:color-mix(in srgb,var(--dsw-alias-label-primary) 7%,transparent);color:var(--dsw-alias-label-primary)}
+.lr-note-dock-modes{display:flex;align-items:center;gap:2px;padding:2px;border:1px solid var(--lr-line,var(--dsw-alias-border-l1));border-radius:8px}
+.lr-note-dock-mode{height:22px;padding:0 9px;border:0;border-radius:6px;background:transparent;color:var(--dsw-alias-label-secondary);font-family:inherit;font-size:11px;cursor:pointer;transition:background .14s ease,color .14s ease}
+.lr-note-dock-mode.active{background:color-mix(in srgb,var(--lr-accent,var(--dsw-alias-brand-primary)) 14%,transparent);color:var(--dsw-alias-label-primary);font-weight:600}
+.lr-note-dock-body{flex:1 1 auto;display:flex;min-height:0;gap:0;border-top:1px solid var(--lr-line,var(--dsw-alias-border-l1))}
+.lr-note-dock-input{flex:1 1 50%;min-width:0;min-height:0;resize:none;padding:10px 13px 14px;border:0;background:transparent;color:var(--dsw-alias-label-primary);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;line-height:1.65;outline:none;overflow:auto;tab-size:2}
+.lr-note-dock-input::placeholder{color:var(--dsw-alias-label-tertiary)}
+.lr-note-dock-preview{flex:1 1 50%;min-width:0;min-height:0;padding:10px 15px 16px;border-left:1px solid var(--lr-line,var(--dsw-alias-border-l1));line-height:1.7;overflow:auto}
+.lr-note-dock-body.preview-only .lr-note-dock-input{display:none}
+.lr-note-dock-body.preview-only .lr-note-dock-preview{flex-basis:100%;border-left:0}
+.lr-note-dock-empty{display:flex;align-items:center;justify-content:center;height:100%;font-size:11.5px;color:var(--dsw-alias-label-tertiary)}
+.lr-note-dock-preview .lr-note-h{margin:10px 0 6px}
+.lr-note-dock-preview .lr-note-p{margin:0 0 8px}
+.lr-note-dock-preview .lr-note-doc-list{margin:0 0 8px;padding-left:20px}
+.lr-note-dock-preview .lr-note-pre{margin:0 0 8px;padding:8px 10px;border-radius:8px;background:var(--dsw-alias-bg-layer-2);font-size:.92em;overflow:auto}
+.lr-note-dock-preview .lr-note-quote{margin:0 0 8px;padding:2px 0 2px 10px;border-left:2px solid var(--lr-line,var(--dsw-alias-border-l1));color:var(--dsw-alias-label-secondary)}
+.lr-note-dock-preview .lr-note-table-wrap{margin:0 0 8px;overflow:auto}
+.lr-note-dock-preview .lr-note-code{padding:1px 4px;border-radius:4px;background:var(--dsw-alias-bg-layer-2);font-size:.92em}
+.lr-note-dock-preview .lr-note-figure{margin:0 0 8px}
+.lr-note-dock-preview .lr-note-figure img{max-width:100%;border-radius:8px}
+.lr-note-dock-preview .lr-note-hr{margin:10px 0;border:0;border-top:1px solid var(--dsw-alias-border-l1)}
+.lr-note-dock-foot{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:7px 12px 9px;border-top:1px solid var(--lr-line,var(--dsw-alias-border-l1))}
+.lr-note-dock-words{font-size:10.5px;color:var(--dsw-alias-label-tertiary);font-variant-numeric:tabular-nums}
+.lr-note-dock-kbd{margin-left:4px;padding:1px 4px;border:1px solid var(--dsw-alias-border-l1);border-radius:4px;font-family:inherit;font-size:9.5px;color:var(--dsw-alias-label-tertiary)}
+.lr-note-dock-help{flex:0 1 auto;max-height:96px;overflow:auto;padding:0 12px 7px;font-size:10.5px;line-height:1.6;color:var(--dsw-alias-label-secondary)}
+.lr-note-dock-help-title{padding-bottom:3px;font-weight:600;color:var(--dsw-alias-label-primary)}
+.lr-note-dock-help-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0 16px}
+.lr-note-dock-help-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lr-note-dock-help-row kbd{padding:0 4px;border:1px solid var(--dsw-alias-border-l1);border-radius:4px;font-family:inherit;font-size:9.5px;color:var(--dsw-alias-label-tertiary)}
+/* Narrow screens: a full-page editor over the plugin panel (spec §14.1). It is
+   not a drawer and not an overlay card — it replaces the reader surface. */
+.lr-note-dock-full{position:fixed;inset:0;z-index:120;height:auto!important;border-top:0;background:var(--dsw-alias-bg-base);border-radius:0}
+@supports (height: 100dvh){.lr-note-dock-full{height:100dvh!important}}
+.lr-note-dock-full .lr-note-dock-body.full{flex-direction:column}
+.lr-note-dock-full .lr-note-dock-input{flex:1 1 auto;border-left:0}
+.lr-note-dock-full .lr-note-dock-preview{flex:1 1 auto;border-left:0}
+/* Maths (spec §7.4): no library, so the layout is plain CSS. */
+.lr-math{line-height:1.7}
+.lr-math-inline{display:inline-flex;align-items:center;vertical-align:middle}
+.lr-math-display{display:block;text-align:center;padding:6px 0;overflow-x:auto}
+.lr-math-holder{display:inline-flex;align-items:center;vertical-align:middle}
+.lr-math-holder.is-display{display:block}
+.lr-note-math-block{display:block;margin:8px 0;padding:6px 0;text-align:center;overflow-x:auto}
+.lr-math-frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .18em;font-size:.94em;line-height:1.15}
+.lr-math-num{padding:0 .18em}
+.lr-math-den{padding:0 .18em;border-top:1px solid currentColor}
+.lr-math-sqrt{display:inline-flex;align-items:flex-start;margin:0 .1em}
+.lr-math-radical{line-height:1}
+.lr-math-sqrt-body{border-top:1px solid currentColor;padding:0 .12em;line-height:1.15}
+.lr-math-sqrt-index{font-size:.68em;line-height:1;transform:translateY(-.15em)}
+.lr-math-script{display:inline-flex;align-items:baseline}
+.lr-math-sub,.lr-math-sup{font-size:.7em;line-height:0}
+.lr-math-func{font-style:italic;margin-right:.08em}
+.lr-math-text{font-style:normal}
+/* An unknown command stays visible instead of silently disappearing. */
+.lr-math-unknown{padding:0 3px;border-radius:3px;background:color-mix(in srgb,var(--dsw-alias-state-error-primary) 12%,transparent);color:var(--dsw-alias-state-error-primary);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em}
+/* 「整理笔记」 badge + the suspicious-finding dialog. */
+.lr-note-organize{position:relative;gap:5px}
+.lr-note-organize-badge{display:inline-flex;align-items:center;justify-content:center;min-width:15px;height:15px;padding:0 4px;border-radius:8px;background:color-mix(in srgb,var(--dsw-alias-state-warn-primary) 30%,transparent);font-size:9.5px;font-weight:700;line-height:1}
+.lr-note-questions{display:flex;flex-direction:column;gap:10px}
+.lr-note-questions-empty{display:flex;align-items:center;gap:8px;padding:14px;border:1px solid var(--lr-line,var(--dsw-alias-border-l1));border-radius:10px;color:var(--dsw-alias-label-secondary);font-size:12px}
+.lr-note-question{padding:12px;border:1px solid var(--lr-line,var(--dsw-alias-border-l1));border-radius:11px;background:var(--dsw-alias-bg-layer-1)}
+.lr-note-question-quote{display:flex;align-items:flex-start;gap:6px;font-size:12.5px;line-height:1.6;color:var(--dsw-alias-label-primary)}
+.lr-note-question-quote q{font-style:italic}
+.lr-note-question-problem{margin-top:6px;font-size:11.5px;line-height:1.6;color:var(--dsw-alias-label-secondary)}
+.lr-note-question-ask{display:flex;gap:6px;margin-top:5px;font-size:11.5px;line-height:1.6;color:var(--dsw-alias-label-primary)}
+.lr-note-question-label{flex:0 0 auto;font-weight:600;color:var(--dsw-alias-state-warn-primary)}
+.lr-note-question-thread{margin-top:8px;display:flex;flex-direction:column;gap:5px;padding:7px 9px;border-radius:8px;background:var(--dsw-alias-bg-layer-2);font-size:11.5px;line-height:1.6}
+.lr-note-question-msg.user{color:var(--dsw-alias-label-primary);font-weight:600}
+.lr-note-question-msg.ai{color:var(--dsw-alias-label-secondary);white-space:pre-wrap}
+.lr-note-question-input{width:100%;min-height:56px;margin-top:8px;padding:7px 9px;border:1px solid var(--dsw-alias-border-l1);border-radius:8px;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-family:inherit;font-size:11.5px;line-height:1.6;resize:vertical}
+.lr-note-question-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px}
+.lr-note-questions-foot{display:flex;align-items:center;padding-top:2px}
+/* Library: one row per paper with an expandable 三件套 panel (spec §12.4). */
+.lr-pdf-expand{align-self:flex-start;display:inline-flex;align-items:center;gap:4px;margin-top:2px;padding:3px 7px;border:1px solid var(--dsw-alias-border-l1);border-radius:7px;background:transparent;color:var(--dsw-alias-label-secondary);font-family:inherit;font-size:10.5px;cursor:pointer;transition:background .14s ease,color .14s ease}
+.lr-pdf-expand:hover,.lr-pdf-expand.open{background:color-mix(in srgb,var(--lr-accent,var(--dsw-alias-brand-primary)) 9%,transparent);color:var(--dsw-alias-label-primary)}
+.lr-pdf-trio{display:flex;flex-direction:column;gap:5px;margin-top:2px;padding:8px;border:1px dashed var(--dsw-alias-border-l2);border-radius:9px;background:color-mix(in srgb,var(--lr-accent,var(--dsw-alias-brand-primary)) 3%,transparent)}
+.lr-pdf-trio .lr-btn{justify-content:flex-start}
+.lr-reader-note-pill{display:inline-flex;align-items:center;height:16px;padding:0 6px;border-radius:8px;border:1px solid color-mix(in srgb,var(--lr-teal,#0d9488) 40%,transparent);background:color-mix(in srgb,var(--lr-teal,#0d9488) 13%,transparent);color:var(--lr-teal,#0d9488);font-size:9.5px;font-weight:600;line-height:1;white-space:nowrap}
+.lr-standalone-pill{display:inline-flex;align-items:center;height:16px;padding:0 6px;border-radius:8px;border:1px solid var(--dsw-alias-border-l1);color:var(--dsw-alias-label-tertiary);font-size:9.5px;line-height:1;white-space:nowrap}
+.lr-note-scope{display:flex;align-items:center;gap:7px;margin-bottom:2px;padding:2px;font-size:11px;color:var(--dsw-alias-label-secondary);cursor:pointer;user-select:none}
+.lr-note-scope input{width:13px;height:13px;accent-color:var(--lr-accent,var(--dsw-alias-brand-primary));cursor:pointer}
+/* Delete dialog: keep / summary / all (spec §12.3). */
+.lr-delete-choice{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.lr-delete-choice-title{font-size:11.5px;font-weight:600;color:var(--dsw-alias-label-secondary)}
+.lr-delete-option{display:flex;align-items:flex-start;gap:8px;padding:9px 10px;border:1px solid var(--dsw-alias-border-l1);border-radius:9px;cursor:pointer;transition:border-color .14s ease,background .14s ease}
+.lr-delete-option:hover{border-color:var(--dsw-alias-border-l2)}
+.lr-delete-option.checked{border-color:color-mix(in srgb,var(--lr-accent,var(--dsw-alias-brand-primary)) 52%,var(--dsw-alias-border-l1));background:color-mix(in srgb,var(--lr-accent,var(--dsw-alias-brand-primary)) 7%,transparent)}
+.lr-delete-option input{flex:0 0 auto;margin-top:2px;width:14px;height:14px;accent-color:var(--lr-accent,var(--dsw-alias-brand-primary));cursor:pointer}
+.lr-delete-option-body{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lr-delete-option-label{font-size:12px;font-weight:600;line-height:1.4;color:var(--dsw-alias-label-primary)}
+.lr-delete-option-desc{font-size:11px;line-height:1.55;color:var(--dsw-alias-label-secondary)}
+@media(max-width:900px){
+  /* Below 900px the editor and the preview stack instead of splitting. */
+  .lr-note-dock-body{flex-direction:column}
+  .lr-note-dock-preview{border-left:0;border-top:1px solid var(--lr-line,var(--dsw-alias-border-l1))}
+  .lr-note-dock:not(.lr-note-dock-full) .lr-note-dock-body{flex-direction:column}
+  .lr-note-dock:not(.lr-note-dock-full) .lr-note-dock-input{flex:1 1 auto}
+  .lr-note-dock:not(.lr-note-dock-full) .lr-note-dock-preview{flex:1 1 auto}
+}
+@media(max-width:860px){
+  .lr-note-entry .lr-label{display:none}
+  .lr-note-dock-full .lr-note-dock-hint{display:none}
+  .lr-note-dock-full .lr-note-dock-body{flex-direction:column}
+  .lr-note-dock-full .lr-note-dock-input,.lr-note-dock-full .lr-note-dock-preview{flex:1 1 auto}
+}
 `
 
     return {
-      inject: ['slots', 'locale'],
+      inject: ['slots', 'locale', 'layout'],
       apply(ctx) {
+        layoutService = ctx.layout
         ctx.effect(
           () =>
             ctx.locale.register(NS, {

@@ -75,7 +75,8 @@ test('POST /summary generates a note, resolves figure placeholders and mirrors i
     // label, so only the shape and the link target are asserted here.
     const imageLine = body.split('\n').find((line) => line.startsWith('![') && line.includes('fig-p01-01.png'))
     assert.ok(imageLine, 'the placeholder must be replaced by an image block')
-    assert.match(imageLine, /^!\[[^\]]+\]\(_附件\/paper-test-001\/fig-p01-01\.png\)$/)
+    // spec §7.8b: summary figures live under _附件/<id>/图/ next to the PDF.
+    assert.match(imageLine, /^!\[[^\]]+\]\(_附件\/paper-test-001\/图\/fig-p01-01\.png\)$/)
     assert.match(body, /\n\*[^*\n]+ · p\.1\*\n/, 'the image must be followed by a p.1 caption line')
     assert.doesNotMatch(body, /\[\[FIGURE/, 'no placeholder may survive the generation step')
     assert.deepEqual(await readdir(path.join(app.paperDir(), 'figures')), ['fig-p01-01.png'])
@@ -86,7 +87,7 @@ test('POST /summary generates a note, resolves figure placeholders and mirrors i
     assert.match(note, /^---\n/)
     assert.match(note, /> \[!info\] 来源/)
     assert.match(note, /fig-p01-01\.png/)
-    const attachment = path.join(app.vaultPath, NOTES_FOLDER, '_附件', PAPER_ID, 'fig-p01-01.png')
+    const attachment = path.join(app.vaultPath, NOTES_FOLDER, '_附件', PAPER_ID, '图', 'fig-p01-01.png')
     assert.deepEqual([...(await readFile(attachment)).subarray(0, 4)], [0x89, 0x50, 0x4e, 0x47])
 
     const meta = await app.readMeta()
@@ -500,7 +501,8 @@ test('POST /summary/images inserts at an explicit heading and copies the file tw
     const body = res.json()
     assert.equal(body.status, 'inserted')
     assert.ok(!('fallback' in body), 'an explicit anchor must not report a fallback')
-    assert.match(body.markdown, /!\[测试插图\]\(_附件\/paper-test-001\/img-/)
+    // spec §7.8b: summary figures live under _附件/<id>/图/ next to the PDF.
+    assert.match(body.markdown, /!\[测试插图\]\(_附件\/paper-test-001\/图\/img-/)
 
     // Inserted inside the chosen section, before the next same-level heading.
     const headingAt = body.markdown.indexOf('## 4. 实验、数据与结果')
@@ -510,7 +512,9 @@ test('POST /summary/images inserts at an explicit heading and copies the file tw
 
     const localFigures = await readdir(path.join(app.paperDir(), 'figures'))
     assert.equal(localFigures.length, 1)
-    const vaultFigures = await readdir(path.join(app.vaultPath, NOTES_FOLDER, '_附件', PAPER_ID))
+    const vaultFigures = await readdir(
+      path.join(app.vaultPath, NOTES_FOLDER, '_附件', PAPER_ID, '图'),
+    )
     assert.deepEqual(vaultFigures, localFigures)
   } finally {
     await app.close()
@@ -700,7 +704,8 @@ test('image placement answers twice, then forces the end with fallback="end" (sp
     assert.equal(third.fallback, 'end')
     const imageAt = third.markdown.indexOf(')')
     assert.ok(third.markdown.trimEnd().length - third.markdown.lastIndexOf('](/') < 400)
-    assert.match(third.markdown, /!\[[^\]]*\]\(_附件\/paper-test-001\/img-/)
+    // spec §7.8b: summary figures live under _附件/<id>/图/ next to the PDF.
+    assert.match(third.markdown, /!\[[^\]]*\]\(_附件\/paper-test-001\/图\/img-/)
   } finally {
     await app.close()
   }
@@ -724,7 +729,8 @@ test('image placement force:true appends at the end with fallback="end"', async 
     assert.equal(body.status, 'inserted')
     assert.equal(body.fallback, 'end')
     // The image block is the last thing in the note.
-    assert.match(body.markdown.trimEnd().split('\n').slice(-1)[0], /_附件\/paper-test-001\/img-/)
+    // spec §7.8b: summary figures live under _附件/<id>/图/ next to the PDF.
+    assert.match(body.markdown.trimEnd().split('\n').slice(-1)[0], /_附件\/paper-test-001\/图\/img-/)
   } finally {
     await app.close()
   }
@@ -886,7 +892,8 @@ test('an unavailable vault degrades to a local-only save with a noteError', asyn
       caption: '降级插图',
     })
     assert.equal(withImage.status, 200)
-    assert.match(withImage.json().markdown, /!\[降级插图\]\(_附件\/paper-test-001\/img-/)
+    // spec §7.8b: summary figures live under _附件/<id>/图/ next to the PDF.
+    assert.match(withImage.json().markdown, /!\[降级插图\]\(_附件\/paper-test-001\/图\/img-/)
   } finally {
     await app.close()
   }
