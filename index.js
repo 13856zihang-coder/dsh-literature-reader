@@ -506,6 +506,8 @@ function makeSse(res, onAbort) {
 
 function publicPaper(meta) {
   const summaryExists = Boolean(meta.summaryPath) && existsSync(meta.summaryPath)
+  const storageMode = meta.storageMode || (meta.vaultPath ? 'obsidian' : 'local')
+  const syncState = meta.syncState || (storageMode === 'obsidian' ? 'synced' : 'local-only')
   // The reader note lives in the vault, so its presence is a file check like the
   // summary's (spec §3.10). A path recorded in meta that no longer exists must
   // not claim `hasReaderNote: true`.
@@ -546,6 +548,8 @@ function publicPaper(meta) {
     chatCount: meta.chatCount || 0,
     sha256: meta.sha256 || '',
     sourceAsset: meta.sourceAsset || '',
+    storageMode,
+    syncState,
     vaultPath: meta.vaultPath || '',
     vaultFolder: meta.vaultPath ? dirnameRel(meta.vaultPath) : '',
     vaultMissing: Boolean(meta.vaultPath) && meta.vaultExists === false,
@@ -719,6 +723,8 @@ export function apply(ctx, rawConfig = {}) {
       const existing = Boolean(meta.summaryPath) && existsSync(meta.summaryPath)
       if (existing) {
         const note = await updateSummaryNote({ vault, config, meta, body: markdown, tags })
+        meta.storageMode = 'obsidian'
+        meta.syncState = 'synced'
         return { notePath: note.path, noteRelative: note.relative, noteCreated: false, noteError: '' }
       }
       // A fresh note gets the full source frontmatter, not just the tags.
@@ -732,8 +738,12 @@ export function apply(ctx, rawConfig = {}) {
         pdfPath: sourcePdf && existsSync(sourcePdf) ? sourcePdf : path.join(dir, 'source.pdf'),
       })
       meta.summaryPath = note.path
+      meta.storageMode = 'obsidian'
+      meta.syncState = 'synced'
       return { notePath: note.path, noteRelative: note.relative, noteCreated: true, noteError: '' }
     } catch (error) {
+      meta.storageMode = meta.vaultPath ? 'obsidian' : 'local'
+      meta.syncState = 'local-only'
       return {
         notePath: meta.summaryPath || '',
         noteRelative: '',
@@ -1600,6 +1610,8 @@ export function apply(ctx, rawConfig = {}) {
       sha256,
       vaultPath: normalized,
       vaultExists: true,
+      storageMode: 'obsidian',
+      syncState: 'synced',
       sourceAsset: '',
       pageCount: details.pages || 0,
       createdAt: nowIso(),
@@ -3735,6 +3747,8 @@ export function apply(ctx, rawConfig = {}) {
         fileSize: uploadInfo.size,
         vaultPath: '',
         vaultExists: false,
+        storageMode: 'local',
+        syncState: 'local-only',
         sourceAsset: '',
         pageCount: info.pages || 0,
         createdAt: nowIso(),
@@ -3865,6 +3879,8 @@ export function apply(ctx, rawConfig = {}) {
       sha256,
       vaultPath: targetRel,
       vaultExists: true,
+      storageMode: 'obsidian',
+      syncState: 'synced',
       sourceAsset: '',
       pageCount: info.pages || 0,
       createdAt: nowIso(),

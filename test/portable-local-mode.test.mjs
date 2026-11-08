@@ -50,6 +50,8 @@ test('PDF import works without Obsidian and stores the source in the paper cache
     assert.equal(finished.json().localOnly, true)
     const paper = finished.json().paper
     assert.equal(paper.vaultPath, '')
+    assert.equal(paper.storageMode, 'local')
+    assert.equal(paper.syncState, 'local-only')
     assert.equal(existsSync(path.join(app.paperDir(paper.id), 'source.pdf')), true)
     assert.equal((await readFile(path.join(app.paperDir(paper.id), 'source.pdf'))).subarray(0, 5).toString(), '%PDF-')
   } finally {

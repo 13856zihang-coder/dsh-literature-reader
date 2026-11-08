@@ -8,6 +8,7 @@ window.__ModuleLoader__.load({
     const NS = 'literature-reader'
     const API = '/literature-reader/api'
     const LAST_KEY = 'dsh.literature.lastPaper.v1'
+    const PAGE_KEY = 'dsh.literature.lastPage.v1'
     const EMPTY = []
     const ZOOM_MIN = 40
     const ZOOM_MAX = 300
@@ -57,6 +58,7 @@ window.__ModuleLoader__.load({
       vaultUnavailablePath: '未连接（本地阅读模式）',
       vaultUnavailableRetry: '重新检测',
       vaultDownload: '下载 Obsidian',
+      localMode: '本地模式',
       noSearchResults: '没有匹配的文献',
       statusUnread: '未阅读',
       statusProcessing: '处理中',
@@ -563,6 +565,7 @@ window.__ModuleLoader__.load({
       vaultUnavailablePath: 'Not connected (local reading mode)',
       vaultUnavailableRetry: 'Detect again',
       vaultDownload: 'Download Obsidian',
+      localMode: 'Local mode',
       noSearchResults: 'No matching literature',
       statusUnread: 'Unread',
       statusProcessing: 'Processing',
@@ -2033,6 +2036,10 @@ function findFigurePlaceholders(source) {
         // ignore storage failures
       }
       return fallback
+    }
+
+    function pageStorageKey(paperId) {
+      return `${PAGE_KEY}.${paperId}`
     }
 
     function safeError(error) {
@@ -9230,6 +9237,17 @@ function findFigurePlaceholders(source) {
         currentPageRef.current = currentPage
       }, [currentPage])
 
+      // Keep a small resume cursor per paper. This is local UI state and does
+      // not change the PDF, vault files, or the paper record.
+      useEffect(() => {
+        if (!paper?.id) return
+        try {
+          localStorage.setItem(pageStorageKey(paper.id), String(currentPage))
+        } catch {
+          // storage can be unavailable
+        }
+      }, [paper?.id, currentPage])
+
       useEffect(() => {
         zoomRef.current = zoom
       }, [zoom])
@@ -9372,8 +9390,15 @@ function findFigurePlaceholders(source) {
           upsertPaper(nextPaper)
           setMessages(chatResult.messages || [])
           setAnnotations(annotationResult.strokes || [])
-          setRangeStart(1)
-          setRangeEnd(Math.min(nextPaper.pageCount || 1, 5))
+          const resumePage = storedNumber(
+            pageStorageKey(nextPaper.id),
+            1,
+            1,
+            Math.max(1, nextPaper.pageCount || 1),
+          )
+          setCurrentPage(resumePage)
+          setRangeStart(resumePage)
+          setRangeEnd(Math.min(nextPaper.pageCount || 1, Math.max(5, resumePage)))
           localStorage.setItem(LAST_KEY, id)
           lastPaperId.current = id
           if (nextPaper.status === 'processing') startOutlineLater(nextPaper)
@@ -12038,6 +12063,9 @@ function findFigurePlaceholders(source) {
                     ),
                     paper.year ? h('span', { className: 'lr-meta-chip' }, String(paper.year)) : null,
                     h('span', { className: 'lr-meta-chip' }, pageCountLabel(paper)),
+                    paper.storageMode === 'local'
+                      ? h('span', { className: 'lr-meta-chip warm' }, t('localMode'))
+                      : null,
                   ),
                 )
               : h('div', { className: 'lr-title-block' }, h('div', { className: 'lr-title' }, t('panel'))),
