@@ -1423,7 +1423,30 @@ export function apply(ctx, rawConfig = {}) {
 
   async function buildVaultLibrary(refresh = false) {
     const vault = await getVaultInfo()
-    if (!vault) throw new HttpError(400, '未找到 Obsidian 库')
+    if (!vault) {
+      const records = await listMetaRecords()
+      return {
+        available: false,
+        reason: '未找到 Obsidian 库。当前可继续使用本地阅读缓存；配置 vault 后才能同步文件与笔记。',
+        vault: null,
+        folders: [],
+        root: '',
+        pdfs: [],
+        notes: [],
+        detached: records.map((meta) => ({
+          paperId: meta.id,
+          title: meta.title || meta.fileName,
+          fileName: meta.fileName || '',
+          status: meta.status || 'ready',
+          analysisReady: Boolean(meta.analysisReady),
+          hasSummary: Boolean(meta.summaryPath && existsSync(meta.summaryPath)),
+          vaultPath: meta.vaultPath || '',
+          vaultMissing: Boolean(meta.vaultPath) && meta.vaultExists === false,
+        })),
+        stats: { pdfs: 0, notes: 0, folders: 0, linked: 0 },
+        defaultFolder: '',
+      }
+    }
     /** Absolute path → POSIX path relative to the vault ('' when outside). */
     const vaultRelOf = (abs) => {
       if (!abs) return ''
@@ -1508,6 +1531,7 @@ export function apply(ctx, rawConfig = {}) {
       }))
       .filter((item) => item.vaultPath || item.status !== 'ready')
     return {
+      available: true,
       vault: { path: vault.path, name: vault.name, isVault: Boolean(vault.isVault) },
       folders: scan.folders,
       root: scan.root,
@@ -3676,9 +3700,74 @@ export function apply(ctx, rawConfig = {}) {
     }
     await ready
     const vault = await getVaultInfo()
-    if (!vault) throw new HttpError(400, '未找到 Obsidian 库，无法导入到 vault')
     const sha256 = await sha256File(upload.file)
     const existing = (await listMetaRecords()).find((item) => item.sha256 === sha256)
+    // Obsidian is optional. Keep an imported PDF inside its paper cache when
+    // no vault is available, so the core reader remains usable and can be
+    // synced later after the user configures a vault.
+    if (!vault) {
+      if (existing) {
+        await unlink(upload.file).catch(() => {})
+        const existingMeta = await loadMeta(existing.id)
+        if (existingMeta.status === 'processing' && !jobs.has(existing.id)) startProcessing(existing.id)
+        json(res, 200, { paper: publicPaper(existingMeta), deduped: true, localOnly: true })
+        return
+      }
+      const fileName = `${safeFileName(upload.name.replace(/\.pdf$/i, ''), 'paper')}.pdf`
+      const id = slugForPaper(fileName)
+      const dir = paperDirOf(id)
+      await mkdir(dir, { recursive: true })
+      const targetAbs = path.join(dir, 'source.pdf')
+      await rename(upload.file, targetAbs).catch(async () => {
+        await copyFile(upload.file, targetAbs)
+        await unlink(upload.file).catch(() => {})
+      })
+      let info = { pages: 0 }
+      try {
+        info = await pdfInfo(targetAbs, config)
+      } catch {
+        info = { pages: 0 }
+      }
+      const meta = {
+        id,
+        title: safeFileName(upload.name),
+        fileName,
+        fileSize: uploadInfo.size,
+        vaultPath: '',
+        vaultExists: false,
+        sourceAsset: '',
+        pageCount: info.pages || 0,
+        createdAt: nowIso(),
+        updatedAt: nowIso(),
+        status: 'processing',
+        phase: 'extract',
+        progress: { label: '已导入本地缓存，准备解析…', done: 0, total: 1 },
+        scanned: false,
+        chars: 0,
+        ocrDone: 0,
+        ocrTotal: 0,
+        authors: [],
+        year: null,
+        venue: '',
+        doi: '',
+        abstract: '',
+        keywords: [],
+        tags: [],
+        tldr: '',
+        outline: [],
+        analysisReady: false,
+        analysisError: '',
+        error: '',
+        summaryPath: '',
+        summarizedAt: '',
+        chatCount: 0,
+      }
+      await writeJson(path.join(dir, 'meta.json'), meta)
+      metaCache.set(id, meta)
+      startProcessing(id)
+      json(res, 200, { paper: publicPaper(meta), localOnly: true })
+      return
+    }
     if (existing?.vaultPath) {
       await unlink(upload.file).catch(() => {})
       const existingMeta = await loadMeta(existing.id)
