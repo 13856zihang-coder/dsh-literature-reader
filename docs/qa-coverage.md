@@ -12,9 +12,14 @@
 ## 0. 本轮基线（阅读笔记，2026-11-07 实测）
 
 ```
-node --test   →  tests 405 / suites 38 / pass 405 / fail 0 / cancelled 0 / skipped 0 / 11.5s
+node --test   →  tests 432 / suites 43 / pass 432 / fail 0 / cancelled 0 / skipped 0 / 11.8s
 node --check  →  index.js client.js lib/{ai,reader-note,vault,obsidian,figures}.js  7/7 OK
 ```
+
+> 2026-11-09 增量（输入法修复）：新增 `test/modal-ime.test.mjs`（2 suites / **9 例**），
+> 覆盖 spec §7.3b（合成期不抢跑）与 §7.3c（弹窗重渲染不抢焦点）。总数 423 → 432，suites 41 → 43。
+> 该文件是唯一使用**真实 `useEffect`** 的客户端测试：`reader-note-ui.test.mjs` 的 `useEffect` 是空实现，
+> 因此对「effect 重跑抢焦点」这类缺陷无能为力。
 
 按文件分布（阅读笔记相关的六个文件全部为本轮新增，`host-api` 与 `client-sync` 有既有用例被本轮改动）：
 
@@ -26,6 +31,7 @@ node --check  →  index.js client.js lib/{ai,reader-note,vault,obsidian,figures
 | `test/tripod.test.mjs` | 18 | data-layer | 新增 |
 | `test/reader-note-ui.test.mjs` | 60 | client-ui | 新增 |
 | `test/reader-note-integration.test.mjs` | 8 | **qa (t5)** | 新增 |
+| `test/modal-ime.test.mjs` | 9 | client-ui | 新增（输入法 / 弹窗焦点，真实 `useEffect`） |
 | `test/fullscreen.test.mjs` | 13 | client-ui | 新增（全屏阅读） |
 | `test/host-api.test.mjs` | 37 | **qa (t5)** | 既有，3 处断言随三件套更新 |
 | `test/client-sync.test.mjs` | 5 | **qa (t5)** | 既有，§7 路由清单更新 |
@@ -120,6 +126,8 @@ node --check  →  index.js client.js lib/{ai,reader-note,vault,obsidian,figures
 | §7.2 草稿按 paperId、≤200KB、防抖 400ms、提交后清空 | `#drafts are per paper, round-trip, and clear on demand`；源码 `READER_NOTE_DRAFT_DEBOUNCE = 400`、`READER_NOTE_DRAFT_LIMIT = 200*1024` | 覆盖（防抖时序为源码核对，未用假时钟验证） |
 | §7.3 快捷键全表 + Cmd 等价 + 未识别键放行 | `#every documented Ctrl shortcut maps to its command`、`#font size and submit map to actions, not commands`、`#macOS Cmd behaves exactly like Ctrl`、`#unrelated keys stay unhandled so the textarea keeps them`、`#applyReaderNoteKey turns a keydown into new text plus a selection` | 覆盖 |
 | §7.3 `applyMarkdownCommand` 全命令矩阵（包裹/取消/行前缀/链接） | 该文件 9 例 | 覆盖 |
+| §7.3b IME 合成期间不抢跑（上屏 Enter 不提交、取消候选的 Esc 不关闭、合成中不挪焦点） | `modal-ime.test.mjs#IME composition guards`（4 例：三种合成形态 `isComposing`/`keyCode 229`/`Process`、`isActionableEnter` 对上屏 Enter 一律 false、dock 的 `Esc`/`Ctrl+Enter` 合成中返回 `null`、`applyReaderNoteKey` 返回 `{handled:false}`） | 覆盖 |
+| §7.3c 弹窗重渲染不得抢焦点（新建文件夹 / 重命名 / 各输入弹窗） | `modal-ime.test.mjs#Modal focus must survive a re-render`（5 例，真实 `useEffect` + 假 DOM）。关键用例 `typing a letter does not steal focus from the input` 已用变异验证：把 effect 改回依赖 `onClose` 即失败 | 覆盖 |
 | §7.4 `renderMath` 子集 + 未知命令原样显示 + 不抛异常 | `#the documented subset renders to readable text`、`#\begin{aligned} stacks rows…`、`#an unknown command is shown verbatim in monospace instead of throwing`、`#malformed input never throws`、`#inline and display maths render as an element of the right shape` | 覆盖（希腊字母大小写、`\sum` 等符号为源码枚举核对） |
 | §7.4 预览里 `## HH:mm · …` 按普通二级标题渲染 | `#the preview renders maths, headings and entry titles`、`#the preview never throws on odd markdown` | 覆盖 |
 | §7.5 整理完成 toast、疑似错误对话框（quote/problem/ask + 讨论 + 修正 + 保留） | `#organize toast accepts either stats or report`、`#the questions dialog shows quote, problem and ask for each item`、`#resolved items drop out and an empty state explains why`、`#the dialog prefers the persisted discussion thread over the session one`、`#the dialog renders without questions at all` | 覆盖 |

@@ -424,6 +424,31 @@ async rewriteReaderNoteQuestion({ meta, markdown, question, history, signal })  
 支持包裹（`**`、`*`、`` ` ``、`$`、`$$`）、行前缀（`# `、`## `、`### `、`- `、`1. `、`> ` 及「恢复正文」移除行首标记）、
 链接（有选区 `[选区](url)`，无选区插入 `[]()`）。已有同类标记时执行「取消」。
 
+### 7.3b 输入法（IME）合成期间不得抢跑
+
+中文/日文/韩文输入在候选未上屏前处于**合成中**（`compositionstart` … `compositionend`）。这段时间里的
+按键属于输入法，不属于应用：
+
+- 合成中的 `keydown` 报 `key === 'Process'` 或 `keyCode === 229`；`nativeEvent.isComposing === true` 也成立。
+- 用于**上屏的那次 `Enter`** 只应提交候选词，不能触发「记录」「确定」「应用」等动作，也不能 `preventDefault`。
+- 用于**取消候选列表的那次 `Esc`** 只应收起候选框，不能关闭弹窗/面板。
+- 合成中不得移动焦点，否则浏览器会直接 `compositionend`，用户表现为「打一个字就退出来」。
+
+统一判定（`client.js` 的 `isComposingEvent` / `isActionableEnter`）：
+`isComposingEvent` 覆盖 `isComposing`、`keyCode === 229`、`key === 'Process'` 三种形态；
+所有「回车提交」一律走 `isActionableEnter(event[, { modifiers: true }])`；
+`readerNoteCommandForKey` 在合成中直接返回 `null`，把按键交还给 textarea。
+
+### 7.3c 弹窗不得在重渲染时抢焦点
+
+`Modal` 的 `onClose` 在每个调用点都是内联箭头函数，每次渲染都是新引用。若 effect 依赖 `onClose`，
+则**输入一个字母引起的重渲染就会重跑 effect**，其中安排的光标复位会把焦点从输入框挪到 `✕` 按钮上，
+既打断输入也打断输入法（与 §7.3b 叠加，就是「每次打一个字母就会退出」）。
+
+约定：`Modal` 用 ref 持有最新 `onClose`，监听器只在挂载时安装一次（依赖 `[]`）；
+初始焦点在挂载后只决定一次——正文若已有焦点（`autoFocus` 生效或用户正在输入）则**不打扰**，
+否则聚焦正文里第一个文本输入控件，没有文本控件才回落到 `✕`（保证 `Esc` 可达）。
+
 ### 7.4 公式
 
 `renderMath(source, { display })` → React 节点。**离线自研，不引入外部库**（客户端 bundle 不能 require npm 包）。

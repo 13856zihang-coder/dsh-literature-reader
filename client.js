@@ -2261,22 +2261,81 @@ function findFigurePlaceholders(source) {
       return h('span', { className: 'lr-spinner', style: { width: size, height: size }, 'aria-hidden': true })
     }
 
+    /**
+     * True while an input method editor is composing (Chinese/Japanese/Korean).
+     * The Enter that commits a candidate, the Escape that dismisses the
+     * candidate list and the `Process` keydowns emitted while picking one must
+     * never be read as "submit" or "close".
+     */
+    function isComposingEvent(event) {
+      const native = event?.nativeEvent || event
+      if (!native) return false
+      if (native.isComposing === true) return true
+      // Safari/Firefox expose composition state only through the key code.
+      if (native.keyCode === 229) return true
+      return native.key === 'Process'
+    }
+
+    /**
+     * A plain Enter — the only one that may act. `modifiers` requires Ctrl/Cmd
+     * (textarea shortcuts such as Ctrl+Enter) and still defers to composition.
+     */
+    function isActionableEnter(event, { modifiers = false } = {}) {
+      if (!event || event.key !== 'Enter' || isComposingEvent(event)) return false
+      if (modifiers) return Boolean(event.ctrlKey || event.metaKey)
+      return true
+    }
+
+    /**
+     * A control the user types into. Checkboxes and radios are excluded so a
+     * list-only dialog keeps its previous behaviour (focus on the close button).
+     */
+    function isTextEntry(node) {
+      if (!node) return false
+      const tag = String(node.tagName || '').toLowerCase()
+      if (tag === 'textarea' || tag === 'select') return true
+      if (tag !== 'input') return false
+      const type = String(node.type || 'text').toLowerCase()
+      return !['checkbox', 'radio', 'file', 'submit', 'button', 'reset', 'image', 'range', 'color'].includes(type)
+    }
+
     function Modal({ title, subtitle, onClose, children, wide = false, elevated = false }) {
       const closeRef = useRef(null)
+      // Call sites pass a fresh `onClose` arrow on every render, so an effect
+      // depending on it re-ran on every keystroke — and every run scheduled
+      // `closeRef.focus()`, which pulled focus out of the field being typed
+      // into and aborted IME composition after the first letter. Keep the
+      // latest callback in a ref so the listener installs once per modal.
+      const onCloseRef = useRef(onClose)
+      onCloseRef.current = onClose
       useEffect(() => {
         const onKey = (event) => {
-          if (event.key === 'Escape') onClose?.()
+          // Escape may be dismissing an IME candidate list instead.
+          if (event.key === 'Escape' && !isComposingEvent(event)) onCloseRef.current?.()
         }
         window.addEventListener('keydown', onKey)
         const previous = document.body.style.overflow
         document.body.style.overflow = 'hidden'
-        const timer = setTimeout(() => closeRef.current?.focus(), 30)
         return () => {
           window.removeEventListener('keydown', onKey)
           document.body.style.overflow = previous
-          clearTimeout(timer)
         }
-      }, [onClose])
+      }, [])
+      // Choose the initial focus once, when the dialog opens. A text field that
+      // already took focus through `autoFocus` is left alone: re-focusing on a
+      // later render is exactly what used to interrupt typing.
+      useEffect(() => {
+        const timer = setTimeout(() => {
+          const modal = closeRef.current?.closest?.('.lr-modal')
+          // A field that already has focus (through `autoFocus`, or because the
+          // user is typing) is never disturbed.
+          if (modal && modal.contains(document.activeElement)) return
+          const fields = modal?.querySelectorAll?.('input, textarea, select')
+          const field = fields ? Array.from(fields).find(isTextEntry) : null
+          ;(field || closeRef.current)?.focus()
+        }, 30)
+        return () => clearTimeout(timer)
+      }, [])
       return h(
         'div',
         {
@@ -2682,14 +2741,17 @@ function findFigurePlaceholders(source) {
       onEffort,
     }) {
       const panelRef = useRef(null)
+      const onCloseRef = useRef(onClose)
+      onCloseRef.current = onClose
       useEffect(() => {
         if (!open) return undefined
         const onKey = (event) => {
-          if (event.key === 'Escape') onClose?.()
+          // Escape may belong to an IME candidate list instead.
+          if (event.key === 'Escape' && !isComposingEvent(event)) onCloseRef.current?.()
         }
         const onDown = (event) => {
           const node = panelRef.current
-          if (node && !node.contains(event.target)) onClose?.()
+          if (node && !node.contains(event.target)) onCloseRef.current?.()
         }
         window.addEventListener('keydown', onKey)
         document.addEventListener('mousedown', onDown, true)
@@ -2697,7 +2759,7 @@ function findFigurePlaceholders(source) {
           window.removeEventListener('keydown', onKey)
           document.removeEventListener('mousedown', onDown, true)
         }
-      }, [open, onClose])
+      }, [open])
       if (!open) return null
 
       const selection = health?.selection || {
@@ -2719,7 +2781,7 @@ function findFigurePlaceholders(source) {
           h('span', { className: 'lr-model-pop-title' }, t('modelPickerTitle')),
           h(
             'button',
-            { type: 'button', className: 'lr-btn icon small', onClick: onClose, 'aria-label': t('close') },
+            { type: 'button', className: 'lr-btn icon small', onClick: () => onCloseRef.current?.(), 'aria-label': t('close') },
             h(Icon, { name: 'close', size: 12 }),
           ),
         ),
@@ -4122,7 +4184,8 @@ function findFigurePlaceholders(source) {
                     onChange: (event) => setFolderName(event.target.value),
                     autoFocus: true,
                     onKeyDown: (event) => {
-                      if (event.key === 'Enter') createFolder()
+                      // Enter that commits an IME candidate must not submit.
+                      if (isActionableEnter(event)) createFolder()
                     },
                   }),
                 ),
@@ -4165,7 +4228,7 @@ function findFigurePlaceholders(source) {
                     onChange: (event) => setRenameValue(event.target.value),
                     autoFocus: true,
                     onKeyDown: (event) => {
-                      if (event.key === 'Enter') saveRename()
+                      if (isActionableEnter(event)) saveRename()
                     },
                   }),
                 ),
@@ -5262,6 +5325,9 @@ function findFigurePlaceholders(source) {
      */
     function readerNoteCommandForKey(event) {
       if (!event || event.altKey) return null
+      // While an IME is composing the keystroke belongs to the candidate list:
+      // Enter commits it, Escape dismisses it, Ctrl+Enter must not submit.
+      if (isComposingEvent(event)) return null
       const mod = event.ctrlKey || event.metaKey
       const key = typeof event.key === 'string' ? event.key : ''
       if (!mod) return event.key === 'Escape' ? { action: 'close' } : null
@@ -5693,13 +5759,16 @@ function findFigurePlaceholders(source) {
     }
 
     function NoteLightbox({ image, onClose }) {
+      const onCloseRef = useRef(onClose)
+      onCloseRef.current = onClose
       useEffect(() => {
         const onKey = (event) => {
-          if (event.key === 'Escape') onClose?.()
+          // Escape may dismiss an IME candidate list instead of the lightbox.
+          if (event.key === 'Escape' && !isComposingEvent(event)) onCloseRef.current?.()
         }
         window.addEventListener('keydown', onKey)
         return () => window.removeEventListener('keydown', onKey)
-      }, [onClose])
+      }, [])
       if (!image) return null
       return h(
         'div',
@@ -5919,7 +5988,7 @@ function findFigurePlaceholders(source) {
               placeholder: t('noteAnnPlaceholder'),
               onChange: (event) => setNote(event.target.value),
               onKeyDown: (event) => {
-                if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                if (isActionableEnter(event, { modifiers: true })) {
                   event.preventDefault()
                   submit()
                 }
@@ -6188,7 +6257,7 @@ function findFigurePlaceholders(source) {
           disabled: running || disabled,
           onChange: (event) => onInstruction(event.target.value),
           onKeyDown: (event) => {
-            if (event.key === 'Enter' && !running) {
+            if (isActionableEnter(event) && !running) {
               event.preventDefault()
               onApply?.()
             }
@@ -6531,7 +6600,7 @@ function findFigurePlaceholders(source) {
               placeholder: t('noteQuestionAnswerPlaceholder'),
               onChange: (event) => setAnswer(event.target.value),
               onKeyDown: (event) => {
-                if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                if (isActionableEnter(event, { modifiers: true })) {
                   event.preventDefault()
                   answerQuestion(false)
                 }
@@ -11124,7 +11193,7 @@ function findFigurePlaceholders(source) {
       }
 
       function onComposerKeyDown(event) {
-        if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent?.isComposing) {
+        if (isActionableEnter(event) && !event.shiftKey) {
           event.preventDefault()
           if (!sending) sendQuestion(question)
         }
