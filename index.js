@@ -3,6 +3,9 @@ import { appendFile, copyFile, link, mkdir, open, readFile, readdir, rename, rm,
 import path from 'node:path'
 import { createHash, randomUUID } from 'node:crypto'
 import { LiteratureAI } from './lib/ai.js'
+import { Catalog } from './lib/catalog.js'
+import { createLiteratureReviewSource } from './lib/review-source.js'
+import { createManagementApi } from './lib/management-api.js'
 import {
   buildFullText,
   ensurePageImage,
@@ -579,6 +582,23 @@ export function apply(ctx, rawConfig = {}) {
   // later, so they cannot live in the request scope.
   const pendingImages = new Map()
   const ready = ensureBaseDirs(dirs)
+  const catalog = new Catalog({
+    dataDir: dirs.dataDir,
+    getVault: getVaultInfo,
+    listPapers: listMetaRecords,
+    updatePaper: async (id, values) => {
+      const meta = await loadMeta(id)
+      const fields = ['title', 'tags', 'authors', 'year', 'venue', 'doi']
+      const manual = fields.filter((field) => Object.hasOwn(values, field))
+      meta.catalogManualFields = [...new Set([...(meta.catalogManualFields || []), ...manual])]
+      for (const key of [...fields, 'vaultPath', 'fileName', 'vaultExists', 'summaryPath', 'readerNotePath', 'readerNoteRelative']) {
+        if (Object.hasOwn(values, key)) meta[key] = values[key]
+      }
+      await saveMeta(meta)
+    },
+  })
+  const reviewSource = createLiteratureReviewSource(catalog)
+  const managementApi = createManagementApi({ catalog, readBody: readJsonBody, json })
   // Load the saved model preference once the data directory exists. Calls that
   // arrive before it settles simply use the deployment config.
   const preferenceReady = ready
@@ -1307,14 +1327,17 @@ export function apply(ctx, rawConfig = {}) {
       memo = result.memo
       if (!memo.trim()) throw new Error('AI 没有返回有效的阅读备忘')
       await writeFileAtomic(analysisPath, `${memo.trim()}\n`)
-      meta.title = result.metadata.title || meta.title
-      meta.authors = result.metadata.authors?.length ? result.metadata.authors : meta.authors || []
-      meta.year = result.metadata.year || meta.year || null
-      meta.venue = result.metadata.venue || meta.venue || ''
-      meta.doi = result.metadata.doi || meta.doi || ''
+      meta.extractedMetadata = result.metadata
+      meta.originalTitle = result.metadata.title || meta.originalTitle || meta.title
+      const manual = new Set(meta.catalogManualFields || [])
+      if (!manual.has('title')) meta.title = result.metadata.title || meta.title
+      if (!manual.has('authors')) meta.authors = result.metadata.authors?.length ? result.metadata.authors : meta.authors || []
+      if (!manual.has('year')) meta.year = result.metadata.year || meta.year || null
+      if (!manual.has('venue')) meta.venue = result.metadata.venue || meta.venue || ''
+      if (!manual.has('doi')) meta.doi = result.metadata.doi || meta.doi || ''
       meta.abstract = result.metadata.abstract || meta.abstract || ''
       meta.keywords = result.metadata.keywords?.length ? result.metadata.keywords : meta.keywords || []
-      meta.tags = mergeTags(meta.tags, result.metadata.tags, result.metadata.keywords)
+      if (!manual.has('tags')) meta.tags = mergeTags(meta.tags, result.metadata.tags, result.metadata.keywords)
       meta.tldr = result.tldr
     } else {
       meta.analysisReady = true
@@ -1407,10 +1430,17 @@ export function apply(ctx, rawConfig = {}) {
     await ready
     const entries = await readdir(dirs.papersDir, { withFileTypes: true }).catch(() => [])
     const records = []
-    for (const entry of entries) {
-      if (!entry.isDirectory() || !PAPER_ID_RE.test(entry.name)) continue
-      const meta = await readJson(path.join(dirs.papersDir, entry.name, 'meta.json'))
-      if (meta?.id) records.push(meta)
+    const papers = entries.filter((entry) => entry.isDirectory() && PAPER_ID_RE.test(entry.name))
+    for (let offset = 0; offset < papers.length; offset += 8) {
+      const results = await Promise.allSettled(
+        papers.slice(offset, offset + 8).map((entry) =>
+          readJson(path.join(dirs.papersDir, entry.name, 'meta.json')),
+        ),
+      )
+      for (const result of results) {
+        if (result.status === 'rejected') throw result.reason
+        if (result.value?.id) records.push(result.value)
+      }
     }
     records.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))
     return records
@@ -1434,31 +1464,10 @@ export function apply(ctx, rawConfig = {}) {
     const scan = await scanVault(vault.path, { refresh })
     const records = await listMetaRecords()
     const byVault = new Map(records.filter((meta) => meta.vaultPath).map((meta) => [meta.vaultPath, meta]))
-    const byNameSize = new Map()
-    for (const meta of records) {
-      if (!meta.fileName || !meta.fileSize) continue
-      const key = `${meta.fileName}\u0000${meta.fileSize}`
-      const previous = byNameSize.get(key)
-      if (!previous || String(meta.updatedAt) > String(previous.updatedAt)) byNameSize.set(key, meta)
-    }
     const matched = new Set()
     const pdfs = []
     for (const pdf of scan.pdfs) {
-      let record = byVault.get(pdf.rel)
-      if (!record) {
-        record = byNameSize.get(`${pdf.fileName}\u0000${pdf.size}`)
-        if (record && !record.vaultPath) {
-          record.vaultPath = pdf.rel
-          record.sourceAsset = ''
-          record.vaultExists = true
-          await saveMeta(record).catch(() => {})
-        }
-      }
-      if (record && record.vaultPath !== pdf.rel) {
-        record.vaultPath = pdf.rel
-        record.vaultExists = true
-        await saveMeta(record).catch(() => {})
-      }
+      const record = byVault.get(pdf.rel)
       if (record) matched.add(record.id)
       const title =
         (pdf.noteExplicitTitle && pdf.noteTitle && pdf.noteTitle.trim()) ||
@@ -1539,8 +1548,7 @@ export function apply(ctx, rawConfig = {}) {
     if (!info?.isFile()) throw new HttpError(404, 'PDF 不存在')
     const sha256 = await sha256File(abs)
     let records = await listMetaRecords()
-    let record = records.find((meta) => meta.vaultPath === normalized) ||
-      records.find((meta) => meta.sha256 === sha256)
+    let record = records.find((meta) => meta.vaultPath === normalized)
     if (record) {
       if (record.vaultPath !== normalized) {
         record.vaultPath = normalized
@@ -4147,6 +4155,19 @@ export function apply(ctx, rawConfig = {}) {
       })
     if (segments[0] !== 'api') throw new HttpError(404, 'Not found')
     const method = req.method || 'GET'
+    if (segments.length === 2 && segments[1] === 'review-source') {
+      const site = req.headers['sec-fetch-site']
+      const expectedOrigin = `${req.socket?.encrypted ? 'https' : 'http'}://${req.headers.host}`
+      if (['cross-site', 'same-site'].includes(site) || req.headers.origin && req.headers.origin !== expectedOrigin) throw new HttpError(403, '拒绝跨站请求')
+      if (method !== 'GET') throw new HttpError(405, '仅支持 GET')
+      try { json(res, 200, { ok: true, ...await reviewSource(url) }) }
+      catch (error) { throw new HttpError(error.status || 500, error.message) }
+      return
+    }
+    if (segments[1] === 'vault') {
+      await ready
+      if (await managementApi(req, res, url, segments)) return
+    }
     if (segments.length === 2 && segments[1] === 'health' && method === 'GET') {
       await preferenceReady
       const popplerDir = await resolvePoppler(config).catch(() => undefined)

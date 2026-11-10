@@ -107,6 +107,8 @@ function loadClientModule(source) {
   let definition
   const sandbox = {
     window: {
+      addEventListener() {},
+      removeEventListener() {},
       __ModuleLoader__: {
         load(value) {
           definition = value

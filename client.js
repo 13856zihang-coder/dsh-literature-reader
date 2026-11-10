@@ -1,6 +1,52 @@
 window.__ModuleLoader__.load({
   id: '@local/literature-reader',
   factory(require) {
+    function installReviewNavigation(ctx, provider, prefix) {
+      let dialog = null, controller = null, closed = false
+      const close = () => { if (dialog) { dialog.close(); dialog.remove(); dialog = null } }
+      const receive = async event => {
+        const request = event.detail
+        if (!request || request.version !== 1 || request.provider !== provider || typeof request.requestId !== 'string'
+          || !/^[\w-]{1,100}$/.test(request.requestId) || typeof request.entityId !== 'string' || request.entityId.length > 160
+          || typeof request.scopeId !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(request.date)) return
+        controller?.abort(); controller = new AbortController()
+        const current = controller
+        const reply = (status, message) => window.dispatchEvent(new CustomEvent('dsh-review:located', { detail: { version: 1, requestId: request.requestId, provider, status, message } }))
+        try {
+          const query = new URLSearchParams({ from: request.date, to: request.date })
+          if (typeof request.referenceQuery === 'string' && request.referenceQuery.length <= 200) { query.set('mode', 'references'); query.set('query', request.referenceQuery) }
+          let record = null, snapshot = null, cursor = null
+          do {
+            if (snapshot) { query.set('snapshot', snapshot); query.set('cursor', cursor) }
+            const response = await fetch(`${prefix}/api/review-source?${query}`, { signal: current.signal })
+            if (!response.ok) throw new Error('来源记录暂不可读取')
+            const page = await response.json()
+            if (page.schema !== 1 || page.provider !== provider || page.scopeId !== request.scopeId) throw new Error('来源作用域已改变')
+            record = page.records.find(row => row.entityId === request.entityId || row.locator.entityId === request.entityId)
+            snapshot = page.snapshot; cursor = page.pagination.nextCursor
+          } while (!record && cursor)
+          if (closed || current.signal.aborted) return
+          if (!record) { reply('missing', '原记录已删除、日期改变或不再属于此范围；仍可查看回顾保全证据'); return }
+          ctx.layout?.selectPanel?.(provider === 'literature' ? 'literature-reader' : provider)
+          close()
+          const previous = document.activeElement
+          dialog = document.createElement('dialog')
+          dialog.dataset.reviewEntity = record.entityId
+          dialog.setAttribute('aria-label', '已定位原记录')
+          dialog.style.cssText = 'max-width:650px;width:90vw;max-height:85vh;overflow:auto;border:2px solid #718563;border-radius:10px;padding:26px;background:var(--dsw-alias-bg-layer-1,#fff);color:var(--dsw-alias-label-primary,#252a22);font:14px/1.7 system-ui'
+          const heading = document.createElement('h2'); heading.textContent = record.title
+          const caption = document.createElement('p'); caption.textContent = `${record.date} · 原插件当前记录 · 只读定位`
+          const content = document.createElement('pre'); content.textContent = JSON.stringify(record.facts, null, 2); content.style.cssText = 'white-space:pre-wrap;overflow-wrap:anywhere'
+          const done = document.createElement('button'); done.type = 'button'; done.textContent = '关闭原记录'; done.onclick = () => { close(); previous?.focus?.() }
+          dialog.addEventListener('cancel', () => { close(); previous?.focus?.() })
+          dialog.append(heading, caption, content, done); document.body.append(dialog); dialog.showModal(); done.focus()
+          reply('located', '已在来源插件中定位并显示当前记录')
+        } catch (error) { if (!current.signal.aborted && !closed) reply('unavailable', error.message) }
+      }
+      window.addEventListener('dsh-review:locate', receive)
+      return () => { closed = true; controller?.abort(); close(); window.removeEventListener('dsh-review:locate', receive) }
+    }
+
     const React = require('react')
     const h = React.createElement
     const { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } = React
@@ -3145,31 +3191,33 @@ function findFigurePlaceholders(source) {
         }
       }, [data, activeFolder])
 
-      const pdfs = data?.pdfs || []
-      const notes = data?.notes || []
+      const pdfs = data?.pdfs || EMPTY
+      const notes = data?.notes || EMPTY
       const folders = data?.folders || []
       const query = search.trim().toLowerCase()
-      const belongs = (folder) => {
-        if (!activeFolder) return true
-        if (includeChildren) {
-          return folder === activeFolder || folder.startsWith(`${activeFolder}/`)
+      const { visiblePdfs, visibleNotes, standaloneNotes } = useMemo(() => {
+        const belongs = (folder) => {
+          if (!activeFolder) return true
+          if (includeChildren) {
+            return folder === activeFolder || folder.startsWith(`${activeFolder}/`)
+          }
+          return folder === activeFolder
         }
-        return folder === activeFolder
-      }
-      const matches = (item) => {
-        if (query) {
-          const haystack = [item.title, item.fileName, item.folder, ...(item.tags || [])]
-            .join(' ')
-            .toLowerCase()
-          if (!haystack.includes(query)) return false
+        const matches = (item) => {
+          if (query) {
+            const haystack = [item.title, item.fileName, item.folder, ...(item.tags || [])]
+              .join(' ')
+              .toLowerCase()
+            if (!haystack.includes(query)) return false
+          }
+          return belongs(item.folder || '')
         }
-        return belongs(item.folder || '')
-      }
-      const visiblePdfs = pdfs.filter(matches)
-      const visibleNotes = notes.filter(matches)
-      // 「笔记」tab: standalone notes only by default; the toggle restores the
-      // flat list of everything (spec §14.8).
-      const standaloneNotes = visibleNotes.filter(isStandaloneNote)
+        const visiblePdfs = pdfs.filter(matches)
+        const visibleNotes = notes.filter(matches)
+        // 「笔记」tab: standalone notes only by default; the toggle restores the
+        // flat list of everything (spec §14.8).
+        return { visiblePdfs, visibleNotes, standaloneNotes: visibleNotes.filter(isStandaloneNote) }
+      }, [pdfs, notes, activeFolder, includeChildren, query])
       const listedNotes = showAllNotes ? visibleNotes : standaloneNotes
       const folderLabel = activeFolder || t('allItems')
 
@@ -13770,6 +13818,7 @@ html:fullscreen [data-shell-leading]{display:none!important}
     return {
       inject: ['slots', 'locale', 'layout'],
       apply(ctx) {
+      ctx.effect(() => installReviewNavigation(ctx, 'literature', '/literature-reader'), 'review: source navigation')
         layoutService = ctx.layout
         ctx.effect(
           () =>
