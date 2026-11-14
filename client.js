@@ -64,6 +64,7 @@ window.__ModuleLoader__.load({
     const NS = 'literature-reader'
     const API = '/literature-reader/api'
     const LAST_KEY = 'dsh.literature.lastPaper.v1'
+    const PAGE_KEY = 'dsh.literature.lastPage.v1'
     const EMPTY = []
     const ZOOM_MIN = 40
     const ZOOM_MAX = 300
@@ -108,6 +109,12 @@ window.__ModuleLoader__.load({
       folderName: '文件夹名',
       create: '创建',
       libraryLoading: '正在扫描 Obsidian 库…',
+      vaultUnavailableTitle: '未连接 Obsidian',
+      vaultUnavailableDesc: '当前仍可导入 PDF、阅读和提问；配置 Obsidian vault 后，文件与笔记才会同步回库。',
+      vaultUnavailablePath: '未连接（本地阅读模式）',
+      vaultUnavailableRetry: '重新检测',
+      vaultDownload: '下载 Obsidian',
+      localMode: '本地模式',
       noSearchResults: '没有匹配的文献',
       statusUnread: '未阅读',
       statusProcessing: '处理中',
@@ -609,6 +616,12 @@ window.__ModuleLoader__.load({
       folderName: 'Folder name',
       create: 'Create',
       libraryLoading: 'Scanning the Obsidian vault…',
+      vaultUnavailableTitle: 'Obsidian is not connected',
+      vaultUnavailableDesc: 'You can still import PDFs, read, and ask questions. Configure an Obsidian vault when you want files and notes synced back.',
+      vaultUnavailablePath: 'Not connected (local reading mode)',
+      vaultUnavailableRetry: 'Detect again',
+      vaultDownload: 'Download Obsidian',
+      localMode: 'Local mode',
       noSearchResults: 'No matching literature',
       statusUnread: 'Unread',
       statusProcessing: 'Processing',
@@ -2079,6 +2092,10 @@ function findFigurePlaceholders(source) {
         // ignore storage failures
       }
       return fallback
+    }
+
+    function pageStorageKey(paperId) {
+      return `${PAGE_KEY}.${paperId}`
     }
 
     function safeError(error) {
@@ -3637,11 +3654,12 @@ function findFigurePlaceholders(source) {
 
       const deleteItem = deleteTarget?.item || deleteTarget
       const deleteRelatedNotes = deleteTarget?.kind === 'pdf' ? relatedNotesOf(deleteItem) : []
-      const deleteBackupPath = `${dataDir || 'D:\\DSH-Literature'}\\backups`
+      const deleteBackupPath = `${dataDir || '插件缓存'}\\backups`
       const deleteFolderStats =
         deleteTarget?.kind === 'folder'
           ? { pdfs: deleteTarget.pdfCount || 0, notes: deleteTarget.noteCount || 0 }
           : null
+      const vaultAvailable = data?.available !== false && Boolean(data?.vault?.path)
 
       return h(
         'div',
@@ -3666,7 +3684,7 @@ function findFigurePlaceholders(source) {
               h(
                 'div',
                 { className: 'lr-library-path' },
-                data?.vault?.path || 'D:\\note',
+                data?.vault?.path || t('vaultUnavailablePath'),
                 data
                   ? [
                       h(
@@ -3713,6 +3731,7 @@ function findFigurePlaceholders(source) {
                   setFolderName('')
                   setFolderError('')
                 },
+                disabled: !vaultAvailable || busy,
                 title: t('newFolder'),
               },
               h(Icon, { name: 'plus', size: 14 }),
@@ -3755,6 +3774,40 @@ function findFigurePlaceholders(source) {
                 'button',
                 { type: 'button', className: 'lr-error-close', onClick: () => setLocalError('') },
                 h(Icon, { name: 'close', size: 12 }),
+              ),
+            )
+          : null,
+        !loading && !vaultAvailable
+          ? h(
+              'div',
+              { className: 'lr-vault-unavailable', role: 'status' },
+              h('div', { className: 'lr-vault-unavailable-title' }, t('vaultUnavailableTitle')),
+              h('div', { className: 'lr-vault-unavailable-desc' }, data?.reason || t('vaultUnavailableDesc')),
+              h(
+                'div',
+                { className: 'lr-vault-unavailable-actions' },
+                h(
+                  'button',
+                  { type: 'button', className: 'lr-btn', onClick: () => onRefresh(true) },
+                  h(Icon, { name: 'refresh', size: 13 }),
+                  t('vaultUnavailableRetry'),
+                ),
+                h(
+                  'button',
+                  { type: 'button', className: 'lr-btn primary', onClick: () => onImport('') },
+                  h(Icon, { name: 'upload', size: 13 }),
+                  t('emptyImport'),
+                ),
+                h(
+                  'a',
+                  {
+                    className: 'lr-btn',
+                    href: 'https://obsidian.md/download',
+                    target: '_blank',
+                    rel: 'noreferrer',
+                  },
+                  t('vaultDownload'),
+                ),
               ),
             )
           : null,
@@ -9434,6 +9487,17 @@ function findFigurePlaceholders(source) {
         currentPageRef.current = currentPage
       }, [currentPage])
 
+      // Keep a small resume cursor per paper. This is local UI state and does
+      // not change the PDF, vault files, or the paper record.
+      useEffect(() => {
+        if (!paper?.id) return
+        try {
+          localStorage.setItem(pageStorageKey(paper.id), String(currentPage))
+        } catch {
+          // storage can be unavailable
+        }
+      }, [paper?.id, currentPage])
+
       useEffect(() => {
         zoomRef.current = zoom
       }, [zoom])
@@ -9576,8 +9640,15 @@ function findFigurePlaceholders(source) {
           upsertPaper(nextPaper)
           setMessages(chatResult.messages || [])
           setAnnotations(annotationResult.strokes || [])
-          setRangeStart(1)
-          setRangeEnd(Math.min(nextPaper.pageCount || 1, 5))
+          const resumePage = storedNumber(
+            pageStorageKey(nextPaper.id),
+            1,
+            1,
+            Math.max(1, nextPaper.pageCount || 1),
+          )
+          setCurrentPage(resumePage)
+          setRangeStart(resumePage)
+          setRangeEnd(Math.min(nextPaper.pageCount || 1, Math.max(5, resumePage)))
           localStorage.setItem(LAST_KEY, id)
           lastPaperId.current = id
           if (nextPaper.status === 'processing') startOutlineLater(nextPaper)
@@ -12242,6 +12313,9 @@ function findFigurePlaceholders(source) {
                     ),
                     paper.year ? h('span', { className: 'lr-meta-chip' }, String(paper.year)) : null,
                     h('span', { className: 'lr-meta-chip' }, pageCountLabel(paper)),
+                    paper.storageMode === 'local'
+                      ? h('span', { className: 'lr-meta-chip warm' }, t('localMode'))
+                      : null,
                   ),
                 )
               : h('div', { className: 'lr-title-block' }, h('div', { className: 'lr-title' }, t('panel'))),
@@ -13435,6 +13509,10 @@ html:fullscreen [data-shell-leading]{display:none!important}
 .lr-library-search{height:36px;border-radius:10px;border-color:var(--lr-line);background:color-mix(in srgb,var(--dsw-alias-bg-base) 80%,transparent)}
 .lr-library-search:focus-within{border-color:color-mix(in srgb,var(--lr-accent) 45%,var(--lr-line));box-shadow:0 0 0 3px color-mix(in srgb,var(--lr-accent) 7%,transparent)}
 .lr-library-breadcrumb{margin-top:14px}
+.lr-vault-unavailable{margin:16px 20px 0;padding:20px 22px;border:1px dashed color-mix(in srgb,var(--lr-warm) 46%,var(--lr-line));border-radius:14px;background:color-mix(in srgb,var(--lr-warm) 7%,var(--dsw-alias-bg-base));color:var(--lr-ink)}
+.lr-vault-unavailable-title{font-size:15px;font-weight:650}
+.lr-vault-unavailable-desc{max-width:720px;margin-top:6px;color:var(--lr-muted);font-size:11.5px;line-height:1.6}
+.lr-vault-unavailable-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .lr-pdf-grid{gap:14px;margin-top:16px}
 .lr-pdf-card{position:relative;border-radius:15px;padding:14px;background:color-mix(in srgb,var(--dsw-alias-bg-base) 92%,transparent);border-color:var(--lr-line);box-shadow:0 1px 2px color-mix(in srgb,var(--dsw-alias-label-primary) 4%,transparent);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
 .lr-pdf-card:hover{transform:translateY(-2px);box-shadow:var(--lr-shadow);border-color:color-mix(in srgb,var(--lr-accent) 28%,var(--lr-line))}

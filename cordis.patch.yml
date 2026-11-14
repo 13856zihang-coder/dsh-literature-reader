@@ -2,8 +2,10 @@
     - id: literature-reader
       name: '@local/literature-reader'
       config:
-        dataDir: 'D:/DSH-Literature'
-        obsidianVault: 'D:/note'
+        # 留空：缓存使用系统 Documents/DSH-Literature；vault 自动从 Obsidian
+        # 注册表发现，也可以在这里填入你自己的 vault 绝对路径。
+        dataDir: ''
+        obsidianVault: ''
         notesFolder: '文献阅读'
         wordNote: '英文单词'
         autoOpenObsidian: true
