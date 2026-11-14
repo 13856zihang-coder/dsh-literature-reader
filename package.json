@@ -1,10 +1,14 @@
 {
   "name": "@local/literature-reader",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "build:math": "node scripts/build-math.mjs"
+  },
+  "devDependencies": {
+    "katex": "0.16.25"
   },
   "description": "AI literature reader for DSH: read PDFs, translate or explain selections, archive vocabulary to Obsidian, annotate, and generate study notes.",
   "exports": {
@@ -20,6 +24,7 @@
     "cordis.patch.yml",
     "locale/*.json",
     "icon.svg",
+    "vendor/katex-LICENSE",
     "README.md"
   ],
   "dsh": {
